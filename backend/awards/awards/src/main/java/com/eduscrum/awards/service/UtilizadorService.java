@@ -1,0 +1,78 @@
+package com.eduscrum.awards.service;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.eduscrum.awards.model.Aluno;
+import com.eduscrum.awards.model.PapelSistema;
+import com.eduscrum.awards.model.Professor;
+import com.eduscrum.awards.model.Utilizador;
+import com.eduscrum.awards.repository.AlunoRepository;
+import com.eduscrum.awards.repository.ProfessorRepository;
+import com.eduscrum.awards.repository.UtilizadorRepository;
+
+@Service
+public class UtilizadorService {
+
+    @Autowired private UtilizadorRepository utilizadorRepository;
+    @Autowired private AlunoRepository alunoRepository;
+    @Autowired private ProfessorRepository professorRepository;
+    @Autowired private PasswordEncoder passwordEncoder;
+
+    public List<Utilizador> listarTodos() {
+        return utilizadorRepository.findAll();
+    }
+
+    public Optional<Utilizador> procurarPorEmail(String email) {
+        return utilizadorRepository.findByEmail(email);
+    }
+
+    @Transactional
+    public Utilizador criarUtilizador(String nome, String email, String password, PapelSistema papelSistema) {
+
+        // validação do email
+        if (utilizadorRepository.findByEmail(email).isPresent()) {
+            throw new IllegalArgumentException("Email já registado: " + email);
+        }
+
+        // gerar hash seguro da password
+        String hashedPassword = passwordEncoder.encode(password);
+
+        // guardar diretamente a subclasse quando aplicável
+        switch (papelSistema) {
+            case ALUNO -> {
+                Aluno a = new Aluno();
+                a.setNome(nome);
+                a.setEmail(email);
+                a.setPasswordHash(hashedPassword);
+                a.setPapelSistema(PapelSistema.ALUNO);
+                return alunoRepository.save(a);
+            }
+            case PROFESSOR -> {
+                Professor p = new Professor();
+                p.setNome(nome);
+                p.setEmail(email);
+                p.setPasswordHash(hashedPassword);
+                p.setPapelSistema(PapelSistema.PROFESSOR);
+                return professorRepository.save(p);
+            }
+            default -> {
+                Utilizador u = new Utilizador();
+                u.setNome(nome);
+                u.setEmail(email);
+                u.setPasswordHash(hashedPassword);
+                u.setPapelSistema(papelSistema);
+                return utilizadorRepository.save(u);
+            }
+        }
+    }
+
+    public void eliminarUtilizador(Long id) {
+        utilizadorRepository.deleteById(id);
+    }
+}
