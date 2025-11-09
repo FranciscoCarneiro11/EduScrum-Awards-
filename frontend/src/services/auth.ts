@@ -35,7 +35,7 @@ export async function registerUser(data: RegisterPayload) {
   const res = await api.post<AuthResponse>("/api/auth/register", {
     nome: data.nome,
     email: data.email,
-    password: data.password,   // ✅ nome certo, o backend espera 'password'
+    password: data.password,  
     papelSistema: data.papelSistema.toUpperCase(), // garante que é ALUNO/PROFESSOR
   })
   return res.data
@@ -46,7 +46,6 @@ export async function registerUser(data: RegisterPayload) {
 export function saveSession(response: AuthResponse) {
   localStorage.setItem("auth_token", response.token)
   
-  // ✅ Guarda só os dados do user (sem o token)
   const user: User = {
     nome: response.nome,
     email: response.email,
@@ -57,10 +56,10 @@ export function saveSession(response: AuthResponse) {
 
 export function clearSession() {
   localStorage.removeItem("auth_token")
-  localStorage.removeItem("user")  // ✅ Alterado de 'auth_user'
+  localStorage.removeItem("user")  
 }
 
 export function getCurrentUser(): User | null {
-  const raw = localStorage.getItem("user")  // ✅ Alterado de 'auth_user'
+  const raw = localStorage.getItem("user") 
   return raw ? (JSON.parse(raw) as User) : null
 }

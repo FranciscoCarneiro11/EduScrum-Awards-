@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "utilizador")  
 @Inheritance(strategy = InheritanceType.JOINED)
-@Data
+@Getter  // Mantém os getters do Lombok
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -30,4 +30,21 @@ public class Utilizador {
     private PapelSistema papelSistema;
 
     private LocalDateTime criadoEm = LocalDateTime.now();
+
+    // Setters manuais
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
+    public void setPapelSistema(PapelSistema papelSistema) {
+        this.papelSistema = papelSistema;
+    }
 }

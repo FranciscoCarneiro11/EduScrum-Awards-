@@ -13,7 +13,6 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | null>(null)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  // 🔒 Corrigido: inicializa de forma segura
   const [user, setUser] = useState<User | null>(() => {
     try {
       const stored = localStorage.getItem("user")

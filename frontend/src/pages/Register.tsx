@@ -36,7 +36,7 @@ export default function Register() {
       const response = await registerUser({
         nome,
         email,
-        password, // <-- enviar 'password' (o backend espera este campo)
+        password, 
         papelSistema,
       })
 

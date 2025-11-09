@@ -7,15 +7,20 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.Getter;
 
 
 @Entity
 @Table(name = "professor")
 @PrimaryKeyJoinColumn(name = "id") 
-@Data
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class Professor extends Utilizador {
     private String departamento;
+
+    public void setDepartamento(String departamento) {
+        this.departamento = departamento;
+    }
 }

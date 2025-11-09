@@ -7,15 +7,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.Getter;
 
 @Entity
 @Table(name = "aluno")
 @PrimaryKeyJoinColumn(name = "id") 
-@Data
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class Aluno extends Utilizador {
     private int totalPontos = 0;
-}
 
+    public void setTotalPontos(int totalPontos) {
+        this.totalPontos = totalPontos;
+    }
+}

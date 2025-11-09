@@ -46,13 +46,12 @@ public class SecurityConfig {
             .cors(cors -> {}) // usa o bean corsConfigurationSource()
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // PERMITE explicitamente estes endpoints
+                // permite explicitamente estes endpoints
                 .requestMatchers("/api/auth/**", "/api/utilizadores/**").permitAll()
                 // permite também OPTIONS (pré-flight CORS)
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .anyRequest().authenticated()
             )
-            // ⚠️ ADICIONA ESTA LINHA AQUI
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

@@ -19,10 +19,23 @@ import com.eduscrum.awards.repository.UtilizadorRepository;
 @Service
 public class UtilizadorService {
 
-    @Autowired private UtilizadorRepository utilizadorRepository;
-    @Autowired private AlunoRepository alunoRepository;
-    @Autowired private ProfessorRepository professorRepository;
-    @Autowired private PasswordEncoder passwordEncoder;
+    private final UtilizadorRepository utilizadorRepository;
+    private final AlunoRepository alunoRepository;
+    private final ProfessorRepository professorRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    @Autowired
+    public UtilizadorService(
+            UtilizadorRepository utilizadorRepository,
+            AlunoRepository alunoRepository,
+            ProfessorRepository professorRepository,
+            PasswordEncoder passwordEncoder) {
+        this.utilizadorRepository = utilizadorRepository;
+        this.alunoRepository = alunoRepository;
+        this.professorRepository = professorRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
 
     public List<Utilizador> listarTodos() {
         return utilizadorRepository.findAll();
