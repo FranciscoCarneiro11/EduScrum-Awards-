@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Link } from "react-router-dom"
 
 export default function Login() {
-  const { signIn } = useAuth()
+  const { login } = useAuth()
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({ email: "", password: "" })
@@ -19,13 +19,14 @@ export default function Login() {
     e.preventDefault()
     setError("")
     try {
-      await signIn(formData.email, formData.password)
-      navigate("/") // redirecionar após sucesso
+      await login(formData.email, formData.password)
+      navigate("/") // Redireciona para a Home após login
     } catch (err: any) {
       console.error(err)
       setError("Email ou password incorretos.")
     }
   }
+
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100">

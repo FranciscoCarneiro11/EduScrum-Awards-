@@ -1,8 +1,25 @@
-function App() {
+import { Outlet, useLocation } from "react-router-dom"
+import Navbar from "@/components/Navbar"
+import Footer from "@/components/Footer"
+
+export default function App() {
+  const location = useLocation()
+
+  // Páginas onde não queremos mostrar Navbar e Footer
+  const hideLayout = ["/login", "/register"].includes(location.pathname)
+
   return (
-    <main className="p-10 text-3xl text-green-400">
-      Tailwind a funcionar 
-    </main>
-  );
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-indigo-50 via-white to-violet-50">
+      {/* Navbar fixa no topo (não aparece em login/registo) */}
+      {!hideLayout && <Navbar />}
+
+      {/* Conteúdo principal */}
+      <main className={`flex-grow ${hideLayout ? "" : "pt-20 pb-10"}`}>
+        <Outlet />
+      </main>
+
+      {/* Footer (não aparece em login/registo) */}
+      {!hideLayout && <Footer />}
+    </div>
+  )
 }
-export default App;
