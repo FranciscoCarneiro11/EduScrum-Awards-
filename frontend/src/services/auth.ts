@@ -12,7 +12,7 @@ type LoginPayload = { email: string; password: string }
 type RegisterPayload = {
   nome: string
   email: string
-  password: string  // ✅ Alterado de 'password' para 'passwordHash'
+  password: string
   papelSistema: "ALUNO" | "PROFESSOR"
 }
 
@@ -35,12 +35,17 @@ export async function registerUser(data: RegisterPayload) {
   const res = await api.post<AuthResponse>("/api/auth/register", {
     nome: data.nome,
     email: data.email,
-    password: data.password,  
-    papelSistema: data.papelSistema.toUpperCase(), // garante que é ALUNO/PROFESSOR
+    password: data.password,
+    papelSistema: data.papelSistema.toUpperCase(),
   })
   return res.data
 }
 
+// Obter utilizador autenticado do backend
+export async function fetchCurrentUser(): Promise<User> {
+  const res = await api.get<User>("/api/utilizadores/me")
+  return res.data
+}
 
 // GESTÃO DE SESSÃO LOCAL
 export function saveSession(response: AuthResponse) {
@@ -56,10 +61,10 @@ export function saveSession(response: AuthResponse) {
 
 export function clearSession() {
   localStorage.removeItem("auth_token")
-  localStorage.removeItem("user")  
+  localStorage.removeItem("user")
 }
 
 export function getCurrentUser(): User | null {
-  const raw = localStorage.getItem("user") 
+  const raw = localStorage.getItem("user")
   return raw ? (JSON.parse(raw) as User) : null
 }
