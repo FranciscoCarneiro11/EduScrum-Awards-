@@ -5,4 +5,8 @@
 
 body {
   @apply bg-gradient-to-b from-indigo-50 via-white to-violet-50 text-gray-800;
+<<<<<<< HEAD
 }/* chore: no-op commit */
+=======
+}
+>>>>>>> ef65f70 (WIP: trabalho local)
