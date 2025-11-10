@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 
 import com.eduscrum.awards.model.Utilizador;
 import com.eduscrum.awards.model.UtilizadorDTO;
@@ -23,6 +25,29 @@ public class UtilizadorController {
 
     @Autowired
     private UtilizadorService utilizadorService;
+
+    //Obter utilizador logado
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser(Authentication authentication) {
+        // Verifica se o utilizador está autenticado
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).body("Utilizador não autenticado");
+        }
+
+        String email = authentication.getName();
+
+        Utilizador user = utilizadorService.procurarPorEmail(email)
+            .orElseThrow(() -> new RuntimeException("Utilizador não encontrado"));
+
+        UtilizadorDTO userDTO = new UtilizadorDTO(
+            user.getNome(),
+            user.getEmail(),
+            null, 
+            user.getPapelSistema()
+        );
+
+        return ResponseEntity.ok(userDTO);
+    }
 
     // Endpoint para listar todos os utilizadores
     @GetMapping

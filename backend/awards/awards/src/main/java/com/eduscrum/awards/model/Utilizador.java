@@ -31,6 +31,33 @@ public class Utilizador {
 
     private LocalDateTime criadoEm = LocalDateTime.now();
 
+    // Getters manuais
+    // ========== GETTERS MANUAIS ==========
+    public Long getId() {
+        return id;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public PapelSistema getPapelSistema() {
+        return papelSistema;
+    }
+
+    public LocalDateTime getCriadoEm() {
+        return criadoEm;
+    }
+
+
     // Setters manuais
     public void setNome(String nome) {
         this.nome = nome;
