@@ -23,7 +23,3 @@ export default function App() {
     </div>
   )
 }
-<<<<<<< HEAD
-// chore: no-op commit
-=======
->>>>>>> ef65f70 (WIP: trabalho local)

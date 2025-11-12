@@ -48,8 +48,4 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       </BrowserRouter>
     </AuthProvider>
   </React.StrictMode>
-<<<<<<< HEAD
-)// chore: no-op commit
-=======
 )
->>>>>>> ef65f70 (WIP: trabalho local)
