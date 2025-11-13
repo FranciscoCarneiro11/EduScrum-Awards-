@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.eduscrum.awards.model.Curso;
 import com.eduscrum.awards.model.CursoDTO;
+import com.eduscrum.awards.model.CursoResponseDTO;
 import com.eduscrum.awards.service.CursoService;
 
 @RestController
@@ -18,12 +19,21 @@ public class CursoController {
     @Autowired
     private CursoService cursoService;
 
-    // Listar todos os cursos
+   // Listar todos os cursos
     @GetMapping
-    public ResponseEntity<List<Curso>> listarCursos() {
-        List<Curso> cursos = cursoService.listarCursos();
+    public ResponseEntity<List<CursoResponseDTO>> listarCursos() {
+        List<CursoResponseDTO> cursos = cursoService.listarCursos().stream()
+            .map(c -> new CursoResponseDTO(
+                c.getId(),
+                c.getNome(),
+                c.getCodigo(),
+                c.getAdmin().getId()
+            ))
+            .toList();
+
         return ResponseEntity.ok(cursos);
     }
+
 
     // Obter curso por ID
     @GetMapping("/{id}")
