@@ -11,10 +11,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eduscrum.awards.model.Aluno;
 import com.eduscrum.awards.model.PapelSistema;
 import com.eduscrum.awards.model.Professor;
+import com.eduscrum.awards.model.Admin;
 import com.eduscrum.awards.model.Utilizador;
 import com.eduscrum.awards.repository.AlunoRepository;
 import com.eduscrum.awards.repository.ProfessorRepository;
 import com.eduscrum.awards.repository.UtilizadorRepository;
+import com.eduscrum.awards.repository.AdminRepository;
 
 @Service
 public class UtilizadorService {
@@ -22,6 +24,7 @@ public class UtilizadorService {
     private final UtilizadorRepository utilizadorRepository;
     private final AlunoRepository alunoRepository;
     private final ProfessorRepository professorRepository;
+    private final AdminRepository adminRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -29,10 +32,12 @@ public class UtilizadorService {
             UtilizadorRepository utilizadorRepository,
             AlunoRepository alunoRepository,
             ProfessorRepository professorRepository,
+            AdminRepository adminRepository,         
             PasswordEncoder passwordEncoder) {
         this.utilizadorRepository = utilizadorRepository;
         this.alunoRepository = alunoRepository;
         this.professorRepository = professorRepository;
+        this.adminRepository = adminRepository;     
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -73,6 +78,14 @@ public class UtilizadorService {
                 p.setPasswordHash(hashedPassword);
                 p.setPapelSistema(PapelSistema.PROFESSOR);
                 return professorRepository.save(p);
+            }
+            case ADMIN -> {                            
+                Admin admin = new Admin();
+                admin.setNome(nome);
+                admin.setEmail(email);
+                admin.setPasswordHash(hashedPassword);
+                admin.setPapelSistema(PapelSistema.ADMIN);
+                return adminRepository.save(admin);
             }
             default -> {
                 Utilizador u = new Utilizador();
