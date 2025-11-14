@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard"
 import Perfil from "./pages/Perfil"
 import Sobre from "./pages/Sobre"
 import AdminDashboard from "./pages/AdminDashboard"
+import ProfessorDashboard from "./pages/ProfessorDashboard"
 import "./index.css"
 import { AuthProvider } from "@/context/AuthContext"
 import { ProtectedRoute } from "@/components/ProtectedRoute"
@@ -50,7 +51,19 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                 </ProtectedRoute>
               }
             />
+
+            {/* Área do Professor */}
+            <Route
+              path="professor/dashboard"
+              element={
+                <ProtectedRoute>
+                  <ProfessorDashboard />
+                </ProtectedRoute>
+              }
+            />
+
           </Route>
+          
 
           {/* Rotas sem Navbar e Footer  */}
           <Route path="/login" element={<Login />} />
