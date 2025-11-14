@@ -1,5 +1,7 @@
 package com.eduscrum.awards.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -18,6 +20,7 @@ public class Curso {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "admin_id")
+    @JsonIgnore
     private Admin admin;
 
 
