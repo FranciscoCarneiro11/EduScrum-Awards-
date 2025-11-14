@@ -10,7 +10,7 @@ export default function App() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-indigo-50 via-white to-violet-50">
-      {/* Navbar fixa no topo (não aparece em login/registo) */}
+      {/* Navbar fixa no topo */}
       {!hideLayout && <Navbar />}
 
       {/* Conteúdo principal */}
@@ -18,8 +18,10 @@ export default function App() {
         <Outlet />
       </main>
 
-      {/* Footer (não aparece em login/registo) */}
+      {/* Footer */}
       {!hideLayout && <Footer />}
     </div>
+    
   )
+  
 }

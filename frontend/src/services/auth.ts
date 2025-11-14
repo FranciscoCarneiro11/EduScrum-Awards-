@@ -4,7 +4,7 @@ import api from "@/lib/api"
 export type User = {
   nome: string
   email: string
-  papelSistema: "ALUNO" | "PROFESSOR" 
+  papelSistema: "ALUNO" | "PROFESSOR" | "ADMIN"
 }
 
 // Tipos para login e registo
@@ -13,7 +13,7 @@ type RegisterPayload = {
   nome: string
   email: string
   password: string
-  papelSistema: "ALUNO" | "PROFESSOR"
+  papelSistema: "ALUNO" | "PROFESSOR" | "ADMIN"
 }
 
 // Respostas do backend
@@ -21,7 +21,7 @@ type AuthResponse = {
   token: string
   nome: string
   email: string
-  papelSistema: "ALUNO" | "PROFESSOR" 
+  papelSistema: "ALUNO" | "PROFESSOR" | "ADMIN"
 }
 
 // LOGIN

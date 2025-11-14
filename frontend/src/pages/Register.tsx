@@ -10,20 +10,17 @@ import { registerUser } from "@/services/auth"
 export default function Register() {
   const navigate = useNavigate()
 
-  // Campos do formulário
   const [nome, setNome] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
-  const [papelSistema, setPapelSistema] = useState<"ALUNO" | "PROFESSOR">("ALUNO")
+  const [papelSistema, setPapelSistema] = useState<"ALUNO" | "PROFESSOR" | "ADMIN">("ALUNO")
 
-  // Estados de interface
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
 
-  // Submissão
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -163,12 +160,13 @@ export default function Register() {
                   id="role"
                   value={papelSistema}
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                    setPapelSistema(e.target.value as "ALUNO" | "PROFESSOR")
+                    setPapelSistema(e.target.value as "ALUNO" | "PROFESSOR" | "ADMIN")
                   }
                   className="pl-10 pr-4 py-2 border border-gray-300 rounded-md w-full text-gray-800 focus:ring-2 focus:ring-indigo-400 focus:outline-none"
                 >
                   <option value="ALUNO">Aluno</option>
                   <option value="PROFESSOR">Professor</option>
+                  <option value="ADMIN">Administrador</option>
                 </select>
               </div>
             </div>

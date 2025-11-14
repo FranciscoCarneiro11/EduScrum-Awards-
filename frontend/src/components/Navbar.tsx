@@ -3,13 +3,10 @@ import { useAuth } from "@/context/AuthContext"
 import { useEffect, useState } from "react"
 
 export default function Navbar() {
-  const authContext = useAuth()
-  const { user, isAuthenticated, logout } = authContext
+  const { user, isAuthenticated, logout } = useAuth()
   const navigate = useNavigate()
-  
-  // 🔥 Força re-render quando o estado muda
+
   const [, forceUpdate] = useState(0)
-  
   useEffect(() => {
     forceUpdate(prev => prev + 1)
   }, [isAuthenticated, user])
@@ -19,8 +16,15 @@ export default function Navbar() {
     navigate("/login")
   }
 
-  // 🔍 DEBUG
-  console.log("🔍 Navbar RENDER - isAuthenticated:", isAuthenticated, "user:", user)
+  const isAdmin = user?.papelSistema === "ADMIN"
+  const isProfessor = user?.papelSistema === "PROFESSOR"
+  const isAluno = user?.papelSistema === "ALUNO"
+
+  // Caminho do Dashboard dinamicamente
+  const dashboardPath =
+    isAdmin ? "/admin"
+    : isProfessor ? "/professor/dashboard"
+    : "/dashboard"
 
   return (
     <nav className="bg-white/80 backdrop-blur-md shadow-md fixed top-0 left-0 w-full z-50">
@@ -36,8 +40,9 @@ export default function Navbar() {
 
         {/* Navegação */}
         <div className="flex items-center gap-6 text-gray-700">
+          
           {!isAuthenticated ? (
-            // 🔸 NÃO autenticado
+            // NÃO autenticado
             <>
               <Link to="/" className="hover:text-violet-600 transition font-medium">
                 Home
@@ -53,14 +58,39 @@ export default function Navbar() {
               </Link>
             </>
           ) : (
-            // 🔹 Autenticado
+            // AUTENTICADO
             <>
               <Link to="/" className="hover:text-violet-600 transition font-medium">
                 Home
               </Link>
-              <Link to="/dashboard" className="hover:text-violet-600 transition font-medium">
+
+              {/* LINK DASHBOARD para todos */}
+              <Link to={dashboardPath} className="hover:text-violet-600 transition font-medium">
                 Dashboard
               </Link>
+
+              {isProfessor && (
+                <>
+                  <Link to="/professor/disciplinas" className="hover:text-violet-600 transition font-medium">
+                    Disciplinas
+                  </Link>
+                  <Link to="/professor/projetos" className="hover:text-violet-600 transition font-medium">
+                    Projetos
+                  </Link>
+                </>
+              )}
+
+              {isAluno && (
+                <>
+                  <Link to="/aluno/cursos" className="hover:text-violet-600 transition font-medium">
+                    Cursos
+                  </Link>
+                  <Link to="/aluno/disciplinas" className="hover:text-violet-600 transition font-medium">
+                    Disciplinas
+                  </Link>
+                </>
+              )}
+
               <Link to="/perfil" className="hover:text-violet-600 transition font-medium">
                 Perfil
               </Link>
@@ -76,7 +106,10 @@ export default function Navbar() {
               </button>
 
               <span className="text-sm text-gray-600">
-                Olá, <span className="font-medium text-violet-600">{user?.nome?.split(" ")[0]}</span>
+                <span className="font-medium text-violet-600">{user?.nome?.split(" ")[0]}</span>
+                <span className="text-xs ml-1 px-2 py-0.5 bg-violet-100 text-violet-700 rounded-full">
+                  {isAdmin ? "Admin" : isProfessor ? "Professor" : "Aluno"}
+                </span>
               </span>
             </>
           )}

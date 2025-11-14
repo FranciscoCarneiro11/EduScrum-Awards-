@@ -6,7 +6,7 @@ import type { User } from "@/services/auth"
 type AuthContextType = {
   user: User | null
   isAuthenticated: boolean
-  login: (email: string, password: string) => Promise<void>
+  login: (email: string, password: string) => Promise<User>
   logout: () => void
 }
 
@@ -17,21 +17,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
-  // 🔥 Verificar autenticação ao montar o componente
+  // Verificar autenticação ao montar o componente
   useEffect(() => {
     console.log("🔍 AuthContext useEffect - A verificar token...")
     const token = localStorage.getItem("auth_token")
     
     if (token) {
-      console.log("✅ Token encontrado, a buscar utilizador...")
+      console.log("Token encontrado, a buscar utilizador...")
       fetchCurrentUser()
         .then(u => {
-          console.log("✅ Utilizador carregado:", u)
+          console.log("Utilizador carregado:", u)
           setUser(u)
           setIsAuthenticated(true)
         })
         .catch(err => {
-          console.error("❌ Erro ao buscar utilizador:", err)
+          console.error("Erro ao buscar utilizador:", err)
           clearSession()
           setUser(null)
           setIsAuthenticated(false)
@@ -40,16 +40,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setIsLoading(false)
         })
     } else {
-      console.log("❌ Sem token no localStorage")
+      console.log("Sem token no localStorage")
       setIsLoading(false)
     }
   }, [])
 
   // Login
-  const login = async (email: string, password: string) => {
-    console.log("🔍 Login chamado com:", email)
+  const login = async (email: string, password: string): Promise<User> => {
+    console.log("Login chamado com:", email)
     const data = await apiLogin({ email, password })
-    console.log("✅ Login bem-sucedido:", data)
+    console.log("Login bem-sucedido:", data)
     
     saveSession(data)
     
@@ -61,19 +61,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     setUser(newUser)
     setIsAuthenticated(true)
-    console.log("✅ Estado atualizado - isAuthenticated: true, user:", newUser)
+    console.log("Estado atualizado - isAuthenticated: true, user:", newUser)
+    return newUser
   }
 
   // Logout
   const logout = () => {
-    console.log("🔍 Logout chamado")
+    console.log("Logout chamado")
     clearSession()
     setUser(null)
     setIsAuthenticated(false)
   }
 
-  // Debug do estado atual
-  console.log("🔍 AuthContext render - isAuthenticated:", isAuthenticated, "user:", user, "isLoading:", isLoading)
+  console.log("AuthContext render - isAuthenticated:", isAuthenticated, "user:", user, "isLoading:", isLoading)
 
   // Mostrar loading enquanto verifica
   if (isLoading) {

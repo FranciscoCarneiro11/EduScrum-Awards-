@@ -18,15 +18,21 @@ export default function Login() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError("")
+
     try {
-      await login(formData.email, formData.password)
-      navigate("/") // Redireciona para a Home após login
+      const user = await login(formData.email, formData.password)
+
+      if (user?.papelSistema === "ADMIN") {
+        navigate("/admin")
+      } else {
+        navigate("/")
+      }
+
     } catch (err: any) {
       console.error(err)
       setError("Email ou password incorretos.")
     }
   }
-
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100">

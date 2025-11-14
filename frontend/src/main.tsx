@@ -8,6 +8,7 @@ import Register from "./pages/Register"
 import Dashboard from "./pages/Dashboard"
 import Perfil from "./pages/Perfil"
 import Sobre from "./pages/Sobre"
+import AdminDashboard from "./pages/AdminDashboard"
 import "./index.css"
 import { AuthProvider } from "@/context/AuthContext"
 import { ProtectedRoute } from "@/components/ProtectedRoute"
@@ -17,7 +18,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* Rotas com Navbar e Footer (usa App como layout) */}
+          {/* Rotas com Navbar e Footer  */}
           <Route path="/" element={<App />}>
             <Route index element={<Home />} />
             <Route path="sobre" element={<Sobre />} />
@@ -39,9 +40,19 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                 </ProtectedRoute>
               }
             />
+
+            {/* Área do Admin  */}
+            <Route
+              path="admin"
+              element={
+                <ProtectedRoute>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
           </Route>
 
-          {/* Rotas sem Navbar e Footer (login e register) */}
+          {/* Rotas sem Navbar e Footer  */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
         </Routes>
