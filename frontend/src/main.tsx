@@ -1,3 +1,4 @@
+// frontend/src/main.tsx
 import React from "react"
 import ReactDOM from "react-dom/client"
 import { BrowserRouter, Routes, Route } from "react-router-dom"
@@ -14,17 +15,17 @@ import "./index.css"
 import { AuthProvider } from "@/context/AuthContext"
 import { ProtectedRoute } from "@/components/ProtectedRoute"
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
+ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* Rotas com Navbar e Footer  */}
+          {/* Layout com Navbar + Footer */}
           <Route path="/" element={<App />}>
+            {/* Página inicial */}
             <Route index element={<Home />} />
-            <Route path="sobre" element={<Sobre />} />
-            
-            {/* Rotas protegidas */}
+
+            {/* Dashboard do ALUNO */}
             <Route
               path="dashboard"
               element={
@@ -33,26 +34,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="perfil"
-              element={
-                <ProtectedRoute>
-                  <Perfil />
-                </ProtectedRoute>
-              }
-            />
 
-            {/* Área do Admin  */}
-            <Route
-              path="admin"
-              element={
-                <ProtectedRoute>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              }
-            />
-
-            {/* Área do Professor */}
+            {/* Dashboard do PROFESSOR */}
             <Route
               path="professor/dashboard"
               element={
@@ -62,10 +45,31 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               }
             />
 
-          </Route>
-          
+            {/* Dashboard do ADMIN */}
+            <Route
+              path="admin/dashboard"
+              element={
+                <ProtectedRoute>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Rotas sem Navbar e Footer  */}
+            {/* Perfil (qualquer utilizador autenticado) */}
+            <Route
+              path="perfil"
+              element={
+                <ProtectedRoute>
+                  <Perfil />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Página Sobre (pública) */}
+            <Route path="sobre" element={<Sobre />} />
+          </Route>
+
+          {/* Páginas sem Navbar/Footer */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
         </Routes>

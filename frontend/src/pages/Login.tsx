@@ -22,10 +22,13 @@ export default function Login() {
     try {
       const user = await login(formData.email, formData.password)
 
-      if (user?.papelSistema === "ADMIN") {
-        navigate("/admin")
+      // Redirecionar consoante o papel
+      if (user.papelSistema === "ADMIN") {
+        navigate("/admin/dashboard", { replace: true })
+      } else if (user.papelSistema === "PROFESSOR") {
+        navigate("/professor/dashboard", { replace: true })
       } else {
-        navigate("/")
+        navigate("/dashboard", { replace: true })
       }
 
     } catch (err: any) {
