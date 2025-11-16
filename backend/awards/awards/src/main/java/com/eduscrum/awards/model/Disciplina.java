@@ -1,5 +1,7 @@
 package com.eduscrum.awards.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 
 @Entity

@@ -1,6 +1,7 @@
 package com.eduscrum.awards.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,16 +23,13 @@ public class CursoController {
    // Listar todos os cursos
     @GetMapping
     public ResponseEntity<List<CursoResponseDTO>> listarCursos() {
-        List<CursoResponseDTO> cursos = cursoService.listarCursos().stream()
-            .map(c -> new CursoResponseDTO(
-                c.getId(),
-                c.getNome(),
-                c.getCodigo(),
-                c.getAdmin().getId()
-            ))
-            .toList();
+        List<Curso> cursos = cursoService.listarCursos();
 
-        return ResponseEntity.ok(cursos);
+        List<CursoResponseDTO> cursosDTO = cursos.stream()
+                .map(CursoResponseDTO::new)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(cursosDTO);
     }
 
 
