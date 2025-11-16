@@ -69,8 +69,18 @@ export default function Navbar() {
                 Dashboard
               </Link>
 
+              {isAdmin && (
+                <Link to="/admin/gestao" className="hover:text-violet-600 transition font-medium">
+                  Gestão
+                </Link>
+              )}
+
+
               {isProfessor && (
                 <>
+                  <Link to="/professor/cursos" className="hover:text-violet-600 transition font-medium">
+                    Cursos
+                  </Link>
                   <Link to="/professor/disciplinas" className="hover:text-violet-600 transition font-medium">
                     Disciplinas
                   </Link>

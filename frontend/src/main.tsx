@@ -11,6 +11,9 @@ import Perfil from "./pages/Perfil"
 import Sobre from "./pages/Sobre"
 import AdminDashboard from "./pages/AdminDashboard"
 import ProfessorDashboard from "./pages/ProfessorDashboard"
+import AlunoCursos from "./pages/AlunoCursos"
+import AdminGestaoUtilizadores from "./pages/AdminGestaoUtilizadores"
+import ProfessorCursos from "./pages/ProfessorCursos"
 import "./index.css"
 import { AuthProvider } from "@/context/AuthContext"
 import { ProtectedRoute } from "@/components/ProtectedRoute"
@@ -64,6 +67,38 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
                 </ProtectedRoute>
               }
             />
+
+            {/* Página dos Cursos do Aluno */}
+            <Route
+              path="aluno/cursos"
+              element={
+                <ProtectedRoute>
+                  <AlunoCursos />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Página dos Cursos do Professor */}
+            <Route
+              path="professor/cursos"
+              element={
+                <ProtectedRoute>
+                  <ProfessorCursos />
+                </ProtectedRoute>
+              }
+            />
+
+
+            {/* Página de Gestão de Utilizadores do Admin */}
+            <Route
+              path="admin/gestao"
+              element={
+                <ProtectedRoute>
+                  <AdminGestaoUtilizadores />
+                </ProtectedRoute>
+              }
+            />
+
 
             {/* Página Sobre (pública) */}
             <Route path="sobre" element={<Sobre />} />

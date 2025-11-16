@@ -2,6 +2,7 @@ import api from "@/lib/api"
 
 // Tipo do utilizador
 export type User = {
+  id: number
   nome: string
   email: string
   papelSistema: "ALUNO" | "PROFESSOR" | "ADMIN"
@@ -16,9 +17,10 @@ type RegisterPayload = {
   papelSistema: "ALUNO" | "PROFESSOR" | "ADMIN"
 }
 
-// Respostas do backend
-type AuthResponse = {
+// Resposta do backend (LOGIN + REGISTER)
+export type AuthResponse = {
   token: string
+  id: number
   nome: string
   email: string
   papelSistema: "ALUNO" | "PROFESSOR" | "ADMIN"
@@ -32,12 +34,14 @@ export async function login(data: LoginPayload) {
 
 // REGISTO
 export async function registerUser(data: RegisterPayload) {
-  const res = await api.post<AuthResponse>("/api/auth/register", {
+  const payload = {
     nome: data.nome,
     email: data.email,
     password: data.password,
     papelSistema: data.papelSistema.toUpperCase(),
-  })
+  }
+
+  const res = await api.post<AuthResponse>("/api/auth/register", payload)
   return res.data
 }
 
@@ -50,12 +54,14 @@ export async function fetchCurrentUser(): Promise<User> {
 // GESTÃO DE SESSÃO LOCAL
 export function saveSession(response: AuthResponse) {
   localStorage.setItem("auth_token", response.token)
-  
+
   const user: User = {
+    id: response.id,
     nome: response.nome,
     email: response.email,
-    papelSistema: response.papelSistema
+    papelSistema: response.papelSistema,
   }
+
   localStorage.setItem("user", JSON.stringify(user))
 }
 

@@ -6,11 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.eduscrum.awards.model.Aluno;
 import com.eduscrum.awards.model.PapelSistema;
@@ -22,37 +18,24 @@ import com.eduscrum.awards.security.JwtUtil;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "*") // permite pedidos do frontend
+@CrossOrigin(origins = "*")
 public class AuthController {
 
     @Autowired private UtilizadorRepository utilizadorRepository;
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private JwtUtil jwtUtil;
 
-    // Modelo simples para o pedido de login
+    // MODELOS DOS PEDIDOS
     public static class LoginRequest {
         public String email;
         public String password;
     }
 
-    // Modelo simples para a resposta
-    public static class LoginResponse {
-        public String token;
-        public String email;
-        public String papelSistema;
-
-        public LoginResponse(String token, String email, String papelSistema) {
-            this.token = token;
-            this.email = email;
-            this.papelSistema = papelSistema;
-        }
-    }
-
-    // LOGIN
+    // === LOGIN ====
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        Optional<Utilizador> userOpt = utilizadorRepository.findByEmail(request.email);
 
+        Optional<Utilizador> userOpt = utilizadorRepository.findByEmail(request.email);
         if (userOpt.isEmpty()) {
             return ResponseEntity.status(401).body("Email não encontrado");
         }
@@ -64,63 +47,67 @@ public class AuthController {
         }
 
         String token = jwtUtil.generateToken(user.getEmail());
-
-        return ResponseEntity.ok(new LoginResponse(token, user.getEmail(), user.getPapelSistema().name()));
+        return ResponseEntity.ok(Map.of(
+            "token", token,
+            "id", user.getId(),
+            "nome", user.getNome(),
+            "email", user.getEmail(),
+            "papelSistema", user.getPapelSistema().name()
+        ));
     }
 
-    // REGISTO
+    // === REGISTO ===
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UtilizadorDTO novoDTO) {
-        // verificar se já existe
+
         if (utilizadorRepository.findByEmail(novoDTO.getEmail()).isPresent()) {
             return ResponseEntity.badRequest().body("Email já registado");
         }
 
-        // Validar se password não é nula
         if (novoDTO.getPassword() == null || novoDTO.getPassword().isEmpty()) {
             return ResponseEntity.badRequest().body("Password é obrigatória");
         }
 
-        // encriptar password
         String passwordHash = passwordEncoder.encode(novoDTO.getPassword());
+        PapelSistema papel = novoDTO.getPapelSistema() != null ?
+                novoDTO.getPapelSistema() : PapelSistema.ALUNO;
 
-        // definir papel padrão
-        PapelSistema papelSistema = novoDTO.getPapelSistema() != null ? 
-                                    novoDTO.getPapelSistema() : PapelSistema.ALUNO;
+        Utilizador novoUser;
 
-        Utilizador utilizadorASalvar;
-
-        // Criação conforme o papelSistema
-        if (papelSistema == PapelSistema.ALUNO) {
-            Aluno aluno = new Aluno();
-            aluno.setNome(novoDTO.getNome());
-            aluno.setEmail(novoDTO.getEmail());
-            aluno.setPasswordHash(passwordHash);
-            aluno.setPapelSistema(PapelSistema.ALUNO);
-            utilizadorASalvar = aluno;
-        } else if (papelSistema == PapelSistema.PROFESSOR) {
-            Professor prof = new Professor();
-            prof.setNome(novoDTO.getNome());
-            prof.setEmail(novoDTO.getEmail());
-            prof.setPasswordHash(passwordHash);
-            prof.setPapelSistema(PapelSistema.PROFESSOR);
-            utilizadorASalvar = prof;
-        } else {
-            Utilizador u = new Utilizador();
-            u.setNome(novoDTO.getNome());
-            u.setEmail(novoDTO.getEmail());
-            u.setPasswordHash(passwordHash);
-            u.setPapelSistema(papelSistema);
-            utilizadorASalvar = u;
+        switch (papel) {
+            case ALUNO -> {
+                Aluno aluno = new Aluno();
+                aluno.setNome(novoDTO.getNome());
+                aluno.setEmail(novoDTO.getEmail());
+                aluno.setPasswordHash(passwordHash);
+                aluno.setPapelSistema(PapelSistema.ALUNO);
+                novoUser = aluno;
+            }
+            case PROFESSOR -> {
+                Professor prof = new Professor();
+                prof.setNome(novoDTO.getNome());
+                prof.setEmail(novoDTO.getEmail());
+                prof.setPasswordHash(passwordHash);
+                prof.setPapelSistema(PapelSistema.PROFESSOR);
+                novoUser = prof;
+            }
+            default -> {
+                Utilizador u = new Utilizador();
+                u.setNome(novoDTO.getNome());
+                u.setEmail(novoDTO.getEmail());
+                u.setPasswordHash(passwordHash);
+                u.setPapelSistema(papel);
+                novoUser = u;
+            }
         }
 
-        Utilizador saved = utilizadorRepository.save(utilizadorASalvar);
-
-        // criar token JWT
+        Utilizador saved = utilizadorRepository.save(novoUser);
         String token = jwtUtil.generateToken(saved.getEmail());
 
         return ResponseEntity.ok(Map.of(
             "token", token,
+            "id", saved.getId(),
+            "nome", saved.getNome(),
             "email", saved.getEmail(),
             "papelSistema", saved.getPapelSistema().name()
         ));
