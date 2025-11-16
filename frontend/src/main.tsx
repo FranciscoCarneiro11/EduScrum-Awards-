@@ -14,9 +14,11 @@ import ProfessorDashboard from "./pages/ProfessorDashboard"
 import AlunoCursos from "./pages/AlunoCursos"
 import AdminGestaoUtilizadores from "./pages/AdminGestaoUtilizadores"
 import ProfessorCursos from "./pages/ProfessorCursos"
+import ProfessorCursoDetalhes from "./pages/ProfessorCursoDetalhes"
 import "./index.css"
 import { AuthProvider } from "@/context/AuthContext"
 import { ProtectedRoute } from "@/components/ProtectedRoute"
+import AlunoCursoDetalhes from "./pages/AlunoCursoDetalhes"
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
@@ -98,6 +100,27 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
                 </ProtectedRoute>
               }
             />
+          
+            {/* Aluno - Detalhes do Curso */}
+            <Route
+              path="aluno/cursos/:cursoId"
+              element={
+                <ProtectedRoute>
+                  <AlunoCursoDetalhes />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Professor - Detalhes do Curso */}
+            <Route
+              path="professor/cursos/:cursoId"
+              element={
+                <ProtectedRoute>
+                  <ProfessorCursoDetalhes />
+                </ProtectedRoute>
+              }
+            />
+
 
 
             {/* Página Sobre (pública) */}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { useAuth } from "@/context/AuthContext"
 import api from "@/lib/api"
+import { useNavigate } from "react-router-dom"
 
 type Curso = {
   id: number
@@ -13,6 +14,7 @@ export default function AlunoCursos() {
   const { user } = useAuth()
   const [cursos, setCursos] = useState<Curso[]>([])
   const [loading, setLoading] = useState(true)
+  const navigate = useNavigate()  
 
   useEffect(() => {
     if (!user) return setLoading(false)
@@ -68,9 +70,10 @@ export default function AlunoCursos() {
 
             <button
               className="mt-4 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
-              onClick={() => console.log("Entrar no curso", curso.id)}
+              onClick={() => navigate(`/aluno/cursos/${curso.id}`)} 
             >
               Entrar no Curso
+              
             </button>
           </div>
         ))}
