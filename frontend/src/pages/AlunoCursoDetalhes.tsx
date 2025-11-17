@@ -47,7 +47,7 @@ export default function AlunoCursoDetalhes() {
   const [projetos, setProjetos] = useState<Projeto[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
+    useEffect(() => {
     if (!cursoId || !user) return
 
     async function carregarDados() {
@@ -62,9 +62,10 @@ export default function AlunoCursoDetalhes() {
         const projetosRes = await api.get<Projeto[]>(`/api/cursos/${cursoId}/projetos`)
         setProjetos(projetosRes.data)
 
-        // TODO: Implementar endpoint para listar professores do curso
-        // const profsRes = await api.get<Professor[]>(`/api/cursos/${cursoId}/professores`)
-        // setProfessores(profsRes.data)
+        // Professores associados ao curso
+        const profsRes = await api.get<Professor[]>(`/api/cursos/${cursoId}/professores`)
+        setProfessores(profsRes.data)
+
 
       } catch (err) {
         console.error("Erro ao carregar detalhes do curso:", err)
@@ -75,6 +76,7 @@ export default function AlunoCursoDetalhes() {
 
     carregarDados()
   }, [cursoId, user])
+
 
   if (loading) {
     return (

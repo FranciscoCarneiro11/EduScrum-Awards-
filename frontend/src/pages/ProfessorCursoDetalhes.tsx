@@ -65,6 +65,8 @@ export default function ProfessorCursoDetalhes() {
     dataFim: "" 
   })
 
+  // No useEffect, adiciona logs para debug:
+
   useEffect(() => {
     if (!cursoId || !user) return
 
@@ -72,7 +74,7 @@ export default function ProfessorCursoDetalhes() {
       try {
         setLoading(true)
 
-        // Carregar curso com disciplinas
+        // Curso com disciplinas
         const cursoRes = await api.get<Curso>(`/api/cursos/${cursoId}`)
         setCurso(cursoRes.data)
 
@@ -80,12 +82,17 @@ export default function ProfessorCursoDetalhes() {
         const projetosRes = await api.get<Projeto[]>(`/api/cursos/${cursoId}/projetos`)
         setProjetos(projetosRes.data)
 
-        // TODO: Implementar endpoints
-        // const profsRes = await api.get<Professor[]>(`/api/cursos/${cursoId}/professores`)
-        // setProfessores(profsRes.data)
+        // Professores associados ao curso
+        const profsRes = await api.get<Professor[]>(`/api/cursos/${cursoId}/professores`)
+        setProfessores(profsRes.data)
         
         // const alunosRes = await api.get<Aluno[]>(`/api/cursos/${cursoId}/alunos`)
         // setAlunos(alunosRes.data)
+
+
+        // Alunos do curso
+        const alunosRes = await api.get<Aluno[]>(`/api/cursos/${cursoId}/alunos`)
+        setAlunos(alunosRes.data)
 
       } catch (err) {
         console.error("Erro ao carregar detalhes do curso:", err)

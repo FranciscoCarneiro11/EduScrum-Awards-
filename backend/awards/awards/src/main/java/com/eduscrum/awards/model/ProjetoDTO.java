@@ -9,19 +9,18 @@ public class ProjetoDTO {
     private String descricao;
     private LocalDate dataInicio;
     private LocalDate dataFim;
-    private Long cursoId;
+    private Long disciplinaId;
 
-    public ProjetoDTO() {
-    }
+    public ProjetoDTO() {}
 
     public ProjetoDTO(Long id, String nome, String descricao,
-                      LocalDate dataInicio, LocalDate dataFim, Long cursoId) {
+                      LocalDate dataInicio, LocalDate dataFim, Long disciplinaId) {
         this.id = id;
         this.nome = nome;
         this.descricao = descricao;
         this.dataInicio = dataInicio;
         this.dataFim = dataFim;
-        this.cursoId = cursoId;
+        this.disciplinaId = disciplinaId;
     }
 
     public Long getId() {
@@ -64,11 +63,11 @@ public class ProjetoDTO {
         this.dataFim = dataFim;
     }
 
-    public Long getCursoId() {
-        return cursoId;
+    public Long getDisciplinaId() {
+        return disciplinaId;
     }
 
-    public void setCursoId(Long cursoId) {
-        this.cursoId = cursoId;
+    public void setDisciplinaId(Long disciplinaId) {
+        this.disciplinaId = disciplinaId;
     }
 }

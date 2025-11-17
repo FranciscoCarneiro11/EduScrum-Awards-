@@ -2,6 +2,7 @@ package com.eduscrum.awards.service;
 
 import com.eduscrum.awards.model.*;
 import com.eduscrum.awards.repository.CursoRepository;
+import com.eduscrum.awards.repository.DisciplinaRepository;
 import com.eduscrum.awards.repository.ProjetoRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -15,49 +16,54 @@ public class ProjetoService {
 
     private final ProjetoRepository projetoRepository;
     private final CursoRepository cursoRepository;
+    private final DisciplinaRepository disciplinaRepository;
 
     public ProjetoService(ProjetoRepository projetoRepository,
-                          CursoRepository cursoRepository) {
+                          CursoRepository cursoRepository,
+                          DisciplinaRepository disciplinaRepository) {
         this.projetoRepository = projetoRepository;
         this.cursoRepository = cursoRepository;
+        this.disciplinaRepository = disciplinaRepository;
     }
 
-    // POST /api/cursos/{id}/projetos
-    public ProjetoDTO criarProjeto(Long cursoId, ProjetoRequestDTO dto) {
-        Curso curso = cursoRepository.findById(cursoId)
+    // POST /api/disciplinas/{id}/projetos
+    public ProjetoDTO criarProjeto(Long disciplinaId, ProjetoRequestDTO dto) {
+        Disciplina disciplina = disciplinaRepository.findById(disciplinaId)
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Curso não encontrado"));
+                        HttpStatus.NOT_FOUND, "Disciplina não encontrada"));
 
         Projeto projeto = new Projeto(
                 dto.getNome(),
                 dto.getDescricao(),
-                curso,
+                disciplina,
                 dto.getDataInicio(),
                 dto.getDataFim()
         );
 
-        Projeto guardado = projetoRepository.save(projeto);
-        return toDTO(guardado);
+        return toDTO(projetoRepository.save(projeto));
     }
 
-    // GET /api/cursos/{id}/projetos
+    // GET projetos do curso
     public List<ProjetoDTO> listarProjetosDoCurso(Long cursoId) {
-        return projetoRepository.findByCursoId(cursoId)
+
+        Curso curso = cursoRepository.findById(cursoId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Curso não encontrado"));
+
+        return curso.getDisciplinas()
                 .stream()
+                .flatMap(disc -> projetoRepository.findByDisciplinaId(disc.getId()).stream())
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
-    // GET /api/projetos/{id}
     public ProjetoDTO obterProjeto(Long projetoId) {
         Projeto projeto = projetoRepository.findById(projetoId)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Projeto não encontrado"));
-
         return toDTO(projeto);
     }
 
-    // PUT /api/projetos/{id}
     public ProjetoDTO atualizarProjeto(Long projetoId, ProjetoRequestDTO dto) {
         Projeto projeto = projetoRepository.findById(projetoId)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -68,20 +74,16 @@ public class ProjetoService {
         projeto.setDataInicio(dto.getDataInicio());
         projeto.setDataFim(dto.getDataFim());
 
-        Projeto atualizado = projetoRepository.save(projeto);
-        return toDTO(atualizado);
+        return toDTO(projetoRepository.save(projeto));
     }
 
-    // DELETE /api/projetos/{id}
     public void eliminarProjeto(Long projetoId) {
         Projeto projeto = projetoRepository.findById(projetoId)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Projeto não encontrado"));
-
         projetoRepository.delete(projeto);
     }
 
-    // conversão Entity -> DTO
     private ProjetoDTO toDTO(Projeto projeto) {
         return new ProjetoDTO(
                 projeto.getId(),
@@ -89,7 +91,7 @@ public class ProjetoService {
                 projeto.getDescricao(),
                 projeto.getDataInicio(),
                 projeto.getDataFim(),
-                projeto.getCurso() != null ? projeto.getCurso().getId() : null
+                projeto.getDisciplina() != null ? projeto.getDisciplina().getId() : null
         );
     }
 }

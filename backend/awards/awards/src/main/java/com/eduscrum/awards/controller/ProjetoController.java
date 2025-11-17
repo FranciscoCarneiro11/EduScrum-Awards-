@@ -19,17 +19,17 @@ public class ProjetoController {
         this.projetoService = projetoService;
     }
 
-    // POST /api/cursos/{id}/projetos - Criar projeto num curso
-    @PostMapping("/cursos/{cursoId}/projetos")
+    // Criar projeto numa disciplina
+    @PostMapping("/disciplinas/{disciplinaId}/projetos")
     public ResponseEntity<ProjetoDTO> criarProjeto(
-            @PathVariable Long cursoId,
+            @PathVariable Long disciplinaId,
             @RequestBody ProjetoRequestDTO dto) {
 
-        ProjetoDTO criado = projetoService.criarProjeto(cursoId, dto);
+        ProjetoDTO criado = projetoService.criarProjeto(disciplinaId, dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(criado);
     }
 
-    // GET /api/cursos/{id}/projetos - Listar projetos de um curso
+    // Listar projetos de um curso
     @GetMapping("/cursos/{cursoId}/projetos")
     public ResponseEntity<List<ProjetoDTO>> listarProjetosDoCurso(
             @PathVariable Long cursoId) {
@@ -38,24 +38,19 @@ public class ProjetoController {
         return ResponseEntity.ok(projetos);
     }
 
-    // GET /api/projetos/{id} - Detalhes do projeto
     @GetMapping("/projetos/{id}")
     public ResponseEntity<ProjetoDTO> obterProjeto(@PathVariable Long id) {
-        ProjetoDTO dto = projetoService.obterProjeto(id);
-        return ResponseEntity.ok(dto);
+        return ResponseEntity.ok(projetoService.obterProjeto(id));
     }
 
-    // PUT /api/projetos/{id} - Atualizar projeto
     @PutMapping("/projetos/{id}")
     public ResponseEntity<ProjetoDTO> atualizarProjeto(
             @PathVariable Long id,
             @RequestBody ProjetoRequestDTO dto) {
 
-        ProjetoDTO atualizado = projetoService.atualizarProjeto(id, dto);
-        return ResponseEntity.ok(atualizado);
+        return ResponseEntity.ok(projetoService.atualizarProjeto(id, dto));
     }
 
-    // DELETE /api/projetos/{id} - Eliminar projeto
     @DeleteMapping("/projetos/{id}")
     public ResponseEntity<Void> eliminarProjeto(@PathVariable Long id) {
         projetoService.eliminarProjeto(id);

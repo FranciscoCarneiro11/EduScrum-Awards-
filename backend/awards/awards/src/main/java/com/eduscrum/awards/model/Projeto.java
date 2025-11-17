@@ -18,8 +18,9 @@ public class Projeto {
     private String descricao;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "curso_id", nullable = false)
-    private Curso curso;
+    @JoinColumn(name = "disciplina_id", nullable = false)
+    private Disciplina disciplina;
+
 
     private LocalDate dataInicio;
 
@@ -28,10 +29,10 @@ public class Projeto {
     public Projeto() {
     }
 
-    public Projeto(String nome, String descricao, Curso curso, LocalDate dataInicio, LocalDate dataFim) {
+    public Projeto(String nome, String descricao, Disciplina disciplina, LocalDate dataInicio, LocalDate dataFim) {
         this.nome = nome;
         this.descricao = descricao;
-        this.curso = curso;
+        this.disciplina = disciplina;
         this.dataInicio = dataInicio;
         this.dataFim = dataFim;
     }
@@ -62,12 +63,12 @@ public class Projeto {
         this.descricao = descricao;
     }
 
-    public Curso getCurso() {
-        return curso;
+    public Disciplina getDisciplina() {
+        return disciplina;
     }
 
-    public void setCurso(Curso curso) {
-        this.curso = curso;
+    public void setDisciplina(Disciplina disciplina) {
+        this.disciplina = disciplina;
     }
 
     public LocalDate getDataInicio() {

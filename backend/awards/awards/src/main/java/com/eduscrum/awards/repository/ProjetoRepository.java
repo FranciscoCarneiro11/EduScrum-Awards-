@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface ProjetoRepository extends JpaRepository<Projeto, Long> {
 
-    List<Projeto> findByCursoId(Long cursoId);
+    List<Projeto> findByDisciplinaId(Long disciplinaId);
 }
