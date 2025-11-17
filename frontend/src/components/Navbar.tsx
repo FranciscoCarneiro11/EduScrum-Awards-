@@ -22,7 +22,7 @@ export default function Navbar() {
 
   // Caminho do Dashboard dinamicamente
   const dashboardPath =
-    isAdmin ? "/admin"
+    isAdmin ? "/admin/dashboard"
     : isProfessor ? "/professor/dashboard" 
     : "/dashboard"
 
