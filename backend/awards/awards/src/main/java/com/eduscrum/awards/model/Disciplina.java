@@ -20,6 +20,7 @@ public class Disciplina {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "curso_id", nullable = false)
+    @JsonIgnore
     private Curso curso;
 
     public Disciplina() {

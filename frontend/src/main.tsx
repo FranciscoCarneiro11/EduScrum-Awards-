@@ -19,6 +19,7 @@ import "./index.css"
 import { AuthProvider } from "@/context/AuthContext"
 import { ProtectedRoute } from "@/components/ProtectedRoute"
 import AlunoCursoDetalhes from "./pages/AlunoCursoDetalhes"
+import DisciplinaDetalhes from "./pages/DisciplinaDetalhes"
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
@@ -120,6 +121,16 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
                 </ProtectedRoute>
               }
             />
+            
+            <Route
+              path="disciplinas/:disciplinaId"
+              element={
+                <ProtectedRoute>
+                  <DisciplinaDetalhes />
+                </ProtectedRoute>
+              }
+            />
+
 
 
 

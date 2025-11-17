@@ -94,4 +94,12 @@ public class ProjetoService {
                 projeto.getDisciplina() != null ? projeto.getDisciplina().getId() : null
         );
     }
+
+    public List<ProjetoDTO> listarProjetosDaDisciplina(Long disciplinaId) {
+        return projetoRepository.findByDisciplinaId(disciplinaId)
+                .stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+        }
+
 }

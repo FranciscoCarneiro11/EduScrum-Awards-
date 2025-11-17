@@ -3,23 +3,29 @@ package com.eduscrum.awards.service;
 import com.eduscrum.awards.model.Curso;
 import com.eduscrum.awards.model.Disciplina;
 import com.eduscrum.awards.model.DisciplinaDTO;
+import com.eduscrum.awards.model.DisciplinaDetalhesDTO;
+import com.eduscrum.awards.model.ProjetoDTO;
 import com.eduscrum.awards.repository.CursoRepository;
 import com.eduscrum.awards.repository.DisciplinaRepository;
+import com.eduscrum.awards.repository.ProjetoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class DisciplinaService {
 
     private final DisciplinaRepository disciplinaRepository;
     private final CursoRepository cursoRepository;
+    private final ProjetoRepository projetoRepository;
 
     public DisciplinaService(DisciplinaRepository disciplinaRepository,
-                             CursoRepository cursoRepository) {
+                             CursoRepository cursoRepository,ProjetoRepository projetoRepository ) {
         this.disciplinaRepository = disciplinaRepository;
         this.cursoRepository = cursoRepository;
+        this.projetoRepository = projetoRepository;
     }
 
     @Transactional
@@ -57,4 +63,29 @@ public class DisciplinaService {
         }
         disciplinaRepository.deleteById(disciplinaId);
     }
+
+    public DisciplinaDetalhesDTO obterDisciplina(Long disciplinaId) {
+        Disciplina disciplina = disciplinaRepository.findById(disciplinaId)
+            .orElseThrow(() -> new RuntimeException(
+                "Disciplina não encontrada com ID: " + disciplinaId));
+
+        Curso curso = disciplina.getCurso();
+
+        Long cursoId = null;
+        String cursoNome = null;
+
+        if (curso != null) {
+            cursoId = curso.getId();
+            cursoNome = curso.getNome();
+        }
+
+        return new DisciplinaDetalhesDTO(
+                disciplina.getId(),
+                disciplina.getNome(),
+                disciplina.getCodigo(),
+                cursoId,
+                cursoNome
+        );
+    }
+    
 }

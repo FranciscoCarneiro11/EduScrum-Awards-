@@ -188,7 +188,7 @@ export default function AlunoCursoDetalhes() {
                   <div
                     key={disc.id}
                     className="p-4 border rounded-lg hover:border-violet-300 hover:bg-violet-50 transition cursor-pointer"
-                    onClick={() => navigate(`/aluno/cursos/${cursoId}/disciplinas/${disc.id}`)}
+                    onClick={() => navigate(`/disciplinas/${disc.id}`)}
                   >
                     <div className="flex items-center justify-between">
                       <div>
@@ -196,7 +196,9 @@ export default function AlunoCursoDetalhes() {
                         <p className="text-sm text-gray-500">{disc.codigo}</p>
                       </div>
                       <Button size="sm" variant="ghost">
-                        Ver disciplina →
+                        <Link to={`/disciplinas/${disc.id}`}>
+                          Ver disciplina →
+                        </Link>
                       </Button>
                     </div>
                   </div>
