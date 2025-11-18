@@ -1,14 +1,18 @@
 import { useEffect, useState } from "react"
-import { useParams, Link } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom"
 import { useAuth } from "@/context/AuthContext"
 import api from "@/lib/api"
-import { Card, CardContent } from "@/components/ui/card"
-import { Users, FolderOpen } from "lucide-react"
-import CriarProjetoModal from "@/components/CriarProjetoModal"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { 
+  Users, FolderOpen, BookOpen, CalendarDays, 
+  Plus, Edit, Trash2, ArrowRight, ArrowLeft, Sparkles 
+} from "lucide-react"
 
 export default function DisciplinaDetalhes() {
   const { disciplinaId } = useParams()
   const { user } = useAuth()
+  const navigate = useNavigate()
 
   const [disciplina, setDisciplina] = useState<any>(null)
   const [projetos, setProjetos] = useState<any[]>([])
@@ -16,30 +20,38 @@ export default function DisciplinaDetalhes() {
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
 
-  // --------------------------
-  // Função para atualizar projetos
-  // --------------------------
+  // Estado do novo projeto
+  const [novoProjeto, setNovoProjeto] = useState({
+    nome: "",
+    descricao: "",
+    dataInicio: "",
+    dataFim: ""
+  })
+  const [loadingCriar, setLoadingCriar] = useState(false)
+
+  // Carregar projetos
   async function carregarProjetos() {
     const response = await api.get(`/api/disciplinas/${disciplinaId}/projetos`)
     setProjetos(response.data)
   }
 
-  // --------------------------
-  // Carregamento inicial da página
-  // --------------------------
+  // Carregamento inicial
   useEffect(() => {
     if (!disciplinaId) return
 
     async function fetchData() {
       try {
+        setLoading(true)
+        
+        // Disciplina
         const d = await api.get(`/api/disciplinas/${disciplinaId}`)
         setDisciplina(d.data)
 
+        // Projetos
         await carregarProjetos()
 
-        const professoresResp = await api.get(
-          `/api/cursos/${d.data.cursoId}/professores`
-        )
+        // Professores
+        const professoresResp = await api.get(`/api/cursos/${d.data.cursoId}/professores`)
         setProfessores(professoresResp.data)
       } catch (error) {
         console.error("Erro ao carregar disciplina:", error)
@@ -51,99 +63,366 @@ export default function DisciplinaDetalhes() {
     fetchData()
   }, [disciplinaId])
 
-  if (loading) return <div className="p-8 text-center">Carregando...</div>
-  if (!disciplina) return <div className="p-8 text-center">Disciplina não encontrada.</div>
+  // Criar projeto
+  async function criarProjeto(e: React.FormEvent) {
+    e.preventDefault()
+    setLoadingCriar(true)
+
+    try {
+      await api.post(`/api/disciplinas/${disciplinaId}/projetos`, {
+        nome: novoProjeto.nome,
+        descricao: novoProjeto.descricao,
+        dataInicio: novoProjeto.dataInicio,
+        dataFim: novoProjeto.dataFim
+      })
+
+      await carregarProjetos()
+      setShowModal(false)
+      setNovoProjeto({ nome: "", descricao: "", dataInicio: "", dataFim: "" })
+    } catch (error) {
+      console.error("Erro ao criar projeto", error)
+      alert("Erro ao criar projeto")
+    } finally {
+      setLoadingCriar(false)
+    }
+  }
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">A carregar disciplina...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!disciplina) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Disciplina não encontrada</h2>
+          <Button onClick={() => navigate(-1)}>
+            Voltar
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
+  const isProfessor = user?.papelSistema === "PROFESSOR"
 
   return (
-    <div className="p-10">
-      {/* HEADER */}
-      <div className="bg-gradient-to-r from-purple-500 to-purple-700 text-white rounded-2xl p-8 mb-10 shadow-lg">
-        <h1 className="text-4xl font-bold">{disciplina.nome}</h1>
-        <p className="text-lg opacity-90">{disciplina.codigo}</p>
+    <div className="min-h-screen bg-gray-50 px-6 py-10">
+      <div className="max-w-6xl mx-auto">
 
-        <Link
-          to={`/cursos/${disciplina.cursoId}`}
-          className="underline text-white/90 text-sm mt-3 inline-block"
-        >
-          Voltar ao curso: {disciplina.cursoNome}
-        </Link>
-      </div>
+        {/* HEADER COM GRADIENTE */}
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-white shadow-lg mb-8">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate(-1)}
+            className="mb-4 text-white hover:bg-white/20 border-white/30"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Voltar
+          </Button>
+          
+          <div className="flex items-start justify-between">
+            <div>
+              <span className="inline-block px-3 py-1 bg-white/20 rounded-full text-sm font-medium mb-3">
+                {disciplina.codigo}
+              </span>
+              <h1 className="text-4xl font-bold mb-2">{disciplina.nome}</h1>
+              <p className="text-indigo-100 flex items-center gap-2">
+                <BookOpen className="w-4 h-4" />
+                Curso: {disciplina.cursoNome}
+              </p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+              <BookOpen className="w-12 h-12" />
+            </div>
+          </div>
+        </div>
 
-      {/* GRID */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* STATS RÁPIDAS */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Card className="border-0 shadow-sm">
+            <CardContent className="p-6 flex items-center gap-4">
+              <div className="w-12 h-12 rounded-lg bg-violet-100 flex items-center justify-center">
+                <FolderOpen className="w-6 h-6 text-violet-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{projetos.length}</p>
+                <p className="text-sm text-gray-600">Projetos</p>
+              </div>
+            </CardContent>
+          </Card>
 
-        {/* PROJETOS */}
-        <div className="lg:col-span-2 flex flex-col gap-6">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold flex items-center gap-2">
-              <FolderOpen size={20} /> Projetos da Disciplina
-            </h2>
+          <Card className="border-0 shadow-sm">
+            <CardContent className="p-6 flex items-center gap-4">
+              <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center">
+                <Users className="w-6 h-6 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{professores.length}</p>
+                <p className="text-sm text-gray-600">Professores</p>
+              </div>
+            </CardContent>
+          </Card>
 
-            {user?.papelSistema === "PROFESSOR" && (
-              <button
-                onClick={() => setShowModal(true)}
-                className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"
-              >
-                Criar Projeto
-              </button>
-            )}
+          <Card className="border-0 shadow-sm">
+            <CardContent className="p-6 flex items-center gap-4">
+              <div className="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center">
+                <Sparkles className="w-6 h-6 text-green-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">Ativa</p>
+                <p className="text-sm text-gray-600">Estado</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* LAYOUT EM GRID */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          {/* PROJETOS - 2 colunas */}
+          <div className="lg:col-span-2">
+            <Card className="shadow-sm">
+              <CardHeader className="border-b bg-white">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <FolderOpen className="w-5 h-5 text-violet-600" />
+                    Projetos da Disciplina
+                  </CardTitle>
+                  {isProfessor && (
+                    <Button 
+                      onClick={() => setShowModal(true)}
+                      className="bg-violet-600 hover:bg-violet-700"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Novo Projeto
+                    </Button>
+                  )}
+                </div>
+              </CardHeader>
+
+              <CardContent className="p-6">
+                {projetos.length === 0 ? (
+                  <div className="text-center py-16">
+                    <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-violet-100 to-purple-100 flex items-center justify-center">
+                      <FolderOpen className="w-10 h-10 text-violet-600" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      Ainda não existem projetos
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                      {isProfessor 
+                        ? "Crie o primeiro projeto para esta disciplina"
+                        : "O professor ainda não criou projetos para esta disciplina"
+                      }
+                    </p>
+                    {isProfessor && (
+                      <Button 
+                        onClick={() => setShowModal(true)} 
+                        className="mt-2 bg-violet-600 hover:bg-violet-700"
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Criar Primeiro Projeto
+                      </Button>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {projetos.map((proj) => (
+                      <div
+                        key={proj.id}
+                        className="group p-6 border border-gray-200 rounded-xl hover:border-violet-300 hover:bg-violet-50 transition-all cursor-pointer"
+                      >
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex-1">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-1 group-hover:text-violet-600 transition">
+                              {proj.nome}
+                            </h3>
+                            <p className="text-sm text-gray-600 line-clamp-2">{proj.descricao}</p>
+                          </div>
+                          {isProfessor && (
+                            <div className="flex gap-2">
+                              <Button size="sm" variant="outline">
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="hover:bg-red-50 hover:text-red-600 hover:border-red-300"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="flex items-center gap-4 text-xs text-gray-500 mb-3">
+                          <span className="flex items-center gap-1">
+                            <CalendarDays className="w-3 h-3" />
+                            {new Date(proj.dataInicio).toLocaleDateString("pt-PT")}
+                          </span>
+                          <span>→</span>
+                          <span className="flex items-center gap-1">
+                            <CalendarDays className="w-3 h-3" />
+                            {new Date(proj.dataFim).toLocaleDateString("pt-PT")}
+                          </span>
+                        </div>
+
+                        <Button 
+                          size="sm" 
+                          variant="ghost" 
+                          className="w-full justify-between group-hover:bg-violet-100 transition"
+                        >
+                          Ver Projeto
+                          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
 
-          {projetos.length === 0 ? (
-            <div className="text-gray-500 text-sm">Ainda não existem projetos.</div>
-          ) : (
-            projetos.map((proj) => (
-              <Card key={proj.id} className="hover:shadow-md transition">
-                <CardContent className="p-5">
-                  <h3 className="font-semibold text-lg">{proj.nome}</h3>
-                  <p className="text-gray-600 text-sm mb-2">{proj.descricao}</p>
+          {/* SIDEBAR - PROFESSORES - 1 coluna */}
+          <div>
+            <Card className="shadow-sm">
+              <CardHeader className="border-b bg-white">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Users className="w-5 h-5 text-blue-600" />
+                  Professores
+                </CardTitle>
+              </CardHeader>
 
-                  <p className="text-xs text-gray-500">
-                    {proj.dataInicio} → {proj.dataFim}
+              <CardContent className="p-6">
+                {professores.length === 0 ? (
+                  <p className="text-sm text-gray-500 text-center py-8">
+                    Nenhum professor associado
                   </p>
-
-                  <Link
-                    to={`/projetos/${proj.id}`}
-                    className="mt-3 inline-block text-purple-600 hover:underline"
-                  >
-                    Ver projeto →
-                  </Link>
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </div>
-
-        {/* PROFESSORES */}
-        <div className="flex flex-col gap-6">
-          <h2 className="text-xl font-semibold flex items-center gap-2">
-            <Users size={20} /> Professores
-          </h2>
-
-          {professores.length === 0 ? (
-            <p className="text-gray-500 text-sm">Nenhum professor associado.</p>
-          ) : (
-            professores.map((prof) => (
-              <Card key={prof.id} className="hover:shadow-md transition">
-                <CardContent className="p-5 flex flex-col">
-                  <span className="font-medium">{prof.nome}</span>
-                  <span className="text-gray-500 text-sm">{prof.email}</span>
-                </CardContent>
-              </Card>
-            ))
-          )}
+                ) : (
+                  <ul className="space-y-4">
+                    {professores.map((prof) => (
+                      <li key={prof.id} className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center text-white font-semibold text-sm">
+                          {prof.nome.split(" ").map((n: string) => n[0]).join("").slice(0, 2)}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-gray-900 truncate">{prof.nome}</p>
+                          <p className="text-xs text-gray-500 truncate">{prof.email}</p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
 
-      {/* MODAL DE CRIAR PROJETO */}
+      {/* MODAL CRIAR PROJETO */}
       {showModal && (
-        <CriarProjetoModal
-          disciplinaId={Number(disciplinaId)}
-          onClose={() => setShowModal(false)}
-          onCreated={carregarProjetos}
-        />
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm p-4">
+          <Card className="w-full max-w-md shadow-2xl">
+            <CardHeader className="border-b">
+              <CardTitle className="flex items-center gap-2">
+                <Plus className="w-5 h-5 text-violet-600" />
+                Novo Projeto
+              </CardTitle>
+            </CardHeader>
+
+            <CardContent className="p-6">
+              <form onSubmit={criarProjeto} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Nome do Projeto
+                  </label>
+                  <input
+                    type="text"
+                    value={novoProjeto.nome}
+                    onChange={(e) => setNovoProjeto({ ...novoProjeto, nome: e.target.value })}
+                    placeholder="Ex: Sistema de Gestão"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-400 focus:outline-none"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Descrição
+                  </label>
+                  <textarea
+                    value={novoProjeto.descricao}
+                    onChange={(e) => setNovoProjeto({ ...novoProjeto, descricao: e.target.value })}
+                    placeholder="Breve descrição do projeto"
+                    rows={3}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-400 focus:outline-none resize-none"
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Data de Início
+                    </label>
+                    <input
+                      type="date"
+                      value={novoProjeto.dataInicio}
+                      onChange={(e) => setNovoProjeto({ ...novoProjeto, dataInicio: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-400 focus:outline-none"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Data de Fim
+                    </label>
+                    <input
+                      type="date"
+                      value={novoProjeto.dataFim}
+                      onChange={(e) => setNovoProjeto({ ...novoProjeto, dataFim: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-400 focus:outline-none"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setShowModal(false)
+                      setNovoProjeto({ nome: "", descricao: "", dataInicio: "", dataFim: "" })
+                    }}
+                    className="flex-1"
+                  >
+                    Cancelar
+                  </Button>
+
+                  <Button
+                    type="submit"
+                    disabled={loadingCriar}
+                    className="flex-1 bg-violet-600 hover:bg-violet-700"
+                  >
+                    {loadingCriar ? "A criar..." : "Criar"}
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
       )}
     </div>
   )
 }
-

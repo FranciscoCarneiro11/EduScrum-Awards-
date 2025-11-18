@@ -287,9 +287,9 @@ export default function ProfessorCursoDetalhes() {
               </CardTitle>
               <Button 
                 onClick={() => setShowDisciplinaModal(true)}
-                className="bg-violet-600 hover:bg-violet-700"
+                className="bg-violet-600 hover:bg-violet-700 text-white"
               >
-                <Plus className="w-4 h-4 mr-2" />
+                <Plus className="w-4 h-4 mr-2 text-white" />
                 Nova Disciplina
               </Button>
             </div>
@@ -342,9 +342,9 @@ export default function ProfessorCursoDetalhes() {
               </CardTitle>
               <Button 
                 onClick={() => setShowProjetoModal(true)}
-                className="bg-violet-600 hover:bg-violet-700"
+                className="bg-violet-600 hover:bg-violet-700 text-white"
               >
-                <Plus className="w-4 h-4 mr-2" />
+                <Plus className="w-4 h-4 mr-2 text-white" />
                 Novo Projeto
               </Button>
             </div>
@@ -465,127 +465,172 @@ export default function ProfessorCursoDetalhes() {
 
       {/* Modal Criar Disciplina */}
       {showDisciplinaModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-md">
-            <CardHeader>
-              <CardTitle>Nova Disciplina</CardTitle>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm">
+          <Card className="w-full max-w-md shadow-2xl">
+            
+            <CardHeader className="border-b bg-gradient-to-r from-indigo-600 to-purple-600">
+              <CardTitle className="flex items-center gap-2 text-white">
+                <Plus className="w-5 h-5" />
+                Nova Disciplina
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+
+            <CardContent className="p-6 bg-white">
+              
+              {/* Nome */}
               <div>
-                <label className="block text-sm font-medium mb-2">Nome da Disciplina</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Nome da Disciplina
+                </label>
                 <input
                   type="text"
                   value={novaDisciplina.nome}
-                  onChange={(e) => setNovaDisciplina({ ...novaDisciplina, nome: e.target.value })}
+                  onChange={(e) =>
+                    setNovaDisciplina({ ...novaDisciplina, nome: e.target.value })
+                  }
                   placeholder="Ex: Programação Web"
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-violet-400 focus:outline-none"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg 
+                    focus:ring-2 focus:ring-violet-400 focus:outline-none bg-white text-gray-900"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Código</label>
+
+              {/* Código */}
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Código
+                </label>
                 <input
                   type="text"
                   value={novaDisciplina.codigo}
-                  onChange={(e) => setNovaDisciplina({ ...novaDisciplina, codigo: e.target.value })}
+                  onChange={(e) =>
+                    setNovaDisciplina({ ...novaDisciplina, codigo: e.target.value })
+                  }
                   placeholder="Ex: PW2024"
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-violet-400 focus:outline-none"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg 
+                    focus:ring-2 focus:ring-violet-400 focus:outline-none bg-white text-gray-900"
                 />
               </div>
-              <div className="flex gap-3 pt-4">
+
+              {/* Botões */}
+              <div className="flex gap-3 pt-6">
                 <Button
                   onClick={() => {
                     setShowDisciplinaModal(false)
                     setNovaDisciplina({ nome: "", codigo: "" })
                   }}
                   variant="outline"
-                  className="flex-1"
+                  className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-100"
                 >
                   Cancelar
                 </Button>
+
                 <Button
                   onClick={handleCriarDisciplina}
-                  className="flex-1 bg-violet-600 hover:bg-violet-700"
+                  className="flex-1 bg-violet-600 hover:bg-violet-700 text-white"
                   disabled={!novaDisciplina.nome || !novaDisciplina.codigo}
                 >
                   Criar
                 </Button>
               </div>
+
             </CardContent>
           </Card>
         </div>
       )}
 
+
       {/* Modal Criar Projeto */}
       {showProjetoModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-md">
-            <CardHeader>
-              <CardTitle>Novo Projeto</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm">
+        <Card className="w-full max-w-md shadow-2xl">
+          <CardHeader className="border-b bg-gradient-to-r from-indigo-600 to-purple-600">
+            <CardTitle className="flex items-center gap-2 text-white">
+              <Plus className="w-5 h-5" />
+              Novo Projeto
+            </CardTitle>
+          </CardHeader>
+          
+          <CardContent className="p-6 bg-white">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Nome do Projeto
+              </label>
+              <input
+                type="text"
+                value={novoProjeto.nome}
+                onChange={(e) => setNovoProjeto({ ...novoProjeto, nome: e.target.value })}
+                placeholder="Ex: Sistema de Gestão"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg 
+                        focus:ring-2 focus:ring-violet-400 focus:outline-none bg-white text-gray-900"
+              />
+            </div>
+            
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Descrição
+              </label>
+              <textarea
+                value={novoProjeto.descricao}
+                onChange={(e) => setNovoProjeto({ ...novoProjeto, descricao: e.target.value })}
+                placeholder="Breve descrição do projeto"
+                rows={3}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg 
+                        focus:ring-2 focus:ring-violet-400 focus:outline-none resize-none bg-white text-gray-900"
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4 mt-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Nome do Projeto</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Data Início
+                </label>
                 <input
-                  type="text"
-                  value={novoProjeto.nome}
-                  onChange={(e) => setNovoProjeto({ ...novoProjeto, nome: e.target.value })}
-                  placeholder="Ex: Sistema de Gestão"
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-violet-400 focus:outline-none"
+                  type="date"
+                  value={novoProjeto.dataInicio}
+                  onChange={(e) => setNovoProjeto({ ...novoProjeto, dataInicio: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg 
+                          focus:ring-2 focus:ring-violet-400 focus:outline-none bg-white text-gray-900"
                 />
               </div>
+              
               <div>
-                <label className="block text-sm font-medium mb-2">Descrição</label>
-                <textarea
-                  value={novoProjeto.descricao}
-                  onChange={(e) => setNovoProjeto({ ...novoProjeto, descricao: e.target.value })}
-                  placeholder="Breve descrição do projeto"
-                  rows={3}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-violet-400 focus:outline-none resize-none"
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Data Fim
+                </label>
+                <input
+                  type="date"
+                  value={novoProjeto.dataFim}
+                  onChange={(e) => setNovoProjeto({ ...novoProjeto, dataFim: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg 
+                          focus:ring-2 focus:ring-violet-400 focus:outline-none bg-white text-gray-900"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Data Início</label>
-                  <input
-                    type="date"
-                    value={novoProjeto.dataInicio}
-                    onChange={(e) => setNovoProjeto({ ...novoProjeto, dataInicio: e.target.value })}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-violet-400 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Data Fim</label>
-                  <input
-                    type="date"
-                    value={novoProjeto.dataFim}
-                    onChange={(e) => setNovoProjeto({ ...novoProjeto, dataFim: e.target.value })}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-violet-400 focus:outline-none"
-                  />
-                </div>
-              </div>
-              <div className="flex gap-3 pt-4">
-                <Button
-                  onClick={() => {
-                    setShowProjetoModal(false)
-                    setNovoProjeto({ nome: "", descricao: "", dataInicio: "", dataFim: "" })
-                  }}
-                  variant="outline"
-                  className="flex-1"
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  onClick={handleCriarProjeto}
-                  className="flex-1 bg-violet-600 hover:bg-violet-700"
-                  disabled={!novoProjeto.nome || !novoProjeto.dataInicio || !novoProjeto.dataFim}
-                >
-                  Criar
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+            </div>
+
+            <div className="flex gap-3 pt-6">
+              <Button
+                onClick={() => {
+                  setShowProjetoModal(false)
+                  setNovoProjeto({ nome: "", descricao: "", dataInicio: "", dataFim: "" })
+                }}
+                variant="outline"
+                className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-100"
+              >
+                Cancelar
+              </Button>
+
+              <Button
+                onClick={handleCriarProjeto}
+                className="flex-1 bg-violet-600 hover:bg-violet-700 text-white"
+                disabled={!novoProjeto.nome || !novoProjeto.dataInicio || !novoProjeto.dataFim}
+              >
+                Criar
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+)}
     </div>
   )
 }
