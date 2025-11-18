@@ -7,7 +7,7 @@ public class UtilizadorDTO {
     private String password;
     private PapelSistema papelSistema;
 
-    // ========== CONSTRUTORES MANUAIS ==========
+    // ========== CONSTRUTORES ==========
     public UtilizadorDTO() {
     }
 
@@ -18,7 +18,7 @@ public class UtilizadorDTO {
         this.papelSistema = papelSistema;
     }
 
-    // ========== GETTERS MANUAIS ==========
+    // ========== GETTERS ==========
     public String getNome() {
         return nome;
     }
@@ -35,7 +35,7 @@ public class UtilizadorDTO {
         return papelSistema;
     }
 
-    // ========== SETTERS MANUAIS ==========
+    // ========== SETTERS ==========
     public void setNome(String nome) {
         this.nome = nome;
     }

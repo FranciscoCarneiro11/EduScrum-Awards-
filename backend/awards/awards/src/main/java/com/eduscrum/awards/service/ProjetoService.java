@@ -18,9 +18,7 @@ public class ProjetoService {
     private final CursoRepository cursoRepository;
     private final DisciplinaRepository disciplinaRepository;
 
-    public ProjetoService(ProjetoRepository projetoRepository,
-                          CursoRepository cursoRepository,
-                          DisciplinaRepository disciplinaRepository) {
+    public ProjetoService(ProjetoRepository projetoRepository,CursoRepository cursoRepository,DisciplinaRepository disciplinaRepository) {
         this.projetoRepository = projetoRepository;
         this.cursoRepository = cursoRepository;
         this.disciplinaRepository = disciplinaRepository;

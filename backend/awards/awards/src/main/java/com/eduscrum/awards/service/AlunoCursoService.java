@@ -21,9 +21,7 @@ public class AlunoCursoService {
     private final UtilizadorRepository utilizadorRepository;
     private final CursoRepository cursoRepository;
 
-    public AlunoCursoService(AlunoCursoRepository alunoCursoRepository,
-                             UtilizadorRepository utilizadorRepository,
-                             CursoRepository cursoRepository) {
+    public AlunoCursoService(AlunoCursoRepository alunoCursoRepository,UtilizadorRepository utilizadorRepository,CursoRepository cursoRepository) {
         this.alunoCursoRepository = alunoCursoRepository;
         this.utilizadorRepository = utilizadorRepository;
         this.cursoRepository = cursoRepository;

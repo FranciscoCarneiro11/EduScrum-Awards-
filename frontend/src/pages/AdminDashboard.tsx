@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { BookOpen, Users, GraduationCap, TrendingUp,Plus,Edit,Trash2,Search,Filter} from 'lucide-react'
+import { BookOpen, Users, GraduationCap, TrendingUp,Plus,Edit,Trash2} from 'lucide-react'
 import {LineChart,Line,XAxis,YAxis,Tooltip,ResponsiveContainer,BarChart,Bar} from 'recharts'
 import axios from 'axios'
 
@@ -62,8 +62,8 @@ export default function AdminDashboard() {
         setCursos(
           cursosData.map((c: any) => ({
             ...c,
-            numAlunos: 0,        // ainda não existe na BD
-            numProfessores: 0,   // ainda não existe na BD
+            numAlunos: 0,        
+            numProfessores: 0,   
           }))
         )
 
@@ -88,7 +88,7 @@ export default function AdminDashboard() {
       await axios.post('/api/cursos', {
         nome: novoCurso.nome,
         codigo: novoCurso.codigo,
-        adminId: 7 // temporário
+        adminId: 7 
       })
 
       setShowCreateModal(false)
@@ -399,8 +399,6 @@ export default function AdminDashboard() {
             </Card>
         </div>
     )}
-
-
     </div>
   )
 }

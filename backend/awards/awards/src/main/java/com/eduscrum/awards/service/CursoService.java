@@ -24,11 +24,7 @@ public class CursoService {
     private final AlunoCursoRepository alunoCursoRepository;
 
     @Autowired
-    public CursoService(
-            CursoRepository cursoRepository, 
-            AdminRepository adminRepository,
-            ProfessorCursoRepository professorCursoRepository,
-            AlunoCursoRepository alunoCursoRepository) {
+    public CursoService(CursoRepository cursoRepository, AdminRepository adminRepository,ProfessorCursoRepository professorCursoRepository,AlunoCursoRepository alunoCursoRepository) {
         this.cursoRepository = cursoRepository;
         this.adminRepository = adminRepository;
         this.professorCursoRepository = professorCursoRepository;
@@ -52,7 +48,7 @@ public class CursoService {
                 .orElseThrow(() -> new RuntimeException("Curso não encontrado com ID: " + cursoId));
 
         // Log para debug
-        System.out.println("🔍 Buscando professores do curso ID: " + cursoId);
+        System.out.println("Buscar professores do curso com ID: " + cursoId);
         
         // Busca todas as associações professor-curso
         List<Utilizador> professores = professorCursoRepository.findAll().stream()
@@ -72,12 +68,11 @@ public class CursoService {
     // Listar alunos de um curso
     @Transactional(readOnly = true)
     public List<Utilizador> listarAlunosDoCurso(Long cursoId) {
-        // Verifica se o curso existe
         Curso curso = cursoRepository.findById(cursoId)
                 .orElseThrow(() -> new RuntimeException("Curso não encontrado com ID: " + cursoId));
 
         // Log para debug
-        System.out.println("🔍 Buscando alunos do curso ID: " + cursoId);
+        System.out.println("Buscar alunos do curso com ID: " + cursoId);
         
         // Busca todas as associações aluno-curso
         List<Utilizador> alunos = alunoCursoRepository.findAll().stream()

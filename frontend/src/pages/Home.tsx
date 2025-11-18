@@ -7,7 +7,7 @@ export default function Home() {
 
   return (
     <>
-      {/* 🔹 CONTEÚDO PRINCIPAL (com fundo claro) */}
+      {/*CONTEÚDO PRINCIPAL*/}
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
 
         {/* HERO SECTION */}

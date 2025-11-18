@@ -21,9 +21,7 @@ public class ProfessorCursoService {
     private final UtilizadorRepository utilizadorRepository;
     private final CursoRepository cursoRepository;
 
-    public ProfessorCursoService(ProfessorCursoRepository professorCursoRepository,
-                                 UtilizadorRepository utilizadorRepository,
-                                 CursoRepository cursoRepository) {
+    public ProfessorCursoService(ProfessorCursoRepository professorCursoRepository,UtilizadorRepository utilizadorRepository,CursoRepository cursoRepository) {
         this.professorCursoRepository = professorCursoRepository;
         this.utilizadorRepository = utilizadorRepository;
         this.cursoRepository = cursoRepository;
@@ -42,7 +40,6 @@ public class ProfessorCursoService {
         Curso curso = cursoRepository.findById(cursoId)
                 .orElseThrow(() -> new RuntimeException("Curso não encontrado"));
 
-        // Regra: um professor só pode estar num curso (se quiseres limitar igual ao aluno)
         if (professorCursoRepository.existsByProfessorId(professorId)) {
             throw new RuntimeException("O professor já está associado a um curso.");
         }

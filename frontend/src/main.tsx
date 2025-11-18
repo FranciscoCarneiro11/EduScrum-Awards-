@@ -122,6 +122,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
               }
             />
             
+            {/* Página de Detalhes da Disciplina */}
             <Route
               path="disciplinas/:disciplinaId"
               element={
@@ -130,9 +131,6 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
                 </ProtectedRoute>
               }
             />
-
-
-
 
             {/* Página Sobre (pública) */}
             <Route path="sobre" element={<Sobre />} />

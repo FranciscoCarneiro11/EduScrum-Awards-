@@ -4,28 +4,21 @@ import com.eduscrum.awards.model.Curso;
 import com.eduscrum.awards.model.Disciplina;
 import com.eduscrum.awards.model.DisciplinaDTO;
 import com.eduscrum.awards.model.DisciplinaDetalhesDTO;
-import com.eduscrum.awards.model.ProjetoDTO;
 import com.eduscrum.awards.repository.CursoRepository;
 import com.eduscrum.awards.repository.DisciplinaRepository;
-import com.eduscrum.awards.repository.ProjetoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class DisciplinaService {
 
     private final DisciplinaRepository disciplinaRepository;
     private final CursoRepository cursoRepository;
-    private final ProjetoRepository projetoRepository;
 
-    public DisciplinaService(DisciplinaRepository disciplinaRepository,
-                             CursoRepository cursoRepository,ProjetoRepository projetoRepository ) {
+    public DisciplinaService(DisciplinaRepository disciplinaRepository,CursoRepository cursoRepository ) {
         this.disciplinaRepository = disciplinaRepository;
         this.cursoRepository = cursoRepository;
-        this.projetoRepository = projetoRepository;
     }
 
     @Transactional

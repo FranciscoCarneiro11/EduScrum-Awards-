@@ -28,12 +28,7 @@ public class UtilizadorService {
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UtilizadorService(
-            UtilizadorRepository utilizadorRepository,
-            AlunoRepository alunoRepository,
-            ProfessorRepository professorRepository,
-            AdminRepository adminRepository,         
-            PasswordEncoder passwordEncoder) {
+    public UtilizadorService(UtilizadorRepository utilizadorRepository,AlunoRepository alunoRepository,ProfessorRepository professorRepository,AdminRepository adminRepository,         PasswordEncoder passwordEncoder) {
         this.utilizadorRepository = utilizadorRepository;
         this.alunoRepository = alunoRepository;
         this.professorRepository = professorRepository;

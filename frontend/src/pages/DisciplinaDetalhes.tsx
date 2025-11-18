@@ -4,10 +4,7 @@ import { useAuth } from "@/context/AuthContext"
 import api from "@/lib/api"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { 
-  Users, FolderOpen, BookOpen, CalendarDays, 
-  Plus, Edit, Trash2, ArrowRight, ArrowLeft, Sparkles 
-} from "lucide-react"
+import { Users, FolderOpen, BookOpen, CalendarDays, Plus, Edit, Trash2, ArrowRight, ArrowLeft, Sparkles } from "lucide-react"
 
 export default function DisciplinaDetalhes() {
   const { disciplinaId } = useParams()
@@ -188,7 +185,7 @@ export default function DisciplinaDetalhes() {
         {/* LAYOUT EM GRID */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
-          {/* PROJETOS - 2 colunas */}
+          {/* PROJETOS  */}
           <div className="lg:col-span-2">
             <Card className="shadow-sm">
               <CardHeader className="border-b bg-white">
@@ -292,7 +289,7 @@ export default function DisciplinaDetalhes() {
             </Card>
           </div>
 
-          {/* SIDEBAR - PROFESSORES - 1 coluna */}
+          {/* SIDEBAR - PROFESSORES  */}
           <div>
             <Card className="shadow-sm">
               <CardHeader className="border-b bg-white">

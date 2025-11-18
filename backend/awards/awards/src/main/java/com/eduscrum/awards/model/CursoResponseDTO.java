@@ -3,8 +3,6 @@ package com.eduscrum.awards.model;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.eduscrum.awards.model.Curso;
-
 public class CursoResponseDTO {
 
     private Long id;
@@ -22,7 +20,7 @@ public class CursoResponseDTO {
         this.nome = curso.getNome();
         this.codigo = curso.getCodigo();
 
-        // Se o curso tem admin (não sei se tens relação ManyToOne)
+        // Se o curso tem admin 
         if (curso.getAdmin() != null) {
             this.adminId = curso.getAdmin().getId();
         }

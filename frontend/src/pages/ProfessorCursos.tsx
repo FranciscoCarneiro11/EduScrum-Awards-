@@ -4,15 +4,7 @@ import api from "@/lib/api"
 import { useNavigate } from "react-router-dom"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { 
-  BookOpen, 
-  Users, 
-  ArrowRight, 
-  GraduationCap,
-  FolderKanban,
-  Sparkles,
-  Settings
-} from "lucide-react"
+import { BookOpen, Users, ArrowRight, GraduationCap,FolderKanban,Sparkles,Settings} from "lucide-react"
 
 type Curso = {
   id: number

@@ -45,7 +45,6 @@ export default function AdminGestaoUtilizadoresRedesign() {
   const [userSelecionado, setUserSelecionado] = useState<Utilizador | null>(null)
   const [cursoSelecionadoId, setCursoSelecionadoId] = useState<number | "">("")
 
-  // 🔥 AGORA VOLTA A CARREGAR DADOS REAIS (SEM SIMULAÇÃO)
   useEffect(() => {
     carregarDados()
   }, [])
@@ -54,7 +53,7 @@ export default function AdminGestaoUtilizadoresRedesign() {
     try {
       setLoading(true)
 
-      // 1. Buscar utilizadores e cursos reais
+      // Buscar utilizadores e cursos reais
       const [usersRes, cursosRes] = await Promise.all([
         api.get<Utilizador[]>("/api/utilizadores"),
         api.get<Curso[]>("/api/cursos")
@@ -63,12 +62,12 @@ export default function AdminGestaoUtilizadoresRedesign() {
       setUtilizadores(usersRes.data)
       setCursos(cursosRes.data)
 
-      // 2. Filtrar apenas alunos e professores para buscar cursos
+      // Filtrar apenas alunos e professores para buscar cursos
       const apenasAlunosProf = usersRes.data.filter(
         u => u.papelSistema === "ALUNO" || u.papelSistema === "PROFESSOR"
       )
 
-      // 3. Buscar curso atribuído a cada utilizador
+      // Buscar curso atribuído a cada utilizador
       const associacoes = await Promise.all(
         apenasAlunosProf.map(async (u) => {
           try {
@@ -83,7 +82,7 @@ export default function AdminGestaoUtilizadoresRedesign() {
         })
       )
 
-      // 4. Guardar os cursos associados
+      // Guardar os cursos associados
       const map: CursosPorUserMap = {}
       associacoes.forEach(([id, curso]) => {
         map[id] = curso
@@ -196,9 +195,7 @@ export default function AdminGestaoUtilizadoresRedesign() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
       <div className="max-w-7xl mx-auto">
 
-        {/* ---------------------------------------------------------------------- */}
-        {/*                         HEADER + ESTATÍSTICAS                         */}
-        {/* ---------------------------------------------------------------------- */}
+        {/*HEADER + ESTATÍSTICAS*/}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Gestão de Utilizadores</h1>
           <p className="text-gray-600 mb-6">Atribua cursos e gira os utilizadores da plataforma</p>
@@ -242,10 +239,7 @@ export default function AdminGestaoUtilizadoresRedesign() {
           </div>
         </div>
 
-        {/* ---------------------------------------------------------------------- */}
-        {/*                            FILTROS E PESQUISA?                         */}
-        {/* ---------------------------------------------------------------------- */}
-
+        {/*FILTROS E PESQUISA?*/}
         <Card className="mb-6 shadow-sm">
           <CardContent className="p-6">
             <div className="flex flex-col md:flex-row gap-4">
@@ -285,10 +279,7 @@ export default function AdminGestaoUtilizadoresRedesign() {
           </CardContent>
         </Card>
 
-        {/* ---------------------------------------------------------------------- */}
-        {/*                               TABELA ALUNOS                            */}
-        {/* ---------------------------------------------------------------------- */}
-
+        {/*TABELA ALUNOS*/}
         <Card className="mb-6 shadow-lg">
           <CardHeader className="border-b bg-blue-50">
             <CardTitle className="flex items-center gap-2 text-blue-900">
@@ -389,10 +380,7 @@ export default function AdminGestaoUtilizadoresRedesign() {
           </CardContent>
         </Card>
 
-        {/* ---------------------------------------------------------------------- */}
-        {/*                           TABELA PROFESSORES                           */}
-        {/* ---------------------------------------------------------------------- */}
-
+        {/*TABELA PROFESSORES*/}
         <Card className="shadow-lg">
           <CardHeader className="border-b bg-purple-50">
             <CardTitle className="flex items-center gap-2 text-purple-900">
@@ -495,10 +483,7 @@ export default function AdminGestaoUtilizadoresRedesign() {
 
       </div>
 
-      {/* ---------------------------------------------------------------------- */}
-      {/*                             MODAL ATRIBUIÇÃO                           */}
-      {/* ---------------------------------------------------------------------- */}
-
+      {/*MODAL ATRIBUIÇÃO*/}
       {modalAberto && userSelecionado && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
 

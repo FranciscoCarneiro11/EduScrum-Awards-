@@ -11,8 +11,7 @@ public class DisciplinaDetalhesDTO {
     public DisciplinaDetalhesDTO() {
     }
 
-    public DisciplinaDetalhesDTO(Long id, String nome, String codigo,
-                                 Long cursoId, String cursoNome) {
+    public DisciplinaDetalhesDTO(Long id, String nome, String codigo,Long cursoId, String cursoNome) {
         this.id = id;
         this.nome = nome;
         this.codigo = codigo;
@@ -20,19 +19,40 @@ public class DisciplinaDetalhesDTO {
         this.cursoNome = cursoNome;
     }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() { 
+        return id; 
+    }
 
-    public String getNome() { return nome; }
-    public void setNome(String nome) { this.nome = nome; }
+    public void setId(Long id) { 
+        this.id = id; 
+    }
 
-    public String getCodigo() { return codigo; }
-    public void setCodigo(String codigo) { this.codigo = codigo; }
+    public String getNome() { 
+        return nome; 
+    }
+    public void setNome(String nome) { 
+        this.nome = nome; 
+    }
 
-    public Long getCursoId() { return cursoId; }
-    public void setCursoId(Long cursoId) { this.cursoId = cursoId; }
+    public String getCodigo() { 
+        return codigo; 
+    }
+    public void setCodigo(String codigo) { 
+        this.codigo = codigo; 
+    }
 
-    public String getCursoNome() { return cursoNome; }
-    public void setCursoNome(String cursoNome) { this.cursoNome = cursoNome; }
+    public Long getCursoId() { 
+        return cursoId; 
+    }
+    public void setCursoId(Long cursoId) { 
+        this.cursoId = cursoId; 
+    }
+
+    public String getCursoNome() { 
+        return cursoNome; 
+    }
+    public void setCursoNome(String cursoNome) { 
+        this.cursoNome = cursoNome; 
+    }
 }
 

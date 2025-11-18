@@ -4,10 +4,7 @@ import { useAuth } from "@/context/AuthContext"
 import api from "@/lib/api"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { 
-  BookOpen, Users, FolderKanban, ArrowLeft, 
-  GraduationCap, Plus, Edit, Trash2, CalendarDays
-} from "lucide-react"
+import { BookOpen, Users, FolderKanban, ArrowLeft, GraduationCap, Plus, Edit, Trash2, CalendarDays} from "lucide-react"
 
 type Disciplina = {
   id: number
@@ -64,8 +61,6 @@ export default function ProfessorCursoDetalhes() {
     dataInicio: "", 
     dataFim: "" 
   })
-
-  // No useEffect, adiciona logs para debug:
 
   useEffect(() => {
     if (!cursoId || !user) return

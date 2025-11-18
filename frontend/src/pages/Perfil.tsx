@@ -11,7 +11,7 @@ export default function Perfil() {
   const { user } = useAuth()
   const isProfessor = user?.papelSistema === "PROFESSOR"
 
-  // Preferências locais (placeholder – depois persistimos)
+  // Preferências locais
   const [darkMode, setDarkMode] = useState(false)
   const [emailNotifs, setEmailNotifs] = useState(true)
 
