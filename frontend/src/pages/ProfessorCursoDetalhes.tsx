@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthContext"
 import api from "@/lib/api"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { BookOpen, Users, FolderKanban, ArrowLeft, GraduationCap, Plus, Edit, Trash2, CalendarDays} from "lucide-react"
+import { BookOpen, Users, FolderKanban, ArrowLeft, GraduationCap, Plus, Edit, Trash2 } from "lucide-react"
 
 type Disciplina = {
   id: number
@@ -32,35 +32,19 @@ type Aluno = {
   email: string
 }
 
-type Projeto = {
-  id: number
-  nome: string
-  descricao: string
-  dataInicio: string
-  dataFim: string
-}
-
 export default function ProfessorCursoDetalhes() {
   const { cursoId } = useParams<{ cursoId: string }>()
   const { user } = useAuth()
   const navigate = useNavigate()
-  
+
   const [curso, setCurso] = useState<Curso | null>(null)
   const [professores, setProfessores] = useState<Professor[]>([])
   const [alunos, setAlunos] = useState<Aluno[]>([])
-  const [projetos, setProjetos] = useState<Projeto[]>([])
   const [loading, setLoading] = useState(true)
 
   // Modais
   const [showDisciplinaModal, setShowDisciplinaModal] = useState(false)
-  const [showProjetoModal, setShowProjetoModal] = useState(false)
   const [novaDisciplina, setNovaDisciplina] = useState({ nome: "", codigo: "" })
-  const [novoProjeto, setNovoProjeto] = useState({ 
-    nome: "", 
-    descricao: "", 
-    dataInicio: "", 
-    dataFim: "" 
-  })
 
   useEffect(() => {
     if (!cursoId || !user) return
@@ -69,23 +53,12 @@ export default function ProfessorCursoDetalhes() {
       try {
         setLoading(true)
 
-        // Curso com disciplinas
         const cursoRes = await api.get<Curso>(`/api/cursos/${cursoId}`)
         setCurso(cursoRes.data)
 
-        // Carregar projetos do curso
-        const projetosRes = await api.get<Projeto[]>(`/api/cursos/${cursoId}/projetos`)
-        setProjetos(projetosRes.data)
-
-        // Professores associados ao curso
         const profsRes = await api.get<Professor[]>(`/api/cursos/${cursoId}/professores`)
         setProfessores(profsRes.data)
-        
-        // const alunosRes = await api.get<Aluno[]>(`/api/cursos/${cursoId}/alunos`)
-        // setAlunos(alunosRes.data)
 
-
-        // Alunos do curso
         const alunosRes = await api.get<Aluno[]>(`/api/cursos/${cursoId}/alunos`)
         setAlunos(alunosRes.data)
 
@@ -103,33 +76,15 @@ export default function ProfessorCursoDetalhes() {
   const handleCriarDisciplina = async () => {
     try {
       await api.post(`/api/cursos/${cursoId}/disciplinas`, novaDisciplina)
-      
-      // Recarregar curso
+
       const cursoRes = await api.get<Curso>(`/api/cursos/${cursoId}`)
       setCurso(cursoRes.data)
-      
+
       setShowDisciplinaModal(false)
       setNovaDisciplina({ nome: "", codigo: "" })
     } catch (err) {
       console.error("Erro ao criar disciplina:", err)
       alert("Erro ao criar disciplina")
-    }
-  }
-
-  // Criar projeto
-  const handleCriarProjeto = async () => {
-    try {
-      await api.post(`/api/cursos/${cursoId}/projetos`, novoProjeto)
-      
-      // Recarregar projetos
-      const projetosRes = await api.get<Projeto[]>(`/api/cursos/${cursoId}/projetos`)
-      setProjetos(projetosRes.data)
-      
-      setShowProjetoModal(false)
-      setNovoProjeto({ nome: "", descricao: "", dataInicio: "", dataFim: "" })
-    } catch (err) {
-      console.error("Erro ao criar projeto:", err)
-      alert("Erro ao criar projeto")
     }
   }
 
@@ -139,29 +94,12 @@ export default function ProfessorCursoDetalhes() {
 
     try {
       await api.delete(`/api/cursos/${cursoId}/disciplinas/${disciplinaId}`)
-      
-      // Recarregar curso
+
       const cursoRes = await api.get<Curso>(`/api/cursos/${cursoId}`)
       setCurso(cursoRes.data)
     } catch (err) {
       console.error("Erro ao eliminar disciplina:", err)
       alert("Erro ao eliminar disciplina")
-    }
-  }
-
-  // Eliminar projeto
-  const handleEliminarProjeto = async (projetoId: number) => {
-    if (!confirm("Tem certeza que deseja eliminar este projeto?")) return
-
-    try {
-      await api.delete(`/api/projetos/${projetoId}`)
-      
-      // Recarregar projetos
-      const projetosRes = await api.get<Projeto[]>(`/api/cursos/${cursoId}/projetos`)
-      setProjetos(projetosRes.data)
-    } catch (err) {
-      console.error("Erro ao eliminar projeto:", err)
-      alert("Erro ao eliminar projeto")
     }
   }
 
@@ -191,13 +129,10 @@ export default function ProfessorCursoDetalhes() {
 
   return (
     <div className="min-h-screen bg-gray-50 px-6 py-10">
+
       {/* Header */}
       <div className="max-w-6xl mx-auto mb-8">
-        <Button 
-          variant="ghost" 
-          onClick={() => navigate("/professor/cursos")}
-          className="mb-4"
-        >
+        <Button variant="ghost" onClick={() => navigate("/professor/cursos")} className="mb-4">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Voltar aos cursos
         </Button>
@@ -209,9 +144,7 @@ export default function ProfessorCursoDetalhes() {
                 {curso.codigo}
               </span>
               <h1 className="text-4xl font-bold mb-2">{curso.nome}</h1>
-              <p className="text-indigo-100">
-                Gestão de disciplinas, projetos e alunos
-              </p>
+              <p className="text-indigo-100">Gestão de disciplinas e alunos</p>
             </div>
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
               <GraduationCap className="w-12 h-12" />
@@ -220,8 +153,9 @@ export default function ProfessorCursoDetalhes() {
         </div>
       </div>
 
-      {/* Stats rápidas */}
-      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      {/* Stats */}
+      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+
         <Card>
           <CardContent className="p-6 flex items-center gap-4">
             <div className="w-12 h-12 rounded-lg bg-violet-100 flex items-center justify-center">
@@ -258,20 +192,10 @@ export default function ProfessorCursoDetalhes() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-6 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-lg bg-amber-100 flex items-center justify-center">
-              <FolderKanban className="w-6 h-6 text-amber-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{projetos.length}</p>
-              <p className="text-sm text-gray-600">Projetos</p>
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       <div className="max-w-6xl mx-auto space-y-6">
+
         {/* Disciplinas */}
         <Card>
           <CardHeader>
@@ -289,8 +213,9 @@ export default function ProfessorCursoDetalhes() {
               </Button>
             </div>
           </CardHeader>
+
           <CardContent>
-            {curso.disciplinas && curso.disciplinas.length > 0 ? (
+            {curso.disciplinas?.length ? (
               <div className="space-y-3">
                 {curso.disciplinas.map((disc) => (
                   <div
@@ -302,10 +227,17 @@ export default function ProfessorCursoDetalhes() {
                         <h3 className="font-semibold text-gray-800">{disc.nome}</h3>
                         <p className="text-sm text-gray-500">{disc.codigo}</p>
                       </div>
+
                       <div className="flex gap-2">
-                        <Button size="sm" variant="outline">
-                          <Edit className="w-4 h-4" />
+                        {/* Ir para os detalhes da disciplina (onde estão os projetos) */}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => navigate(`/disciplinas/${disc.id}`)}
+                        >
+                          Ver disciplina
                         </Button>
+
                         <Button 
                           size="sm" 
                           variant="outline"
@@ -318,6 +250,7 @@ export default function ProfessorCursoDetalhes() {
                     </div>
                   </div>
                 ))}
+
               </div>
             ) : (
               <p className="text-gray-500 text-center py-8">
@@ -327,73 +260,9 @@ export default function ProfessorCursoDetalhes() {
           </CardContent>
         </Card>
 
-        {/* Projetos */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <FolderKanban className="w-5 h-5" />
-                Projetos do Curso
-              </CardTitle>
-              <Button 
-                onClick={() => setShowProjetoModal(true)}
-                className="bg-violet-600 hover:bg-violet-700 text-white"
-              >
-                <Plus className="w-4 h-4 mr-2 text-white" />
-                Novo Projeto
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {projetos.length > 0 ? (
-              <div className="space-y-3">
-                {projetos.map((proj) => (
-                  <div
-                    key={proj.id}
-                    className="p-4 border rounded-lg hover:border-violet-300 hover:bg-violet-50 transition"
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-800">{proj.nome}</h3>
-                        <p className="text-sm text-gray-600 mt-1">{proj.descricao}</p>
-                        <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
-                          <span className="flex items-center gap-1">
-                            <CalendarDays className="w-3 h-3" />
-                            Início: {new Date(proj.dataInicio).toLocaleDateString("pt-PT")}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <CalendarDays className="w-3 h-3" />
-                            Fim: {new Date(proj.dataFim).toLocaleDateString("pt-PT")}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="outline">
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={() => handleEliminarProjeto(proj.id)}
-                          className="hover:bg-red-50 hover:text-red-600"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-500 text-center py-8">
-                Ainda não existem projetos neste curso.
-              </p>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Lista de Alunos e Professores */}
+        {/* Professores + Alunos */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
           {/* Professores */}
           <Card>
             <CardHeader>
@@ -403,7 +272,7 @@ export default function ProfessorCursoDetalhes() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {professores.length > 0 ? (
+              {professores.length ? (
                 <ul className="space-y-3">
                   {professores.map((prof) => (
                     <li key={prof.id} className="flex items-center gap-3 p-2">
@@ -434,7 +303,7 @@ export default function ProfessorCursoDetalhes() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {alunos.length > 0 ? (
+              {alunos.length ? (
                 <ul className="space-y-3 max-h-96 overflow-y-auto">
                   {alunos.map((aluno) => (
                     <li key={aluno.id} className="flex items-center gap-3 p-2">
@@ -455,14 +324,16 @@ export default function ProfessorCursoDetalhes() {
               )}
             </CardContent>
           </Card>
+
         </div>
+
       </div>
 
       {/* Modal Criar Disciplina */}
       {showDisciplinaModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm">
           <Card className="w-full max-w-md shadow-2xl">
-            
+
             <CardHeader className="border-b bg-gradient-to-r from-indigo-600 to-purple-600">
               <CardTitle className="flex items-center gap-2 text-white">
                 <Plus className="w-5 h-5" />
@@ -471,7 +342,7 @@ export default function ProfessorCursoDetalhes() {
             </CardHeader>
 
             <CardContent className="p-6 bg-white">
-              
+
               {/* Nome */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -533,99 +404,6 @@ export default function ProfessorCursoDetalhes() {
         </div>
       )}
 
-
-      {/* Modal Criar Projeto */}
-      {showProjetoModal && (
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm">
-        <Card className="w-full max-w-md shadow-2xl">
-          <CardHeader className="border-b bg-gradient-to-r from-indigo-600 to-purple-600">
-            <CardTitle className="flex items-center gap-2 text-white">
-              <Plus className="w-5 h-5" />
-              Novo Projeto
-            </CardTitle>
-          </CardHeader>
-          
-          <CardContent className="p-6 bg-white">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Nome do Projeto
-              </label>
-              <input
-                type="text"
-                value={novoProjeto.nome}
-                onChange={(e) => setNovoProjeto({ ...novoProjeto, nome: e.target.value })}
-                placeholder="Ex: Sistema de Gestão"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg 
-                        focus:ring-2 focus:ring-violet-400 focus:outline-none bg-white text-gray-900"
-              />
-            </div>
-            
-            <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Descrição
-              </label>
-              <textarea
-                value={novoProjeto.descricao}
-                onChange={(e) => setNovoProjeto({ ...novoProjeto, descricao: e.target.value })}
-                placeholder="Breve descrição do projeto"
-                rows={3}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg 
-                        focus:ring-2 focus:ring-violet-400 focus:outline-none resize-none bg-white text-gray-900"
-              />
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4 mt-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Data Início
-                </label>
-                <input
-                  type="date"
-                  value={novoProjeto.dataInicio}
-                  onChange={(e) => setNovoProjeto({ ...novoProjeto, dataInicio: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg 
-                          focus:ring-2 focus:ring-violet-400 focus:outline-none bg-white text-gray-900"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Data Fim
-                </label>
-                <input
-                  type="date"
-                  value={novoProjeto.dataFim}
-                  onChange={(e) => setNovoProjeto({ ...novoProjeto, dataFim: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg 
-                          focus:ring-2 focus:ring-violet-400 focus:outline-none bg-white text-gray-900"
-                />
-              </div>
-            </div>
-
-            <div className="flex gap-3 pt-6">
-              <Button
-                onClick={() => {
-                  setShowProjetoModal(false)
-                  setNovoProjeto({ nome: "", descricao: "", dataInicio: "", dataFim: "" })
-                }}
-                variant="outline"
-                className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-100"
-              >
-                Cancelar
-              </Button>
-
-              <Button
-                onClick={handleCriarProjeto}
-                className="flex-1 bg-violet-600 hover:bg-violet-700 text-white"
-                disabled={!novoProjeto.nome || !novoProjeto.dataInicio || !novoProjeto.dataFim}
-              >
-                Criar
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-)}
     </div>
   )
 }

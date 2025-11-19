@@ -199,8 +199,10 @@ export default function DisciplinaDetalhes() {
                       onClick={() => setShowModal(true)}
                       className="bg-violet-600 hover:bg-violet-700"
                     >
-                      <Plus className="w-4 h-4 mr-2" />
-                      Novo Projeto
+                        <h2 className="text-white text-lg font-semibold flex items-center gap-2">
+                          <Plus className="w-5 h-5 text-white" />
+                          Novo Projeto
+                        </h2>
                     </Button>
                   )}
                 </div>
@@ -327,98 +329,104 @@ export default function DisciplinaDetalhes() {
 
       {/* MODAL CRIAR PROJETO */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm p-4">
-          <Card className="w-full max-w-md shadow-2xl">
-            <CardHeader className="border-b">
-              <CardTitle className="flex items-center gap-2">
-                <Plus className="w-5 h-5 text-violet-600" />
-                Novo Projeto
-              </CardTitle>
-            </CardHeader>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm p-4">
+      <div className="bg-white rounded-xl shadow-lg w-full max-w-md overflow-hidden">
 
-            <CardContent className="p-6">
-              <form onSubmit={criarProjeto} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Nome do Projeto
-                  </label>
-                  <input
-                    type="text"
-                    value={novoProjeto.nome}
-                    onChange={(e) => setNovoProjeto({ ...novoProjeto, nome: e.target.value })}
-                    placeholder="Ex: Sistema de Gestão"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-400 focus:outline-none"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Descrição
-                  </label>
-                  <textarea
-                    value={novoProjeto.descricao}
-                    onChange={(e) => setNovoProjeto({ ...novoProjeto, descricao: e.target.value })}
-                    placeholder="Breve descrição do projeto"
-                    rows={3}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-400 focus:outline-none resize-none"
-                    required
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Data de Início
-                    </label>
-                    <input
-                      type="date"
-                      value={novoProjeto.dataInicio}
-                      onChange={(e) => setNovoProjeto({ ...novoProjeto, dataInicio: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-400 focus:outline-none"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Data de Fim
-                    </label>
-                    <input
-                      type="date"
-                      value={novoProjeto.dataFim}
-                      onChange={(e) => setNovoProjeto({ ...novoProjeto, dataFim: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-400 focus:outline-none"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="flex gap-3 pt-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      setShowModal(false)
-                      setNovoProjeto({ nome: "", descricao: "", dataInicio: "", dataFim: "" })
-                    }}
-                    className="flex-1"
-                  >
-                    Cancelar
-                  </Button>
-
-                  <Button
-                    type="submit"
-                    disabled={loadingCriar}
-                    className="flex-1 bg-violet-600 hover:bg-violet-700"
-                  >
-                    {loadingCriar ? "A criar..." : "Criar"}
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
+        {/* HEADER GRADIENTE IGUAL AO NOVA DISCIPLINA */}
+        <div className="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600">
+          <h2 className="text-white text-lg font-semibold flex items-center gap-2">
+            <Plus className="w-5 h-5 text-white" />
+            Novo Projeto
+          </h2>
         </div>
+
+        {/* FORM */}
+        <div className="p-6">
+          <form onSubmit={criarProjeto} className="space-y-4">
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Nome do Projeto
+              </label>
+              <input
+                type="text"
+                value={novoProjeto.nome}
+                onChange={(e) => setNovoProjeto({ ...novoProjeto, nome: e.target.value })}
+                placeholder="Ex: Sistema de Gestão"
+                className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-violet-400"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Descrição
+              </label>
+              <textarea
+                value={novoProjeto.descricao}
+                onChange={(e) => setNovoProjeto({ ...novoProjeto, descricao: e.target.value })}
+                placeholder="Breve descrição do projeto"
+                rows={3}
+                className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-violet-400 resize-none"
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Data de Início
+                </label>
+                <input
+                  type="date"
+                  value={novoProjeto.dataInicio}
+                  onChange={(e) => setNovoProjeto({ ...novoProjeto, dataInicio: e.target.value })}
+                  className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-violet-400"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Data de Fim
+                </label>
+                <input
+                  type="date"
+                  value={novoProjeto.dataFim}
+                  onChange={(e) => setNovoProjeto({ ...novoProjeto, dataFim: e.target.value })}
+                  className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-violet-400"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* BOTÕES */}
+            <div className="flex gap-3 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setShowModal(false)
+                  setNovoProjeto({ nome: "", descricao: "", dataInicio: "", dataFim: "" })
+                }}
+                className="flex-1"
+              >
+                Cancelar
+              </Button>
+
+              <Button
+                type="submit"
+                disabled={loadingCriar}
+                className="flex-1 bg-purple-400 hover:bg-purple-500 text-white"
+              >
+                {loadingCriar ? "A criar..." : "Criar"}
+              </Button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
       )}
     </div>
   )
