@@ -10,7 +10,6 @@ public class AlunoCurso {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Utilizador com papel ALUNO
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "aluno_id", nullable = false)
     private Utilizador aluno;
