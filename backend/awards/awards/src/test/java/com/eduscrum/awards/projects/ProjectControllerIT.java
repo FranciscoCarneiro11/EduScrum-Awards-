@@ -82,7 +82,7 @@ class ProjectControllerIT {
         Disciplina d = new Disciplina();
         d.setNome("Disciplina Teste Projetos");
         d.setCodigo(codigoDisciplina);
-        d.setCurso(curso);
+        curso.adicionarDisciplina(d);
         return disciplinaRepository.save(d);
     }
 
@@ -122,7 +122,7 @@ void listarProjetosDoCurso_DeveListarProjetos() {
     Disciplina d1 = criarDisciplinaDeTeste(curso, "DISC_A");
     Disciplina d2 = criarDisciplinaDeTeste(curso, "DISC_B");
 
-    // 3) Criar projetos ligados às disciplinas (não diretamente ao curso!)
+    // 3) Criar projetos ligados às disciplinas )
     Projeto p1 = new Projeto(
             "Projeto A",
             "Descricao A",
