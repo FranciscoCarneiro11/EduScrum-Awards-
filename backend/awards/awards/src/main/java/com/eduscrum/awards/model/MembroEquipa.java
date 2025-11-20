@@ -90,5 +90,6 @@ public class MembroEquipa {
 
     public void setDataEntrada(LocalDateTime dataEntrada) {
         this.dataEntrada = dataEntrada;
+
     }
 }

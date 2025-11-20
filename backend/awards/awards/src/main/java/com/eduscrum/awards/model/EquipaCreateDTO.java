@@ -30,3 +30,4 @@ public class EquipaCreateDTO {
         this.idProjeto = idProjeto;
     }
 }
+
