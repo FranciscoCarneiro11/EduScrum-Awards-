@@ -2,10 +2,7 @@ import { useState } from "react"
 import { useAuth } from "@/context/AuthContext"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import {
-  User, Mail, Shield, Trophy, Star, FolderOpen,
-  BookOpen, Users, KanbanSquare, Lock, Bell, Moon
-} from "lucide-react"
+import {User, Mail, Shield, Trophy, Star, FolderOpen,BookOpen, Users, KanbanSquare, Lock, Bell, Moon} from "lucide-react"
 
 export default function Perfil() {
   const { user } = useAuth()
@@ -94,7 +91,9 @@ export default function Perfil() {
                 <Shield className="w-4 h-4" /> Tipo de conta
               </Label>
               <p className="text-lg font-medium text-gray-800">
-                {isProfessor ? "Professor" : "Aluno"}
+                {user?.papelSistema === "ADMIN" && "Administrador"}
+                {user?.papelSistema === "PROFESSOR" && "Professor"}
+                {user?.papelSistema === "ALUNO" && "Aluno"}
               </p>
             </div>
           </CardContent>

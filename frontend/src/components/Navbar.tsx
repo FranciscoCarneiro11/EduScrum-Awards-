@@ -81,12 +81,6 @@ export default function Navbar() {
                   <Link to="/professor/cursos" className="hover:text-violet-600 transition font-medium">
                     Cursos
                   </Link>
-                  <Link to="/professor/disciplinas" className="hover:text-violet-600 transition font-medium">
-                    Disciplinas
-                  </Link>
-                  <Link to="/professor/projetos" className="hover:text-violet-600 transition font-medium">
-                    Projetos
-                  </Link>
                 </>
               )}
 
@@ -94,9 +88,6 @@ export default function Navbar() {
                 <>
                   <Link to="/aluno/cursos" className="hover:text-violet-600 transition font-medium">
                     Cursos
-                  </Link>
-                  <Link to="/aluno/disciplinas" className="hover:text-violet-600 transition font-medium">
-                    Disciplinas
                   </Link>
                 </>
               )}

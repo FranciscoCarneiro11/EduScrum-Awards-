@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Users, ClipboardList, Award, BookOpen, TrendingUp } from "lucide-react"
+import { Users, ClipboardList, BookOpen, TrendingUp, Sparkles } from "lucide-react"
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
 import { Button } from "@/components/ui/button"
 
@@ -34,10 +34,26 @@ export default function ProfessorDashboard() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Dashboard do Professor</h1>
-        <p className="text-gray-600">Gestão de disciplinas, equipas e quizzes.</p>
+      
+      {/* Header com gradiente roxo */}
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-white shadow-lg mb-8">
+        <div className="flex items-start justify-between">
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <Sparkles className="w-5 h-5" />
+              <span className="text-sm font-medium text-indigo-100">Dashboard do Professor</span>
+            </div>
+            <h1 className="text-4xl font-bold mb-2">
+              Bem-vindo!
+            </h1>
+            <p className="text-indigo-100">
+              Gestão de disciplinas, equipas e quizzes
+            </p>
+          </div>
+          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+            <Users className="w-12 h-12" />
+          </div>
+        </div>
       </div>
 
       {/* Top Stats */}
@@ -86,7 +102,7 @@ export default function ProfessorDashboard() {
       </div>
 
       {/* Gráfico */}
-      <Card className="mb-8">
+      <Card className="mb-8 shadow-sm">
         <CardHeader>
           <CardTitle>Participação dos Alunos (Últimas Semanas)</CardTitle>
         </CardHeader>
@@ -103,17 +119,24 @@ export default function ProfessorDashboard() {
       </Card>
 
       {/* Últimos prémios */}
-      <Card className="mb-8">
-        <CardHeader>
+      <Card className="mb-8 shadow-sm">
+        <CardHeader className="border-b">
           <CardTitle>Últimos Prémios Atribuídos</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-6">
           <ul className="space-y-4">
             {premiosRecentes.map((p, i) => (
-              <li key={i}>
-                <p className="font-medium text-violet-600">{p.premio}</p>
-                <p className="text-gray-700">{p.aluno}</p>
-                <p className="text-sm text-gray-500">{p.pontos} pts — {p.data}</p>
+              <li key={i} className="border-b border-gray-100 pb-3 last:border-none">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="font-semibold text-violet-700">{p.premio}</p>
+                    <p className="text-sm text-gray-600">{p.aluno}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-bold text-violet-600">+{p.pontos} pts</p>
+                    <p className="text-xs text-gray-400">{p.data}</p>
+                  </div>
+                </div>
               </li>
             ))}
           </ul>
@@ -121,37 +144,42 @@ export default function ProfessorDashboard() {
       </Card>
 
       {/* Disciplinas */}
-      <Card>
-        <CardHeader>
+      <Card className="shadow-sm">
+        <CardHeader className="border-b">
           <CardTitle>Disciplinas</CardTitle>
         </CardHeader>
 
-        <CardContent>
-          <table className="w-full">
-            <thead>
-              <tr className="border-b text-left">
-                <th className="py-2">Disciplina</th>
-                <th>Curso</th>
-                <th>Equipas</th>
-                <th className="text-right">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {disciplinas.map((d, i) => (
-                <tr key={i} className="border-b hover:bg-gray-50">
-                  <td className="py-3">{d.nome}</td>
-                  <td>{d.curso}</td>
-                  <td>{d.equipas}</td>
-                  <td className="text-right">
-                    <Button variant="outline" size="sm" className="mr-2">Gerir Equipas</Button>
-                    <Button variant="outline" size="sm" className="mr-2">Ver Quizzes</Button>
-                    <Button size="sm" className="bg-violet-600 hover:bg-violet-700 text-white">Criar Quiz</Button>
-                  </td>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr className="text-left">
+                  <th className="px-6 py-4 font-semibold text-gray-700">Disciplina</th>
+                  <th className="px-6 py-4 font-semibold text-gray-700">Curso</th>
+                  <th className="px-6 py-4 font-semibold text-gray-700">Equipas</th>
+                  <th className="px-6 py-4 font-semibold text-gray-700 text-right">Ações</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-
+              </thead>
+              <tbody>
+                {disciplinas.map((d, i) => (
+                  <tr key={i} className="border-b hover:bg-gray-50 transition">
+                    <td className="px-6 py-4 font-medium text-gray-800">{d.nome}</td>
+                    <td className="px-6 py-4 text-gray-600">{d.curso}</td>
+                    <td className="px-6 py-4 text-gray-600">{d.equipas}</td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button variant="outline" size="sm">Gerir Equipas</Button>
+                        <Button variant="outline" size="sm">Ver Quizzes</Button>
+                        <Button size="sm" className="bg-violet-600 hover:bg-violet-700 text-white">
+                          Criar Quiz
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </CardContent>
       </Card>
     </div>

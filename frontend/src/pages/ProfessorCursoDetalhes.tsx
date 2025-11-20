@@ -119,9 +119,7 @@ export default function ProfessorCursoDetalhes() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Curso não encontrado</h2>
-          <Button onClick={() => navigate("/professor/cursos")}>
-            Voltar aos meus cursos
-          </Button>
+          
         </div>
       </div>
     )
@@ -132,12 +130,14 @@ export default function ProfessorCursoDetalhes() {
 
       {/* Header */}
       <div className="max-w-6xl mx-auto mb-8">
-        <Button variant="ghost" onClick={() => navigate("/professor/cursos")} className="mb-4">
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Voltar aos cursos
-        </Button>
-
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-white shadow-lg">
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-white shadow-lg mb-8">
+          <button
+            onClick={() => navigate("/professor/cursos")}
+            className="flex items-center text-white hover:text-white/80 transition mb-4"
+          >
+            <ArrowLeft className="w-5 h-5 mr-2" />
+            Voltar aos cursos
+          </button>
           <div className="flex items-start justify-between">
             <div>
               <span className="inline-block px-3 py-1 bg-white/20 rounded-full text-sm font-medium mb-3">
