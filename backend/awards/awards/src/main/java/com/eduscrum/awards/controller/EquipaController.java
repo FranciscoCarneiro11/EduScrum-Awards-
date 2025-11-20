@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/equipas")
-@CrossOrigin(origins = "*")  
+@CrossOrigin(origins = "*")
 public class EquipaController {
 
     private final EquipaService service;
@@ -24,12 +24,19 @@ public class EquipaController {
         this.service = service;
     }
 
-    // EQUIPAS
+    // LISTAR TODAS
     @GetMapping
     public List<EquipaDTO> listar() {
         return service.listar();
     }
 
+    // LISTAR POR PROJETO  
+    @GetMapping("/projeto/{idProjeto}")
+    public List<EquipaDTO> listarPorProjeto(@PathVariable Long idProjeto) {
+        return service.listarPorProjeto(idProjeto);
+    }
+
+    // ------------------------------------------------------
     @GetMapping("/{id}")
     public EquipaDTO obter(@PathVariable Long id) {
         return service.obter(id);
@@ -52,7 +59,7 @@ public class EquipaController {
         service.apagar(id);
     }
 
-    //MEMBROS 
+    // MEMBROS
     @GetMapping("/{id}/membros")
     public List<MembroEquipaDTO> listarMembros(@PathVariable Long id) {
         return service.listarMembros(id);

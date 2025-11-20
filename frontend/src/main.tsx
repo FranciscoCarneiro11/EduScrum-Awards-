@@ -1,4 +1,3 @@
-// frontend/src/main.tsx
 import React from "react"
 import ReactDOM from "react-dom/client"
 import { BrowserRouter, Routes, Route } from "react-router-dom"
@@ -15,6 +14,8 @@ import AlunoCursos from "./pages/AlunoCursos"
 import AdminGestaoUtilizadores from "./pages/AdminGestaoUtilizadores"
 import ProfessorCursos from "./pages/ProfessorCursos"
 import ProfessorCursoDetalhes from "./pages/ProfessorCursoDetalhes"
+import ProjetoEquipas from "./pages/ProjetoEquipas" 
+import EquipaMembros from "./pages/EquipaMembros"
 import "./index.css"
 import { AuthProvider } from "@/context/AuthContext"
 import { ProtectedRoute } from "@/components/ProtectedRoute"
@@ -128,6 +129,24 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
               element={
                 <ProtectedRoute>
                   <DisciplinaDetalhes />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/projetos/:projetoId/equipas"
+              element={
+                <ProtectedRoute>
+                  <ProjetoEquipas />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/projetos/:projetoId/equipas/:equipaId/membros"
+              element={
+                <ProtectedRoute>
+                  <EquipaMembros />
                 </ProtectedRoute>
               }
             />

@@ -4,17 +4,7 @@ import { useAuth } from "@/context/AuthContext"
 import api from "@/lib/api"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import {
-  Users,
-  FolderOpen,
-  BookOpen,
-  CalendarDays,
-  Plus,
-  Edit,
-  Trash2,
-  ArrowLeft,
-  Sparkles,
-} from "lucide-react"
+import {Users,FolderOpen,BookOpen,CalendarDays,Plus,Edit,Trash2,ArrowLeft,Sparkles,} from "lucide-react"
 
 export default function DisciplinaDetalhes() {
   const { disciplinaId } = useParams()
@@ -413,12 +403,11 @@ export default function DisciplinaDetalhes() {
                               <Button
                                 className="flex-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700"
                                 variant="ghost"
-                                onClick={() =>
-                                  alert("Ver Equipas: página ainda por criar")
-                                }
+                                onClick={() => navigate(`/projetos/${proj.id}/equipas`)}
                               >
                                 Ver Equipas
                               </Button>
+
                               <Button
                                 className="flex-1 bg-purple-50 hover:bg-purple-100 text-purple-700"
                                 variant="ghost"

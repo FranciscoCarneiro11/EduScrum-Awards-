@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthContext"
 import api from "@/lib/api"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { BookOpen, Users, FolderKanban, ArrowLeft, GraduationCap, CalendarDays, Award } from "lucide-react"
+import {BookOpen,Users,FolderKanban,ArrowLeft,GraduationCap,CalendarDays,} from "lucide-react"
 
 type Disciplina = {
   id: number
@@ -38,13 +38,13 @@ export default function AlunoCursoDetalhes() {
   const { cursoId } = useParams<{ cursoId: string }>()
   const { user } = useAuth()
   const navigate = useNavigate()
-  
+
   const [curso, setCurso] = useState<Curso | null>(null)
   const [professores, setProfessores] = useState<Professor[]>([])
   const [projetos, setProjetos] = useState<Projeto[]>([])
   const [loading, setLoading] = useState(true)
 
-    useEffect(() => {
+  useEffect(() => {
     if (!cursoId || !user) return
 
     async function carregarDados() {
@@ -56,14 +56,16 @@ export default function AlunoCursoDetalhes() {
         setCurso(cursoRes.data)
 
         // Carregar projetos do curso
-        const projetosRes = await api.get<Projeto[]>(`/api/cursos/${cursoId}/projetos`)
+        const projetosRes = await api.get<Projeto[]>(
+          `/api/cursos/${cursoId}/projetos`,
+        )
         setProjetos(projetosRes.data)
 
         // Professores associados ao curso
-        const profsRes = await api.get<Professor[]>(`/api/cursos/${cursoId}/professores`)
+        const profsRes = await api.get<Professor[]>(
+          `/api/cursos/${cursoId}/professores`,
+        )
         setProfessores(profsRes.data)
-
-
       } catch (err) {
         console.error("Erro ao carregar detalhes do curso:", err)
       } finally {
@@ -73,7 +75,6 @@ export default function AlunoCursoDetalhes() {
 
     carregarDados()
   }, [cursoId, user])
-
 
   if (loading) {
     return (
@@ -90,7 +91,9 @@ export default function AlunoCursoDetalhes() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Curso não encontrado</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            Curso não encontrado
+          </h2>
         </div>
       </div>
     )
@@ -133,7 +136,9 @@ export default function AlunoCursoDetalhes() {
               <BookOpen className="w-6 h-6 text-violet-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{curso.disciplinas?.length || 0}</p>
+              <p className="text-2xl font-bold">
+                {curso.disciplinas?.length || 0}
+              </p>
               <p className="text-sm text-gray-600">Disciplinas</p>
             </div>
           </CardContent>
@@ -184,7 +189,9 @@ export default function AlunoCursoDetalhes() {
                   >
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="font-semibold text-gray-800">{disc.nome}</h3>
+                        <h3 className="font-semibold text-gray-800">
+                          {disc.nome}
+                        </h3>
                         <p className="text-sm text-gray-500">{disc.codigo}</p>
                       </div>
                       <Button size="sm" variant="ghost">
@@ -220,7 +227,11 @@ export default function AlunoCursoDetalhes() {
                   {professores.map((prof) => (
                     <li key={prof.id} className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-400 to-purple-500 flex items-center justify-center text-white text-xs font-semibold">
-                        {prof.nome.split(" ").map(n => n[0]).join("").slice(0, 2)}
+                        {prof.nome
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")
+                          .slice(0, 2)}
                       </div>
                       <div>
                         <p className="text-sm font-medium">{prof.nome}</p>
@@ -249,12 +260,30 @@ export default function AlunoCursoDetalhes() {
               {projetos.length > 0 ? (
                 <ul className="space-y-3">
                   {projetos.slice(0, 3).map((proj) => (
-                    <li key={proj.id} className="p-3 bg-gray-50 rounded-lg">
-                      <p className="font-medium text-sm">{proj.nome}</p>
-                      <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
-                        <CalendarDays className="w-3 h-3" />
-                        {new Date(proj.dataInicio).toLocaleDateString("pt-PT")}
+                    <li
+                      key={proj.id}
+                      className="p-3 bg-gray-50 rounded-lg flex items-center justify-between gap-3"
+                    >
+                      <div>
+                        <p className="font-medium text-sm">{proj.nome}</p>
+                        <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
+                          <CalendarDays className="w-3 h-3" />
+                          {new Date(proj.dataInicio).toLocaleDateString(
+                            "pt-PT",
+                          )}
+                        </div>
                       </div>
+
+                      {/* Entrada para a página da equipa do aluno neste projeto */}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() =>
+                          navigate(`/aluno/projetos/${proj.id}/equipa`)
+                        }
+                      >
+                        Ver equipa
+                      </Button>
                     </li>
                   ))}
                 </ul>
@@ -263,9 +292,9 @@ export default function AlunoCursoDetalhes() {
                   Sem projetos ativos
                 </p>
               )}
-              
-              <Button 
-                variant="outline" 
+
+              <Button
+                variant="outline"
                 className="w-full mt-4"
                 onClick={() => navigate(`/aluno/cursos/${cursoId}/projetos`)}
               >
