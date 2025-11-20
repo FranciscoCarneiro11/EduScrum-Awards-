@@ -15,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/equipas")
+@CrossOrigin(origins = "*")  
 public class EquipaController {
 
     private final EquipaService service;
@@ -23,6 +24,7 @@ public class EquipaController {
         this.service = service;
     }
 
+    // EQUIPAS
     @GetMapping
     public List<EquipaDTO> listar() {
         return service.listar();
@@ -50,6 +52,7 @@ public class EquipaController {
         service.apagar(id);
     }
 
+    //MEMBROS 
     @GetMapping("/{id}/membros")
     public List<MembroEquipaDTO> listarMembros(@PathVariable Long id) {
         return service.listarMembros(id);
@@ -57,8 +60,9 @@ public class EquipaController {
 
     @PostMapping("/{id}/membros")
     @ResponseStatus(HttpStatus.CREATED)
-    public MembroEquipaDTO adicionarMembro(@PathVariable Long id,
-                                           @Valid @RequestBody MembroEquipaCreateDTO dto) {
+    public MembroEquipaDTO adicionarMembro(
+            @PathVariable Long id,
+            @Valid @RequestBody MembroEquipaCreateDTO dto) {
         return service.adicionarMembro(id, dto);
     }
 

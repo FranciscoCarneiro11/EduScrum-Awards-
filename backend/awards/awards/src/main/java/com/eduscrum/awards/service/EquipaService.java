@@ -8,7 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -19,10 +21,7 @@ public class EquipaService {
     private final ProjetoRepository projetoRepository;
     private final UtilizadorRepository utilizadorRepository;
 
-    public EquipaService(EquipaRepository equipaRepository,
-                         MembroEquipaRepository membroEquipaRepository,
-                         ProjetoRepository projetoRepository,
-                         UtilizadorRepository utilizadorRepository) {
+    public EquipaService(EquipaRepository equipaRepository,MembroEquipaRepository membroEquipaRepository,ProjetoRepository projetoRepository,UtilizadorRepository utilizadorRepository) {
 
         this.equipaRepository = equipaRepository;
         this.membroEquipaRepository = membroEquipaRepository;
@@ -30,14 +29,13 @@ public class EquipaService {
         this.utilizadorRepository = utilizadorRepository;
     }
 
-    // ------------------------
     // EQUIPAS
-    // ------------------------
+    
     public List<EquipaDTO> listar() {
         return equipaRepository.findAll()
                 .stream()
-                .map(this::toDTO)   // toDTO(Equipa)
-                .toList();
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
 
     public EquipaDTO obter(Long id) {
@@ -47,7 +45,8 @@ public class EquipaService {
     public EquipaDTO criar(EquipaCreateDTO dto) {
 
         if (equipaRepository.existsByNome(dto.getNome())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Nome já existe");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, 
+                "Nome já existe");
         }
 
         Equipa e = new Equipa();
@@ -55,7 +54,8 @@ public class EquipaService {
 
         if (dto.getIdProjeto() != null) {
             Projeto p = projetoRepository.findById(dto.getIdProjeto())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Projeto não encontrado"));
+                    .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Projeto não encontrado"));
             e.setProjeto(p);
         }
 
@@ -73,10 +73,9 @@ public class EquipaService {
 
         if (dto.getIdProjeto() != null) {
             Projeto p = projetoRepository.findById(dto.getIdProjeto())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Projeto não encontrado"));
+                    .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Projeto não encontrado"));
             e.setProjeto(p);
-        } else {
-            e.setProjeto(null); // se quiseres desligar o projeto
         }
 
         e = equipaRepository.save(e);
@@ -88,18 +87,15 @@ public class EquipaService {
         equipaRepository.delete(e);
     }
 
-    // ------------------------
-    // MEMBROS
-    // ------------------------
-    public List<MembroEquipaDTO> listarMembros(Long idEquipa) {
+    //MEMBROS
 
-        // só para garantir que a equipa existe
+    public List<MembroEquipaDTO> listarMembros(Long idEquipa) {
         findEquipa(idEquipa);
 
         return membroEquipaRepository.findByEquipaId(idEquipa)
                 .stream()
-                .map(this::toDTO)   // toDTO(MembroEquipa)
-                .toList();
+                .map(this::toMembroDTO)
+                .collect(Collectors.toList());
     }
 
     public MembroEquipaDTO adicionarMembro(Long idEquipa, MembroEquipaCreateDTO dto) {
@@ -107,84 +103,74 @@ public class EquipaService {
         Equipa equipa = findEquipa(idEquipa);
 
         Utilizador utilizador = utilizadorRepository.findById(dto.getIdUtilizador())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilizador não encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Utilizador não encontrado"));
 
-        if (membroEquipaRepository.existsByEquipaIdAndUtilizadorId(idEquipa, dto.getIdUtilizador())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Utilizador já pertence à equipa");
+        if (membroEquipaRepository.existsByEquipaIdAndUtilizadorId(
+                idEquipa, dto.getIdUtilizador())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, 
+                "Utilizador já pertence à equipa");
         }
 
         MembroEquipa me = new MembroEquipa();
         me.setEquipa(equipa);
         me.setUtilizador(utilizador);
-
-        // DTO usa com.eduscrum.awards.model.PapelScrum
-        // Entidade usa MembroEquipa.PapelScrum -> converter
-        if (dto.getPapelScrum() != null) {
-            me.setPapelScrum(
-                    MembroEquipa.PapelScrum.valueOf(dto.getPapelScrum().name())
-            );
-        }
-
-        me.setDataEntrada(java.time.LocalDateTime.now());
+        me.setPapelScrum(dto.getPapelScrum() != null 
+            ? dto.getPapelScrum() 
+            : MembroEquipa.PapelScrum.DEV);
+        
+        me.setDataEntrada(LocalDateTime.now());
 
         me = membroEquipaRepository.save(me);
-        return toDTO(me);
+        return toMembroDTO(me);
     }
 
     public void removerMembro(Long idEquipa, Long idUtilizador) {
 
-        // garantir que a equipa existe
         findEquipa(idEquipa);
 
         MembroEquipa me = membroEquipaRepository
                 .findByEquipaIdAndUtilizadorId(idEquipa, idUtilizador)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Membro não encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Membro não encontrado"));
 
         membroEquipaRepository.delete(me);
     }
 
-    // ------------------------
-    // CONVERSÕES PARA DTO (SEM MAPPER)
-    // ------------------------
+    //CONVERSÕES DTO
+    
     private EquipaDTO toDTO(Equipa e) {
         if (e == null) return null;
 
-        Long idProjeto = (e.getProjeto() == null) ? null : e.getProjeto().getId();
+        Long idProjeto = (e.getProjeto() != null) ? e.getProjeto().getId() : null;
 
-        return new EquipaDTO(
-                e.getId(),
-                e.getNome(),
-                idProjeto
-        );
+        EquipaDTO dto = new EquipaDTO();
+        dto.setId(e.getId());
+        dto.setNome(e.getNome());
+        dto.setIdProjeto(idProjeto);
+        
+        return dto;
     }
 
-    private MembroEquipaDTO toDTO(MembroEquipa me) {
+    private MembroEquipaDTO toMembroDTO(MembroEquipa me) {
         if (me == null) return null;
 
         Utilizador u = me.getUtilizador();
 
-        // Entidade -> enum interno MembroEquipa.PapelScrum
-        // DTO -> enum PapelScrum (ficheiro separado) -> converter
-        PapelScrum papelDTO = null;
-        if (me.getPapelScrum() != null) {
-            papelDTO = PapelScrum.valueOf(me.getPapelScrum().name());
-        }
-
-        return new MembroEquipaDTO(
-                me.getId(),
-                u.getId(),
-                u.getNome(),
-                u.getEmail(),
-                papelDTO,
-                me.getDataEntrada()
-        );
+        MembroEquipaDTO dto = new MembroEquipaDTO();
+        dto.setId(me.getId());
+        dto.setIdUtilizador(u.getId());
+        dto.setNomeUtilizador(u.getNome());
+        dto.setEmailUtilizador(u.getEmail());
+        dto.setPapelScrum(me.getPapelScrum());
+        dto.setDataEntrada(me.getDataEntrada());
+        
+        return dto;
     }
 
-    // ------------------------
-    // AUX
-    // ------------------------
     private Equipa findEquipa(Long id) {
         return equipaRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Equipa não encontrada"));
+                .orElseThrow(() -> new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Equipa não encontrada"));
     }
 }
