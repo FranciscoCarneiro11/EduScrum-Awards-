@@ -4,9 +4,9 @@ import api from "@/lib/api"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 
-import { 
-  Users, GraduationCap, BookOpen, Search, 
-  UserCheck, UserX, AlertCircle 
+import {
+  Users, GraduationCap, BookOpen, Search,
+  UserCheck, UserX, AlertCircle
 } from "lucide-react"
 
 type Papel = "ALUNO" | "PROFESSOR" | "ADMIN"
@@ -314,7 +314,7 @@ export default function AdminGestaoUtilizadoresRedesign() {
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-semibold">
-                              {aluno.nome.slice(0,2).toUpperCase()}
+                              {aluno.nome.slice(0, 2).toUpperCase()}
                             </div>
                             <div>
                               <p className="font-semibold">{aluno.nome}</p>
@@ -342,7 +342,7 @@ export default function AdminGestaoUtilizadoresRedesign() {
 
                         <td className="px-6 py-4 text-right">
                           <div className="flex justify-end gap-2">
-                            
+
                             <Button
                               onClick={() => abrirModal(aluno)}
                               disabled={emLoading}
@@ -415,7 +415,7 @@ export default function AdminGestaoUtilizadoresRedesign() {
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white font-semibold">
-                              {prof.nome.slice(0,2).toUpperCase()}
+                              {prof.nome.slice(0, 2).toUpperCase()}
                             </div>
                             <div>
                               <p className="font-semibold">{prof.nome}</p>
@@ -443,7 +443,7 @@ export default function AdminGestaoUtilizadoresRedesign() {
 
                         <td className="px-6 py-4 text-right">
                           <div className="flex justify-end gap-2">
-                            
+
                             <Button
                               onClick={() => abrirModal(prof)}
                               disabled={emLoading}

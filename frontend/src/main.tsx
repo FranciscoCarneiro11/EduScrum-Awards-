@@ -21,6 +21,8 @@ import { AuthProvider } from "@/context/AuthContext"
 import { ProtectedRoute } from "@/components/ProtectedRoute"
 import AlunoCursoDetalhes from "./pages/AlunoCursoDetalhes"
 import DisciplinaDetalhes from "./pages/DisciplinaDetalhes"
+import Sprints from "./pages/Sprints"
+import Premios from "./pages/Premios"
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
@@ -133,6 +135,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
               }
             />
 
+            {/* Página de Equipas do Projeto */}
             <Route
               path="/projetos/:projetoId/equipas"
               element={
@@ -142,11 +145,31 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
               }
             />
 
+            {/* Página de Membros da Equipa */}
             <Route
               path="/projetos/:projetoId/equipas/:equipaId/membros"
               element={
                 <ProtectedRoute>
                   <EquipaMembros />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Página de Sprints do Projeto */}
+            <Route
+              path="/projetos/:projetoId/sprints"
+              element={
+                <ProtectedRoute>
+                  <Sprints />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/disciplinas/:disciplinaId/premios"
+              element={
+                <ProtectedRoute>
+                  <Premios />
                 </ProtectedRoute>
               }
             />

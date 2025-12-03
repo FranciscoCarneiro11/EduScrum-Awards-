@@ -1,36 +1,82 @@
+import { useEffect, useState } from "react"
 import { useAuth } from "@/context/AuthContext"
+import api from "@/lib/api"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Trophy, Star, TrendingUp, FolderOpen, Sparkles } from "lucide-react"
+import { Trophy, Star, TrendingUp, FolderOpen, Sparkles, CalendarDays } from "lucide-react"
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
 
-export default function AlunoDashboard() {
+// Tipos para os dados da API
+type Premio = {
+  id: number
+  nome: string
+  descricao: string
+  valorPontos: number
+  tipo: string
+}
+
+type Conquista = {
+  id: number
+  dataAtribuicao: string
+  premio: Premio
+}
+
+type Projeto = {
+  id: number
+  nome: string
+  dataFim: string
+}
+
+export default function Dashboard() {
   const { user } = useAuth()
+  
+  const [conquistas, setConquistas] = useState<Conquista[]>([])
+  const [projetos, setProjetos] = useState<Projeto[]>([])
+  const [totalPontos, setTotalPontos] = useState(0)
+  const [loading, setLoading] = useState(true)
 
-  // Dados simulados (depois ligamos à API)
-  const stats = {
-    pontos: 320,
-    premios: 5,
-    ranking: 3,
-    projetosAtivos: 2,
-  }
+  useEffect(() => {
+    if (!user) return
 
-  const premiosRecentes = [
-    { nome: "OnTime Legend", descricao: "Entregou todos os sprints a tempo", pontos: 10, data: "20/10/2025" },
-    { nome: "Innovation Hero", descricao: "Solução criativa no projeto final", pontos: 15, data: "25/10/2025" },
-    { nome: "Team Player", descricao: "Excelente colaboração na equipa", pontos: 8, data: "28/10/2025" },
-  ]
+    async function fetchDados() {
+      try {
+        setLoading(true)
 
+        // 1. Buscar Conquistas Reais
+        const resConquistas = await api.get<Conquista[]>(`/api/alunos/${user?.id}/conquistas`)
+        setConquistas(resConquistas.data)
+
+        // 2. Calcular Total de Pontos (Soma dos prémios)
+        const somaPontos = resConquistas.data.reduce((acc, c) => acc + c.premio.valorPontos, 0)
+        setTotalPontos(somaPontos)
+
+        // 3. Buscar Projetos/Cursos do Aluno para contar ativos
+        // Nota: Estamos a usar a lista de cursos como proxy para projetos ativos por enquanto
+        const resCursos = await api.get(`/api/alunos/${user?.id}/cursos`)
+        setProjetos(resCursos.data) 
+
+      } catch (error) {
+        console.error("Erro ao carregar dashboard", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchDados()
+  }, [user])
+
+  // Dados simples para o gráfico (apenas início e fim por agora)
   const graficoPontos = [
-    { mes: "Jul", pontos: 100 },
-    { mes: "Ago", pontos: 150 },
-    { mes: "Set", pontos: 250 },
-    { mes: "Out", pontos: 320 },
+    { mes: "Início", pontos: 0 },
+    { mes: "Atual", pontos: totalPontos },
   ]
 
-  const projetos = [
-    { nome: "EduScrum Awards", progresso: "80%", sprint: "Sprint 3", status: "Em curso" },
-    { nome: "SmartCampus", progresso: "45%", sprint: "Sprint 1", status: "Em curso" },
-  ]
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-500">
+        A carregar o teu progresso...
+      </div>
+    )
+  }
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -44,10 +90,10 @@ export default function AlunoDashboard() {
               <span className="text-sm font-medium text-indigo-100">Dashboard do Aluno</span>
             </div>
             <h1 className="text-4xl font-bold mb-2">
-              Bem vindo!
+              Olá, {user?.nome?.split(" ")[0]}!
             </h1>
             <p className="text-indigo-100">
-              Acompanha o teu progresso e conquista novos prémios
+              Tens <strong className="text-white">{conquistas.length} prémios</strong> conquistados até agora.
             </p>
           </div>
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
@@ -56,29 +102,31 @@ export default function AlunoDashboard() {
         </div>
       </div>
 
-      {/* Cards de Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      {/* Cards de Stats (AGORA LIGADOS AOS ESTADOS) */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         
         <Card className="bg-gradient-to-br from-violet-50 to-purple-100 border-violet-200">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-violet-600 font-medium mb-1">Total de Pontos</p>
-                <p className="text-3xl font-bold text-violet-700">{stats.pontos}</p>
+                {/* Mostra a variável de estado totalPontos */}
+                <p className="text-4xl font-bold text-violet-700">{totalPontos}</p>
               </div>
               <Trophy className="w-12 h-12 text-violet-500 opacity-20" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-yellow-50 to-amber-100 border-yellow-200">
+        <Card className="bg-gradient-to-br from-amber-50 to-orange-100 border-amber-200">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-yellow-600 font-medium mb-1">Prémios Recebidos</p>
-                <p className="text-3xl font-bold text-yellow-700">{stats.premios}</p>
+                <p className="text-sm text-amber-600 font-medium mb-1">Prémios Recebidos</p>
+                {/* Mostra o tamanho do array conquistas */}
+                <p className="text-4xl font-bold text-amber-700">{conquistas.length}</p>
               </div>
-              <Star className="w-12 h-12 text-yellow-500 opacity-20" />
+              <Star className="w-12 h-12 text-amber-500 opacity-20" />
             </div>
           </CardContent>
         </Card>
@@ -87,114 +135,89 @@ export default function AlunoDashboard() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-blue-600 font-medium mb-1">Ranking</p>
-                <p className="text-3xl font-bold text-blue-700">#{stats.ranking}</p>
+                <p className="text-sm text-blue-600 font-medium mb-1">Cursos Ativos</p>
+                <p className="text-4xl font-bold text-blue-700">{projetos.length}</p>
               </div>
-              <TrendingUp className="w-12 h-12 text-blue-500 opacity-20" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-green-50 to-emerald-100 border-green-200">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-green-600 font-medium mb-1">Projetos Ativos</p>
-                <p className="text-3xl font-bold text-green-700">{stats.projetosAtivos}</p>
-              </div>
-              <FolderOpen className="w-12 h-12 text-green-500 opacity-20" />
+              <FolderOpen className="w-12 h-12 text-blue-500 opacity-20" />
             </div>
           </CardContent>
         </Card>
 
       </div>
 
-      {/* Gráfico de Evolução */}
-      <Card className="mb-8 shadow-sm">
-        <CardHeader>
-          <CardTitle>Evolução dos Pontos</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={250}>
-            <LineChart data={graficoPontos}>
-              <XAxis dataKey="mes" />
-              <YAxis />
-              <Tooltip />
-              <Line type="monotone" dataKey="pontos" stroke="#8b5cf6" strokeWidth={3} />
-            </LineChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-      {/* Grid: Prémios + Projetos */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-        {/* Últimos Prémios */}
-        <Card className="shadow-sm">
+        {/* Lista de Conquistas (Dinâmica) */}
+        <Card className="lg:col-span-2 shadow-sm">
           <CardHeader className="border-b">
             <CardTitle className="flex items-center gap-2">
-              <Star className="w-5 h-5 text-yellow-500" />
-              Últimos Prémios
+              <Star className="w-5 h-5 text-amber-500" />
+              As tuas Conquistas
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6">
-            {premiosRecentes.length > 0 ? (
-              <ul className="space-y-4">
-                {premiosRecentes.map((p, i) => (
-                  <li key={i} className="border-b border-gray-100 pb-3 last:border-none">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <p className="font-semibold text-violet-700">{p.nome}</p>
-                        <p className="text-sm text-gray-600">{p.descricao}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm font-bold text-violet-600">+{p.pontos} pts</p>
-                        <p className="text-xs text-gray-400">{p.data}</p>
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-center text-gray-500 py-8">Ainda não tens prémios</p>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Projetos Ativos */}
-        <Card className="shadow-sm">
-          <CardHeader className="border-b">
-            <CardTitle className="flex items-center gap-2">
-              <FolderOpen className="w-5 h-5 text-green-600" />
-              Projetos Ativos
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            {projetos.length > 0 ? (
+            {conquistas.length > 0 ? (
               <div className="space-y-4">
-                {projetos.map((proj, i) => (
-                  <div key={i} className="p-4 border rounded-lg hover:border-violet-300 hover:bg-violet-50 transition">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-semibold text-gray-800">{proj.nome}</h3>
-                      <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
-                        {proj.status}
-                      </span>
+                {conquistas.map((c) => (
+                  <div key={c.id} className="flex items-start gap-4 p-4 border border-gray-100 rounded-xl hover:bg-gray-50 transition">
+                    <div className="p-3 bg-amber-100 text-amber-600 rounded-lg">
+                      <Trophy className="w-6 h-6" />
                     </div>
-                    <div className="flex items-center justify-between text-sm text-gray-600">
-                      <span>{proj.sprint}</span>
-                      <span className="font-medium text-violet-600">{proj.progresso}</span>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="font-bold text-gray-900">{c.premio.nome}</h4>
+                          <p className="text-sm text-gray-600">{c.premio.descricao}</p>
+                        </div>
+                        <span className="font-bold text-violet-600 bg-violet-50 px-3 py-1 rounded-full text-sm">
+                          +{c.premio.valorPontos} pts
+                        </span>
+                      </div>
+                      <div className="mt-2 flex items-center text-xs text-gray-400">
+                        <CalendarDays className="w-3 h-3 mr-1" />
+                        {new Date(c.dataAtribuicao).toLocaleDateString('pt-PT')}
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-center text-gray-500 py-8">Nenhum projeto ativo</p>
+              <div className="text-center py-10">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Trophy className="w-8 h-8 text-gray-400" />
+                </div>
+                <p className="text-gray-500">Ainda não tens conquistas. Continua a trabalhar!</p>
+              </div>
             )}
           </CardContent>
         </Card>
 
-      </div>
+        {/* Gráfico Simples */}
+        <Card className="shadow-sm">
+          <CardHeader className="border-b">
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-green-600" />
+              Evolução
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="h-[200px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={graficoPontos}>
+                  <XAxis dataKey="mes" hide />
+                  <YAxis hide />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="pontos" stroke="#8b5cf6" strokeWidth={3} dot={{ r: 6 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+            <p className="text-center text-sm text-gray-500 mt-4">
+              Começaste com 0 e já vais em {totalPontos} pontos!
+            </p>
+          </CardContent>
+        </Card>
 
+      </div>
     </div>
   )
 }

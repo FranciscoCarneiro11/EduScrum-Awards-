@@ -411,18 +411,14 @@ export default function DisciplinaDetalhes() {
                               <Button
                                 className="flex-1 bg-purple-50 hover:bg-purple-100 text-purple-700"
                                 variant="ghost"
-                                onClick={() =>
-                                  alert("Ver Sprints: página ainda por criar")
-                                }
+                                onClick={() => navigate(`/projetos/${proj.id}/sprints`)}
                               >
                                 Ver Sprints
                               </Button>
                               <Button
                                 className="flex-1 bg-green-50 hover:bg-green-100 text-green-700"
                                 variant="ghost"
-                                onClick={() =>
-                                  alert("Ver Prémios: página ainda por criar")
-                                }
+                                onClick={() => navigate(`/disciplinas/${disciplina.id}/premios`)}
                               >
                                 Ver Prémios
                               </Button>

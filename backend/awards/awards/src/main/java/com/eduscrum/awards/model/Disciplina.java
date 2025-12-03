@@ -1,11 +1,13 @@
 package com.eduscrum.awards.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "disciplina")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Disciplina {
 
     @Id

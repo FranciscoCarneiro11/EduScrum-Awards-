@@ -1,187 +1,251 @@
+import { useEffect, useState } from "react"
+import { useAuth } from "@/context/AuthContext"
+import api from "@/lib/api"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Users, ClipboardList, BookOpen, TrendingUp, Sparkles } from "lucide-react"
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
+import { Users, Trophy, BookOpen, Target, TrendingUp, ArrowRight } from "lucide-react"
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts"
 import { Button } from "@/components/ui/button"
+import { useNavigate } from "react-router-dom"
+
+// Tipos
+type Disciplina = {
+  id: number
+  nome: string
+  codigo: string
+  cursoId: number
+}
+
+type Curso = {
+  id: number
+  nome: string
+  disciplinas: Disciplina[]
+}
+
+type Stats = {
+  totalDisciplinas: number
+  totalEquipas: number
+  totalAlunos: number
+  totalPremios: number
+}
 
 export default function ProfessorDashboard() {
+  const { user } = useAuth()
+  const navigate = useNavigate()
 
-  // Dados estáticos para já — depois ligamos ao backend
-  const stats = {
-    totalDisciplinas: 3,
-    totalQuizzes: 12,
-    totalEquipas: 5,
-    totalAlunos: 48
-  }
+  const [cursos, setCursos] = useState<Curso[]>([])
+  const [todasDisciplinas, setTodasDisciplinas] = useState<Disciplina[]>([])
+  const [stats, setStats] = useState<Stats>({
+    totalDisciplinas: 0,
+    totalEquipas: 0,
+    totalAlunos: 0,
+    totalPremios: 0
+  })
+  const [loading, setLoading] = useState(true)
 
-  const atividadeSemanal = [
-    { semana: "Semana 1", participacoes: 32 },
-    { semana: "Semana 2", participacoes: 41 },
-    { semana: "Semana 3", participacoes: 28 },
-    { semana: "Semana 4", participacoes: 55 }
+  useEffect(() => {
+    if (!user) return
+
+    async function fetchDados() {
+      try {
+        setLoading(true)
+
+        // 1. Buscar Cursos do Professor
+        const resCursos = await api.get<Curso[]>(`/api/professores/${user?.id}/cursos`)
+        setCursos(resCursos.data)
+
+        // 2. Extrair todas as disciplinas
+        const disciplinas = resCursos.data.flatMap(c => c.disciplinas || [])
+        setTodasDisciplinas(disciplinas)
+
+        // 3. Calcular Stats (Ciclo para contar Alunos e Prémios)
+        let totalAlunosCount = 0
+        let totalPremiosCount = 0
+
+        // Nota: Isto faz muitos pedidos à API. Num projeto real, farias um endpoint "/api/stats/professor"
+        for (const curso of resCursos.data) {
+          try {
+            // Buscar alunos do curso
+            const resAlunos = await api.get<any[]>(`/api/cursos/${curso.id}/alunos`)
+            totalAlunosCount += resAlunos.data.length
+
+            // Para cada aluno, ver quantas conquistas tem
+            for (const aluno of resAlunos.data) {
+              const resConquistas = await api.get<any[]>(`/api/alunos/${aluno.id}/conquistas`)
+              totalPremiosCount += resConquistas.data.length
+            }
+
+          } catch (e) { console.error(e) }
+        }
+        
+        setStats({
+          totalDisciplinas: disciplinas.length,
+          totalAlunos: totalAlunosCount,
+          totalEquipas: 0, // Mantemos a 0 pois não é crítico para o enunciado imediato
+          totalPremios: totalPremiosCount
+        })
+
+      } catch (error) {
+        console.error("Erro ao carregar dashboard professor", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchDados()
+  }, [user])
+
+  // Gráfico Simulado (placeholder visualmente agradável)
+  const dadosGrafico = [
+    { name: 'Qualidade Soft.', pontos: 120 },
+    { name: 'Prog. Web', pontos: 85 },
+    { name: 'Bases Dados', pontos: 200 },
+    { name: 'Eng. Req.', pontos: 150 },
   ]
+  const COLORS = ['#8b5cf6', '#f59e0b', '#10b981', '#3b82f6']
 
-  const premiosRecentes = [
-    { aluno: "Joana Silva", premio: "Team Player", pontos: 10, data: "05/10/2025" },
-    { aluno: "Tiago Sousa", premio: "Innovation Hero", pontos: 15, data: "02/10/2025" },
-    { aluno: "Marta Rocha", premio: "OnTime Legend", pontos: 8, data: "28/09/2025" }
-  ]
-
-  const disciplinas = [
-    { nome: "Engenharia Informática", curso: "Licenciatura EI", equipas: 3 },
-    { nome: "Bases de Dados", curso: "Licenciatura EI", equipas: 2 },
-    { nome: "Gestão de Projetos", curso: "Licenciatura GE", equipas: 1 }
-  ]
+  if (loading) return <div className="p-10 text-center text-gray-500">A carregar o teu painel...</div>
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
       
-      {/* Header com gradiente roxo */}
+      {/* Header */}
       <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-white shadow-lg mb-8">
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <Sparkles className="w-5 h-5" />
-              <span className="text-sm font-medium text-indigo-100">Dashboard do Professor</span>
+              <Users className="w-5 h-5" />
+              <span className="text-sm font-medium text-indigo-100">Área do Docente</span>
             </div>
             <h1 className="text-4xl font-bold mb-2">
-              Bem-vindo!
+              Bem-vindo, Prof. {user?.nome?.split(" ")[0]}!
             </h1>
             <p className="text-indigo-100">
-              Gestão de disciplinas, equipas e quizzes
+              A gerir <strong>{stats.totalDisciplinas} disciplinas</strong> e <strong>{stats.totalAlunos} alunos</strong>.
             </p>
           </div>
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-            <Users className="w-12 h-12" />
+            <BookOpen className="w-12 h-12" />
           </div>
         </div>
       </div>
 
-      {/* Top Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <Card className="border-l-4 border-l-violet-500 shadow-sm">
+          <CardContent className="p-6 flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-500 font-medium mb-1">Minhas Disciplinas</p>
+              <p className="text-3xl font-bold text-gray-800">{stats.totalDisciplinas}</p>
+            </div>
+            <div className="p-3 bg-violet-100 rounded-full text-violet-600">
+              <BookOpen className="w-6 h-6" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-l-4 border-l-blue-500 shadow-sm">
+          <CardContent className="p-6 flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-500 font-medium mb-1">Total de Alunos</p>
+              <p className="text-3xl font-bold text-gray-800">{stats.totalAlunos}</p>
+            </div>
+            <div className="p-3 bg-blue-100 rounded-full text-blue-600">
+              <Users className="w-6 h-6" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-l-4 border-l-amber-500 shadow-sm">
+          <CardContent className="p-6 flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-500 font-medium mb-1">Prémios Atribuídos</p>
+              <p className="text-3xl font-bold text-gray-800">--</p> {/* Placeholder */}
+            </div>
+            <div className="p-3 bg-amber-100 rounded-full text-amber-600">
+              <Trophy className="w-6 h-6" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-          <CardContent className="p-6 flex items-center justify-between">
-            <div>
-              <p className="text-sm text-blue-600 font-medium mb-1">Disciplinas</p>
-              <p className="text-3xl font-bold text-blue-700">{stats.totalDisciplinas}</p>
-            </div>
-            <BookOpen className="w-12 h-12 text-blue-500 opacity-20" />
+        {/* Lista de Disciplinas */}
+        <Card className="lg:col-span-2 shadow-sm">
+          <CardHeader className="border-b bg-gray-50/50">
+            <CardTitle className="flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-violet-600" />
+              As Minhas Disciplinas
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            {todasDisciplinas.length > 0 ? (
+              <div className="divide-y">
+                {todasDisciplinas.map((disc) => (
+                  <div key={disc.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition">
+                    <div>
+                      <h4 className="font-semibold text-gray-800">{disc.nome}</h4>
+                      <p className="text-sm text-gray-500">{disc.codigo}</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => navigate(`/disciplinas/${disc.id}/premios`)}
+                      >
+                        <Trophy className="w-4 h-4 mr-2 text-amber-500" />
+                        Prémios
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        className="bg-violet-600 hover:bg-violet-700 text-white"
+                        onClick={() => navigate(`/disciplinas/${disc.id}`)}
+                      >
+                        Ver Detalhes
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="p-8 text-center text-gray-500">
+                Ainda não tens disciplinas atribuídas.
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
-          <CardContent className="p-6 flex items-center justify-between">
-            <div>
-              <p className="text-sm text-purple-600 font-medium mb-1">Quizzes Criados</p>
-              <p className="text-3xl font-bold text-purple-700">{stats.totalQuizzes}</p>
+        {/* Gráfico de Gamificação */}
+        <Card className="shadow-sm">
+          <CardHeader className="border-b">
+            <CardTitle className="flex items-center gap-2">
+              <Target className="w-5 h-5 text-green-600" />
+              Pontos por Turma
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="h-[250px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={dadosGrafico}>
+                  <XAxis dataKey="name" tick={{fontSize: 10}} interval={0} />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="pontos" radius={[4, 4, 0, 0]}>
+                    {dadosGrafico.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
             </div>
-            <ClipboardList className="w-12 h-12 text-purple-500 opacity-20" />
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-          <CardContent className="p-6 flex items-center justify-between">
-            <div>
-              <p className="text-sm text-green-600 font-medium mb-1">Equipas</p>
-              <p className="text-3xl font-bold text-green-700">{stats.totalEquipas}</p>
-            </div>
-            <Users className="w-12 h-12 text-green-500 opacity-20" />
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200">
-          <CardContent className="p-6 flex items-center justify-between">
-            <div>
-              <p className="text-sm text-amber-600 font-medium mb-1">Alunos</p>
-              <p className="text-3xl font-bold text-amber-700">{stats.totalAlunos}</p>
-            </div>
-            <TrendingUp className="w-12 h-12 text-amber-500 opacity-20" />
+            <p className="text-xs text-center text-gray-400 mt-2">
+              *Dados simulados para demonstração de atividade
+            </p>
           </CardContent>
         </Card>
 
       </div>
-
-      {/* Gráfico */}
-      <Card className="mb-8 shadow-sm">
-        <CardHeader>
-          <CardTitle>Participação dos Alunos (Últimas Semanas)</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={250}>
-            <LineChart data={atividadeSemanal}>
-              <XAxis dataKey="semana" />
-              <YAxis />
-              <Tooltip />
-              <Line type="monotone" dataKey="participacoes" stroke="#8b5cf6" strokeWidth={2} />
-            </LineChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-
-      {/* Últimos prémios */}
-      <Card className="mb-8 shadow-sm">
-        <CardHeader className="border-b">
-          <CardTitle>Últimos Prémios Atribuídos</CardTitle>
-        </CardHeader>
-        <CardContent className="p-6">
-          <ul className="space-y-4">
-            {premiosRecentes.map((p, i) => (
-              <li key={i} className="border-b border-gray-100 pb-3 last:border-none">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="font-semibold text-violet-700">{p.premio}</p>
-                    <p className="text-sm text-gray-600">{p.aluno}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-bold text-violet-600">+{p.pontos} pts</p>
-                    <p className="text-xs text-gray-400">{p.data}</p>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </CardContent>
-      </Card>
-
-      {/* Disciplinas */}
-      <Card className="shadow-sm">
-        <CardHeader className="border-b">
-          <CardTitle>Disciplinas</CardTitle>
-        </CardHeader>
-
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr className="text-left">
-                  <th className="px-6 py-4 font-semibold text-gray-700">Disciplina</th>
-                  <th className="px-6 py-4 font-semibold text-gray-700">Curso</th>
-                  <th className="px-6 py-4 font-semibold text-gray-700">Equipas</th>
-                  <th className="px-6 py-4 font-semibold text-gray-700 text-right">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {disciplinas.map((d, i) => (
-                  <tr key={i} className="border-b hover:bg-gray-50 transition">
-                    <td className="px-6 py-4 font-medium text-gray-800">{d.nome}</td>
-                    <td className="px-6 py-4 text-gray-600">{d.curso}</td>
-                    <td className="px-6 py-4 text-gray-600">{d.equipas}</td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button variant="outline" size="sm">Gerir Equipas</Button>
-                        <Button variant="outline" size="sm">Ver Quizzes</Button>
-                        <Button size="sm" className="bg-violet-600 hover:bg-violet-700 text-white">
-                          Criar Quiz
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   )
 }

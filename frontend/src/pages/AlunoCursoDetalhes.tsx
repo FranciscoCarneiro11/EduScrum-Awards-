@@ -4,7 +4,14 @@ import { useAuth } from "@/context/AuthContext"
 import api from "@/lib/api"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import {BookOpen,Users,FolderKanban,ArrowLeft,GraduationCap,CalendarDays,} from "lucide-react"
+import {
+  BookOpen,
+  Users,
+  FolderKanban,
+  ArrowLeft,
+  GraduationCap,
+  CalendarDays,
+} from "lucide-react"
 
 type Disciplina = {
   id: number
@@ -274,12 +281,12 @@ export default function AlunoCursoDetalhes() {
                         </div>
                       </div>
 
-                      {/* Entrada para a página da equipa do aluno neste projeto */}
+                      {/* --- CORREÇÃO AQUI: Link ajustado para a rota correta --- */}
                       <Button
                         size="sm"
                         variant="outline"
                         onClick={() =>
-                          navigate(`/aluno/projetos/${proj.id}/equipa`)
+                          navigate(`/projetos/${proj.id}/equipas`)
                         }
                       >
                         Ver equipa
@@ -293,10 +300,11 @@ export default function AlunoCursoDetalhes() {
                 </p>
               )}
 
+              {/* --- CORREÇÃO AQUI: Previne erro de página em branco --- */}
               <Button
                 variant="outline"
                 className="w-full mt-4"
-                onClick={() => navigate(`/aluno/cursos/${cursoId}/projetos`)}
+                onClick={() => alert("Página de todos os projetos em construção (use a navegação por disciplina)")}
               >
                 Ver todos os projetos
               </Button>

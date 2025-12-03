@@ -6,12 +6,12 @@ import api from "@/lib/api"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 
-import { ArrowLeft, Users, Trash2, UserPlus } from "lucide-react"
+import { ArrowLeft, Users, Trash2, UserPlus, X } from "lucide-react"
 
-type PapelScrum = "SCRUM_MASTER" | "PRODUCT_OWNER" | "DEVELOPER"
+type PapelScrum = "SM" | "PO" | "DEV"
 
 type MembroEquipa = {
-  id: number             // id do MembroEquipa
+  id: number
   idUtilizador: number
   nomeUtilizador: string
   emailUtilizador: string
@@ -22,6 +22,13 @@ type EquipaDTO = {
   id: number
   nome: string
   idProjeto?: number | null
+}
+
+// Tipo simples para listar utilizadores no select
+type AlunoCandidato = {
+  id: number
+  nome: string
+  email: string
 }
 
 export default function EquipaMembros() {
@@ -35,17 +42,24 @@ export default function EquipaMembros() {
   const [membros, setMembros] = useState<MembroEquipa[]>([])
   const [loading, setLoading] = useState(true)
 
+  // Estados para o Modal de Adicionar Membro
+  const [showModalAdicionar, setShowModalAdicionar] = useState(false)
+  const [alunosCandidatos, setAlunosCandidatos] = useState<AlunoCandidato[]>([])
+  const [selectedAlunoId, setSelectedAlunoId] = useState<number | "">("")
+  const [selectedPapel, setSelectedPapel] = useState<PapelScrum>("DEV")
+  const [loadingAdd, setLoadingAdd] = useState(false)
+
+  // --------------------------------------------------
   // Carregar dados da equipa + membros
+  // --------------------------------------------------
   async function fetchDados() {
     if (!equipaId) return
     try {
       setLoading(true)
-
       const [equipaRes, membrosRes] = await Promise.all([
         api.get<EquipaDTO>(`/api/equipas/${equipaId}`),
         api.get<MembroEquipa[]>(`/api/equipas/${equipaId}/membros`),
       ])
-
       setEquipa(equipaRes.data)
       setMembros(membrosRes.data)
     } catch (err) {
@@ -57,9 +71,64 @@ export default function EquipaMembros() {
 
   useEffect(() => {
     fetchDados()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [equipaId])
 
-  // Remover membro 
+  // --------------------------------------------------
+  // Buscar lista de alunos para adicionar (Chamado ao abrir modal)
+  // --------------------------------------------------
+  async function fetchAlunosCandidatos() {
+    try {
+      // Nota: O ideal seria filtrar por curso, mas para simplificar vamos buscar todos os utilizadores
+      // e filtrar no frontend apenas os ALUNOS que ainda NÃO estão na equipa.
+      const res = await api.get<any[]>("/api/utilizadores")
+      
+      // Filtra apenas ALUNOS
+      const todosAlunos = res.data.filter((u) => u.papelSistema === "ALUNO")
+
+      // Remove quem já está na equipa
+      const idsNaEquipa = membros.map((m) => m.idUtilizador)
+      const candidatos = todosAlunos.filter((a) => !idsNaEquipa.includes(a.id))
+
+      setAlunosCandidatos(candidatos)
+    } catch (err) {
+      console.error("Erro ao buscar alunos", err)
+    }
+  }
+
+  function handleAbrirAdicionarMembro() {
+    fetchAlunosCandidatos()
+    setSelectedAlunoId("")
+    setSelectedPapel("DEV")
+    setShowModalAdicionar(true)
+  }
+
+  // --------------------------------------------------
+  // Adicionar Membro (POST)
+  // --------------------------------------------------
+  async function handleAddMembro() {
+    if (!equipaId || !selectedAlunoId) return
+
+    try {
+      setLoadingAdd(true)
+      await api.post(`/api/equipas/${equipaId}/membros`, {
+        idUtilizador: Number(selectedAlunoId),
+        papelScrum: selectedPapel,
+      })
+      
+      setShowModalAdicionar(false)
+      await fetchDados() // Recarrega a lista
+    } catch (err) {
+      console.error("Erro ao adicionar membro", err)
+      alert("Erro ao adicionar membro. Verifica se o aluno já pertence à equipa.")
+    } finally {
+      setLoadingAdd(false)
+    }
+  }
+
+  // --------------------------------------------------
+  // Remover membro (DELETE)
+  // --------------------------------------------------
   async function handleRemoverMembro(idUtilizador: number) {
     if (!equipaId) return
     if (!confirm("Remover este membro da equipa?")) return
@@ -73,16 +142,12 @@ export default function EquipaMembros() {
     }
   }
 
-  // FUTURO: adicionar membro (POST /api/equipas/{id}/membros)
-  // Aqui depois vamos buscar a lista de alunos do projeto e permitir escolher.
-  function handleAbrirAdicionarMembro() {
-    alert("Adicionar membros — vamos implementar depois com seleção de alunos do projeto.")
-  }
-
+  // --------------------------------------------------
   // Helpers
-  function getPapelLabel(papel: PapelScrum): string {
-    if (papel === "SCRUM_MASTER") return "Scrum Master"
-    if (papel === "PRODUCT_OWNER") return "Product Owner"
+  // --------------------------------------------------
+  function getPapelLabel(papel: string): string {
+    if (papel === "SCRUM_MASTER" || papel === "SM") return "Scrum Master"
+    if (papel === "PRODUCT_OWNER" || papel === "PO") return "Product Owner"
     return "Developer"
   }
 
@@ -105,24 +170,18 @@ export default function EquipaMembros() {
   return (
     <div className="min-h-screen bg-gray-50 px-6 py-10">
       <div className="max-w-4xl mx-auto">
-        {/* HEADER */}
+        {/* HEADER GRADIENTE */}
         <div className="bg-gradient-to-r from-pink-500 to-purple-600 rounded-2xl p-8 text-white shadow-lg mb-8">
           <button
-            onClick={() =>
-              navigate(`/projetos/${projetoId}/equipas`)
-            }
+            onClick={() => navigate(`/projetos/${projetoId}/equipas`)}
             className="flex items-center text-white hover:text-white/80 transition mb-4"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
             Voltar às equipas
           </button>
 
-          <h1 className="text-3xl font-bold mb-1">
-            {equipa.nome}
-          </h1>
-          <p className="text-indigo-100 text-sm">
-            Gestão de membros da equipa
-          </p>
+          <h1 className="text-3xl font-bold mb-1">{equipa.nome}</h1>
+          <p className="text-indigo-100 text-sm">Gestão de membros da equipa</p>
         </div>
 
         {/* CARD LISTA DE MEMBROS */}
@@ -134,12 +193,9 @@ export default function EquipaMembros() {
                   <Users className="w-5 h-5 text-violet-600" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold">
-                    Membros da Equipa
-                  </h2>
+                  <h2 className="text-lg font-semibold">Membros da Equipa</h2>
                   <p className="text-sm text-gray-500">
-                    {membros.length}{" "}
-                    {membros.length === 1 ? "membro" : "membros"}
+                    {membros.length} {membros.length === 1 ? "membro" : "membros"}
                   </p>
                 </div>
               </div>
@@ -157,32 +213,26 @@ export default function EquipaMembros() {
 
             <div className="divide-y">
               {membros.map((m) => (
-                <div
-                  key={m.id}
-                  className="flex items-center justify-between py-3"
-                >
+                <div key={m.id} className="flex items-center justify-between py-3">
                   <div className="flex items-center gap-3">
                     {/* Avatar com iniciais */}
                     <div className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-400 to-purple-600 flex items-center justify-center text-white font-semibold text-sm">
                       {m.nomeUtilizador
                         .split(" ")
                         .map((n) => n[0])
-                        .join("")}
+                        .join("")
+                        .slice(0,2)}
                     </div>
 
                     <div>
-                      <p className="font-medium text-gray-900">
-                        {m.nomeUtilizador}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {m.emailUtilizador}
-                      </p>
+                      <p className="font-medium text-gray-900">{m.nomeUtilizador}</p>
+                      <p className="text-xs text-gray-500">{m.emailUtilizador}</p>
                       <span
                         className={`inline-block text-xs px-2 py-1 rounded-full mt-1
                           ${
-                            m.papelScrum === "SCRUM_MASTER"
+                            m.papelScrum === "SM" 
                               ? "bg-yellow-100 text-yellow-700"
-                              : m.papelScrum === "PRODUCT_OWNER"
+                              : m.papelScrum === "PO" 
                               ? "bg-blue-100 text-blue-700"
                               : "bg-green-100 text-green-700"
                           }
@@ -199,9 +249,7 @@ export default function EquipaMembros() {
                       size="icon"
                       variant="ghost"
                       className="text-red-500 hover:bg-red-50"
-                      onClick={() =>
-                        handleRemoverMembro(m.idUtilizador)
-                      }
+                      onClick={() => handleRemoverMembro(m.idUtilizador)}
                     >
                       <Trash2 className="w-5 h-5" />
                     </Button>
@@ -210,7 +258,7 @@ export default function EquipaMembros() {
               ))}
 
               {membros.length === 0 && (
-                <p className="text-sm text-gray-500 pt-2">
+                <p className="text-sm text-gray-500 pt-2 text-center">
                   Ainda não há membros nesta equipa.
                 </p>
               )}
@@ -220,11 +268,114 @@ export default function EquipaMembros() {
 
         {/* NOTA PARA ALUNO */}
         {!isProfessor && (
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 text-center">
             Só o professor pode adicionar ou remover membros da equipa.
           </p>
         )}
       </div>
+
+      {/* MODAL ADICIONAR MEMBRO */}
+      {showModalAdicionar && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-xl shadow-lg w-full max-w-md overflow-hidden">
+            <div className="px-6 py-4 border-b flex justify-between items-center">
+              <h3 className="font-semibold text-lg">Adicionar Membro</h3>
+              <button 
+                onClick={() => setShowModalAdicionar(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="p-6 space-y-4">
+              {/* Select Aluno */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Aluno
+                </label>
+                <select
+                  className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-violet-500 outline-none"
+                  value={selectedAlunoId}
+                  onChange={(e) => setSelectedAlunoId(Number(e.target.value))}
+                >
+                  <option value="">Selecione um aluno...</option>
+                  {alunosCandidatos.map((aluno) => (
+                    <option key={aluno.id} value={aluno.id}>
+                      {aluno.nome} ({aluno.email})
+                    </option>
+                  ))}
+                </select>
+                {alunosCandidatos.length === 0 && (
+                  <p className="text-xs text-orange-500 mt-1">
+                    Não há alunos disponíveis (ou todos já estão na equipa).
+                  </p>
+                )}
+              </div>
+
+              {/* Select Papel */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Papel no Scrum
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedPapel("DEV")}
+                    className={`py-2 text-xs font-medium rounded-md border transition
+                      ${selectedPapel === "DEV" 
+                        ? "bg-green-50 border-green-500 text-green-700" 
+                        : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                      }`}
+                  >
+                    Developer
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedPapel("SM")}
+                    className={`py-2 text-xs font-medium rounded-md border transition
+                      ${selectedPapel === "SM" 
+                        ? "bg-yellow-50 border-yellow-500 text-yellow-700" 
+                        : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                      }`}
+                  >
+                    Scrum Master
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedPapel("PO")}
+                    className={`py-2 text-xs font-medium rounded-md border transition
+                      ${selectedPapel === "PO" 
+                        ? "bg-blue-50 border-blue-500 text-blue-700" 
+                        : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                      }`}
+                  >
+                    Product Owner
+                  </button>
+                </div>
+              </div>
+
+              {/* Botões */}
+              <div className="flex gap-3 pt-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowModalAdicionar(false)}
+                  className="flex-1"
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  onClick={handleAddMembro}
+                  disabled={!selectedAlunoId || loadingAdd}
+                  className="flex-1 bg-violet-600 hover:bg-violet-700 text-white"
+                >
+                  {loadingAdd ? "A adicionar..." : "Adicionar"}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

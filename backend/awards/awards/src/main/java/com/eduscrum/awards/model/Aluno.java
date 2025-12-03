@@ -22,4 +22,10 @@ public class Aluno extends Utilizador {
     public void setTotalPontos(int totalPontos) {
         this.totalPontos = totalPontos;
     }
+
+    public int getTotalPontos() {
+        return totalPontos;
+    }
+
+
 }

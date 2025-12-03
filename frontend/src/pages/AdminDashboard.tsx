@@ -1,131 +1,180 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { BookOpen, Users, GraduationCap, TrendingUp, Plus, Edit, Trash2, Sparkles, Shield } from 'lucide-react'
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts'
-import axios from 'axios'
+import { BookOpen, Users, GraduationCap, TrendingUp, Plus, Edit, Trash2, Shield } from 'lucide-react'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
+import api from "@/lib/api"
+
+// --- TIPOS ---
+type Curso = {
+  id: number
+  nome: string
+  codigo: string
+  adminId: number
+  numAlunos?: number
+  numProfessores?: number
+  numProjetos?: number
+}
+
+type Utilizador = {
+  id: number
+  papelSistema: "ALUNO" | "PROFESSOR" | "ADMIN"
+}
+
+type Stats = {
+  totalCursos: number
+  totalProfessores: number
+  totalAlunos: number
+  totalProjetos: number
+}
 
 export default function AdminDashboard() {
-  const [cursos, setCursos] = useState<any[]>([])
-  const [stats, setStats] = useState({
+  const [cursos, setCursos] = useState<Curso[]>([])
+  const [stats, setStats] = useState<Stats>({
     totalCursos: 0,
     totalProfessores: 0,
     totalAlunos: 0,
-    totalProjetos: 8
+    totalProjetos: 0
   })
-  const [cursoEditar, setCursoEditar] = useState<any | null>(null)
+  
+  // Estados para Gráficos
+  const [dadosPie, setDadosPie] = useState<any[]>([])
+  const [dadosBarra, setDadosBarra] = useState<any[]>([])
+
+  // Estados de Gestão (Modal)
+  const [cursoEditar, setCursoEditar] = useState<Curso | null>(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [novoCurso, setNovoCurso] = useState({ nome: '', codigo: '' })
+  const [loading, setLoading] = useState(true)
+
+  // --- CARREGAR DADOS ---
+  async function loadData() {
+    try {
+      setLoading(true)
+
+      // 1. Buscar Cursos
+      const cursosRes = await api.get<Curso[]>('/api/cursos')
+      const cursosData = cursosRes.data
+
+      // 2. Buscar Utilizadores (Para totais globais)
+      const usersRes = await api.get<Utilizador[]>('/api/utilizadores')
+      const users = usersRes.data
+
+      const countAlunos = users.filter(u => u.papelSistema === 'ALUNO').length
+      const countProfs = users.filter(u => u.papelSistema === 'PROFESSOR').length
+
+      // 3. Enriquecer Cursos (Contar Projetos, Alunos, Professores por curso)
+      // Nota: Isto é pesado se houver muitos cursos. Idealmente, o backend daria estes números.
+      let totalProjetosSistema = 0
+      const cursosEnriquecidos = await Promise.all(cursosData.map(async (curso) => {
+        try {
+          // Buscar contagens específicas
+          const [alunosRes, profsRes, projetosRes] = await Promise.all([
+            api.get(`/api/cursos/${curso.id}/alunos`),
+            api.get(`/api/cursos/${curso.id}/professores`),
+            api.get(`/api/cursos/${curso.id}/projetos`)
+          ])
+          
+          const qtdProjetos = projetosRes.data.length
+          totalProjetosSistema += qtdProjetos
+
+          return {
+            ...curso,
+            numAlunos: alunosRes.data.length,
+            numProfessores: profsRes.data.length,
+            numProjetos: qtdProjetos
+          }
+        } catch (e) {
+          console.error("Erro ao enriquecer curso", curso.id)
+          return curso
+        }
+      }))
+
+      setCursos(cursosEnriquecidos)
+
+      setStats({
+        totalCursos: cursosData.length,
+        totalAlunos: countAlunos,
+        totalProfessores: countProfs,
+        totalProjetos: totalProjetosSistema
+      })
+
+      // 4. Preparar Dados para Gráficos
+      setDadosPie([
+        { name: 'Alunos', value: countAlunos },
+        { name: 'Professores', value: countProfs },
+      ])
+
+      // Top 5 cursos com mais projetos
+      const topCursos = cursosEnriquecidos
+        .sort((a, b) => (b.numProjetos || 0) - (a.numProjetos || 0))
+        .slice(0, 5)
+        .map(c => ({
+          name: c.codigo, // Usar código para caber no gráfico
+          projetos: c.numProjetos || 0
+        }))
+      
+      setDadosBarra(topCursos)
+
+    } catch (err) {
+      console.error('Erro ao carregar dados admin:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadData()
+  }, [])
+
+  // --- AÇÕES ---
+  const handleCreateCurso = async () => {
+    try {
+      // Assumindo que o backend pega o ID do admin autenticado ou passamos hardcoded se necessário
+      await api.post('/api/cursos', {
+        nome: novoCurso.nome,
+        codigo: novoCurso.codigo,
+        adminId: 1 // ID do admin (pode vir do contexto de auth se o backend exigir)
+      })
+      setShowCreateModal(false)
+      setNovoCurso({ nome: '', codigo: '' })
+      loadData()
+    } catch (err) {
+      console.error('Erro ao criar curso:', err)
+      alert("Erro ao criar curso")
+    }
+  }
 
   const handleUpdateCurso = async () => {
+    if (!cursoEditar) return
     try {
-      await axios.put(`/api/cursos/${cursoEditar.id}`, {
+      await api.put(`/api/cursos/${cursoEditar.id}`, {
         nome: cursoEditar.nome,
         codigo: cursoEditar.codigo,
         adminId: cursoEditar.adminId
       })
-
-      const res = await axios.get('/api/cursos')
-      setCursos(res.data)
-
       setCursoEditar(null)
       setShowCreateModal(false)
-      setNovoCurso({ nome: "", codigo: "" })
-
+      loadData()
     } catch (error) {
       console.error("Erro ao editar curso:", error)
     }
   }
 
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const cursosRes = await axios.get('/api/cursos')
-        const cursosData = cursosRes.data
-
-        const usersRes = await axios.get('/api/utilizadores')
-        const users = usersRes.data
-
-        const totalAlunos = users.filter((u: any) => u.papelSistema === 'ALUNO').length
-        const totalProfessores = users.filter((u: any) => u.papelSistema === 'PROFESSOR').length
-
-        setCursos(
-          cursosData.map((c: any) => ({
-            ...c,
-            numAlunos: 0,
-            numProfessores: 0,
-          }))
-        )
-
-        setStats(prev => ({
-          ...prev,
-          totalCursos: cursosData.length,
-          totalAlunos,
-          totalProfessores
-        }))
-
-      } catch (err) {
-        console.error('Erro ao carregar dados:', err)
-      }
-    }
-
-    loadData()
-  }, [])
-
-  const handleCreateCurso = async () => {
-    try {
-      await axios.post('/api/cursos', {
-        nome: novoCurso.nome,
-        codigo: novoCurso.codigo,
-        adminId: 7
-      })
-
-      setShowCreateModal(false)
-      setNovoCurso({ nome: '', codigo: '' })
-
-      const res = await axios.get('/api/cursos')
-      setCursos(res.data)
-
-      setStats(prev => ({
-        ...prev,
-        totalCursos: res.data.length
-      }))
-    } catch (err) {
-      console.error('Erro ao criar curso:', err)
-    }
-  }
-
   const handleDeleteCurso = async (id: number) => {
     if (!confirm('Tem certeza que deseja eliminar este curso?')) return
-
     try {
-      await axios.delete(`/api/cursos/${id}`)
-
-      const res = await axios.get('/api/cursos')
-      setCursos(res.data)
-
-      setStats(prev => ({
-        ...prev,
-        totalCursos: res.data.length
-      }))
+      await api.delete(`/api/cursos/${id}`)
+      loadData()
     } catch (err) {
       console.error('Erro ao eliminar curso:', err)
     }
   }
 
-  const dadosCrescimento = [
-    { mes: 'Jan', alunos: 80, professores: 8 },
-    { mes: 'Fev', alunos: 85, professores: 9 },
-    { mes: 'Mar', alunos: 95, professores: 10 },
-    { mes: 'Abr', alunos: 105, professores: 11 },
-    { mes: 'Mai', alunos: 115, professores: 12 }
-  ]
+  // Cores para o Pie Chart
+  const COLORS = ['#10b981', '#8b5cf6'] // Verde (Alunos), Roxo (Profs)
 
-  const dadosAtividade = [
-    { curso: 'EI', projetos: 4 },
-    { curso: 'GE', projetos: 2 },
-    { curso: 'DM', projetos: 2 }
-  ]
+  if (loading) return <div className="p-10 text-center">A carregar painel de administração...</div>
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -135,14 +184,12 @@ export default function AdminDashboard() {
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <Sparkles className="w-5 h-5" />
+              <Shield className="w-5 h-5" />
               <span className="text-sm font-medium text-indigo-100">Área do Administrador</span>
             </div>
-            <h1 className="text-4xl font-bold mb-2">
-              Bem-vindo!
-            </h1>
+            <h1 className="text-4xl font-bold mb-2">Bem-vindo!</h1>
             <p className="text-indigo-100">
-              Aqui pode gerir todos os cursos e visualizar estatísticas do sistema
+              Gestão global do sistema EduScrum Awards
             </p>
           </div>
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
@@ -151,89 +198,101 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Cards */}
+      {/* Cards KPI */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-blue-600 font-medium mb-1">Total de Cursos</p>
-                <p className="text-3xl font-bold text-blue-700">{stats.totalCursos}</p>
-              </div>
-              <BookOpen className="w-12 h-12 text-blue-500 opacity-20" />
+        <Card className="bg-blue-50 border-blue-200">
+          <CardContent className="p-6 flex justify-between items-center">
+            <div>
+              <p className="text-sm text-blue-600 font-medium">Cursos</p>
+              <p className="text-3xl font-bold text-blue-700">{stats.totalCursos}</p>
             </div>
+            <BookOpen className="w-10 h-10 text-blue-400" />
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-purple-600 font-medium mb-1">Professores</p>
-                <p className="text-3xl font-bold text-purple-700">{stats.totalProfessores}</p>
-              </div>
-              <Users className="w-12 h-12 text-purple-500 opacity-20" />
+        <Card className="bg-purple-50 border-purple-200">
+          <CardContent className="p-6 flex justify-between items-center">
+            <div>
+              <p className="text-sm text-purple-600 font-medium">Professores</p>
+              <p className="text-3xl font-bold text-purple-700">{stats.totalProfessores}</p>
             </div>
+            <Users className="w-10 h-10 text-purple-400" />
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-green-600 font-medium mb-1">Alunos</p>
-                <p className="text-3xl font-bold text-green-700">{stats.totalAlunos}</p>
-              </div>
-              <GraduationCap className="w-12 h-12 text-green-500 opacity-20" />
+        <Card className="bg-green-50 border-green-200">
+          <CardContent className="p-6 flex justify-between items-center">
+            <div>
+              <p className="text-sm text-green-600 font-medium">Alunos</p>
+              <p className="text-3xl font-bold text-green-700">{stats.totalAlunos}</p>
             </div>
+            <GraduationCap className="w-10 h-10 text-green-400" />
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-orange-600 font-medium mb-1">Projetos Ativos</p>
-                <p className="text-3xl font-bold text-orange-700">{stats.totalProjetos}</p>
-              </div>
-              <TrendingUp className="w-12 h-12 text-orange-500 opacity-20" />
+        <Card className="bg-orange-50 border-orange-200">
+          <CardContent className="p-6 flex justify-between items-center">
+            <div>
+              <p className="text-sm text-orange-600 font-medium">Projetos Ativos</p>
+              <p className="text-3xl font-bold text-orange-700">{stats.totalProjetos}</p>
             </div>
+            <TrendingUp className="w-10 h-10 text-orange-400" />
           </CardContent>
         </Card>
       </div>
 
       {/* Gráficos */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        
+        {/* Distribuição de Utilizadores */}
         <Card className="shadow-sm">
           <CardHeader className="border-b">
-            <CardTitle>Crescimento de Utilizadores</CardTitle>
+            <CardTitle>Distribuição de Utilizadores</CardTitle>
           </CardHeader>
-          <CardContent className="p-6">
-            <ResponsiveContainer width="100%" height={250}>
-              <LineChart data={dadosCrescimento}>
-                <XAxis dataKey="mes" />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="alunos" stroke="#8b5cf6" strokeWidth={2} name="Alunos" />
-                <Line type="monotone" dataKey="professores" stroke="#06b6d4" strokeWidth={2} name="Professores" />
-              </LineChart>
-            </ResponsiveContainer>
+          <CardContent className="p-6 flex justify-center">
+            <div className="h-[250px] w-full max-w-xs">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={dadosPie}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    paddingAngle={5}
+                    dataKey="value"
+                  >
+                    {dadosPie.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="flex justify-center gap-4 mt-2 text-sm">
+                <div className="flex items-center gap-1"><div className="w-3 h-3 rounded-full bg-emerald-500"></div> Alunos</div>
+                <div className="flex items-center gap-1"><div className="w-3 h-3 rounded-full bg-violet-500"></div> Professores</div>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
+        {/* Projetos por Curso */}
         <Card className="shadow-sm">
           <CardHeader className="border-b">
-            <CardTitle>Projetos por Curso</CardTitle>
+            <CardTitle>Top Cursos com Mais Projetos</CardTitle>
           </CardHeader>
           <CardContent className="p-6">
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={dadosAtividade}>
-                <XAxis dataKey="curso" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="projetos" fill="#8b5cf6" />
-              </BarChart>
-            </ResponsiveContainer>
+            <div className="h-[250px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={dadosBarra}>
+                  <XAxis dataKey="name" />
+                  <YAxis allowDecimals={false} />
+                  <Tooltip cursor={{fill: 'transparent'}} />
+                  <Bar dataKey="projetos" fill="#8b5cf6" radius={[4, 4, 0, 0]} barSize={50} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -260,40 +319,33 @@ export default function AdminDashboard() {
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr className="text-left">
-                  <th className="px-6 py-4 font-semibold text-gray-700">Curso</th>
-                  <th className="px-6 py-4 font-semibold text-gray-700">Código</th>
-                  <th className="px-6 py-4 font-semibold text-gray-700 text-center">Alunos</th>
-                  <th className="px-6 py-4 font-semibold text-gray-700 text-center">Professores</th>
-                  <th className="px-6 py-4 font-semibold text-gray-700 text-right">Ações</th>
+              <thead className="bg-gray-50 text-sm uppercase text-gray-500">
+                <tr>
+                  <th className="px-6 py-3 text-left">Curso</th>
+                  <th className="px-6 py-3 text-center">Código</th>
+                  <th className="px-6 py-3 text-center">Alunos</th>
+                  <th className="px-6 py-3 text-center">Professores</th>
+                  <th className="px-6 py-3 text-center">Projetos</th>
+                  <th className="px-6 py-3 text-right">Ações</th>
                 </tr>
               </thead>
-
-              <tbody>
+              <tbody className="divide-y divide-gray-100">
                 {cursos.map((curso) => (
-                  <tr key={curso.id} className="border-b hover:bg-gray-50 transition">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-violet-100 flex items-center justify-center">
-                          <BookOpen className="w-5 h-5 text-violet-600" />
-                        </div>
-                        <span className="font-medium text-gray-800">{curso.nome}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
+                  <tr key={curso.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 font-medium text-gray-900">{curso.nome}</td>
+                    <td className="px-6 py-4 text-center">
+                      <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-md font-bold">
                         {curso.codigo}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-center text-gray-600">0</td>
-                    <td className="px-6 py-4 text-center text-gray-600">0</td>
-
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 text-center">{curso.numAlunos}</td>
+                    <td className="px-6 py-4 text-center">{curso.numProfessores}</td>
+                    <td className="px-6 py-4 text-center">{curso.numProjetos}</td>
+                    <td className="px-6 py-4 text-right">
                       <div className="flex justify-end gap-2">
                         <Button
                           variant="outline"
-                          size="sm"
+                          size="icon"
                           onClick={() => {
                             setCursoEditar(curso)
                             setShowCreateModal(true)
@@ -301,12 +353,11 @@ export default function AdminDashboard() {
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
-
                         <Button
                           variant="outline"
-                          size="sm"
+                          size="icon"
+                          className="text-red-500 hover:bg-red-50 hover:text-red-600"
                           onClick={() => handleDeleteCurso(curso.id)}
-                          className="hover:bg-red-50 hover:text-red-600 hover:border-red-300"
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -320,79 +371,35 @@ export default function AdminDashboard() {
         </CardContent>
       </Card>
 
-      {/* Modal Criar/Editar Curso */}
+      {/* Modal Criar/Editar (Mantive igual, só simplificado visualmente) */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-md bg-white shadow-xl rounded-xl border border-gray-200">
-            <CardHeader>
-              <CardTitle>
-                {cursoEditar ? "Editar Curso" : "Criar Novo Curso"}
-              </CardTitle>
-            </CardHeader>
-
-            <CardContent className="space-y-4">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white w-full max-w-md rounded-xl shadow-2xl p-6">
+            <h2 className="text-xl font-bold mb-4">{cursoEditar ? "Editar Curso" : "Novo Curso"}</h2>
+            
+            <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Nome do Curso
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Nome</label>
                 <input
-                  type="text"
+                  className="w-full border rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-violet-500"
                   value={cursoEditar ? cursoEditar.nome : novoCurso.nome}
-                  onChange={(e) => {
-                    if (cursoEditar) {
-                      setCursoEditar({ ...cursoEditar, nome: e.target.value })
-                    } else {
-                      setNovoCurso({ ...novoCurso, nome: e.target.value })
-                    }
-                  }}
-                  placeholder="Ex: Engenharia Informática"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg 
-                          focus:ring-2 focus:ring-violet-400 focus:outline-none bg-white"
+                  onChange={e => cursoEditar ? setCursoEditar({...cursoEditar, nome: e.target.value}) : setNovoCurso({...novoCurso, nome: e.target.value})}
                 />
               </div>
-
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Código do Curso
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Código</label>
                 <input
-                  type="text"
+                  className="w-full border rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-violet-500"
                   value={cursoEditar ? cursoEditar.codigo : novoCurso.codigo}
-                  onChange={(e) => {
-                    if (cursoEditar) {
-                      setCursoEditar({ ...cursoEditar, codigo: e.target.value })
-                    } else {
-                      setNovoCurso({ ...novoCurso, codigo: e.target.value })
-                    }
-                  }}
-                  placeholder="Ex: EI2024"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg 
-                          focus:ring-2 focus:ring-violet-400 focus:outline-none bg-white"
+                  onChange={e => cursoEditar ? setCursoEditar({...cursoEditar, codigo: e.target.value}) : setNovoCurso({...novoCurso, codigo: e.target.value})}
                 />
               </div>
-
-              <div className="flex gap-3 pt-4">
-                <Button
-                  onClick={() => {
-                    setShowCreateModal(false)
-                    setCursoEditar(null)
-                    setNovoCurso({ nome: "", codigo: "" })
-                  }}
-                  variant="outline"
-                  className="flex-1"
-                >
-                  Cancelar
-                </Button>
-
-                <Button
-                  onClick={cursoEditar ? handleUpdateCurso : handleCreateCurso}
-                  className="flex-1 bg-violet-600 hover:bg-violet-700 text-white"
-                >
-                  {cursoEditar ? "Guardar Alterações" : "Criar Curso"}
-                </Button>
+              <div className="flex gap-3 pt-2">
+                <Button variant="outline" className="flex-1" onClick={() => setShowCreateModal(false)}>Cancelar</Button>
+                <Button className="flex-1 bg-violet-600 text-white hover:bg-violet-700" onClick={cursoEditar ? handleUpdateCurso : handleCreateCurso}>Guardar</Button>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       )}
     </div>
