@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-import { ArrowLeft, Plus, CalendarDays, Target, Timer, Trash2, X,MoreHorizontal } from "lucide-react"
+import { ArrowLeft, Plus, CalendarDays, Target, Trash2, X } from "lucide-react"
 
-// TIPOS 
+//Tipos para os dados da API
 type Sprint = {
   id: number
   nome: string
@@ -33,12 +33,12 @@ export default function Sprints() {
   const { user } = useAuth()
   const isProfessor = user?.papelSistema === "PROFESSOR"
 
-  //  ESTADOS 
+  //Estados
   const [projeto, setProjeto] = useState<Projeto | null>(null)
   const [sprints, setSprints] = useState<Sprint[]>([])
   const [loading, setLoading] = useState(true)
 
-  // Modal Criar Sprint
+  //Modal de Criar Sprint
   const [showModal, setShowModal] = useState(false)
   const [novoSprint, setNovoSprint] = useState({
     nome: "",
@@ -48,7 +48,6 @@ export default function Sprints() {
   })
   const [loadingCriar, setLoadingCriar] = useState(false)
 
-  // API 
   async function fetchData() {
     if (!projetoId) return
     try {
@@ -58,9 +57,9 @@ export default function Sprints() {
         api.get<Sprint[]>(`/api/projetos/${projetoId}/sprints`)
       ])
       setProjeto(projRes.data)
-      
-      // Ordenar sprints por data de início 
-      const sprintsOrdenados = sprintsRes.data.sort((a, b) => 
+
+      //Ordenar sprints por data de início 
+      const sprintsOrdenados = sprintsRes.data.sort((a, b) =>
         new Date(a.dataInicio).getTime() - new Date(b.dataInicio).getTime()
       )
       setSprints(sprintsOrdenados)
@@ -76,7 +75,6 @@ export default function Sprints() {
     fetchData()
   }, [projetoId])
 
-  // ACTIONS 
   async function handleCriarSprint(e: React.FormEvent) {
     e.preventDefault()
     if (!projetoId) return
@@ -87,7 +85,7 @@ export default function Sprints() {
         ...novoSprint,
         projetoId: Number(projetoId)
       })
-      
+
       setShowModal(false)
       setNovoSprint({ nome: "", objetivos: "", dataInicio: "", dataFim: "" })
       await fetchData()
@@ -147,12 +145,12 @@ export default function Sprints() {
   return (
     <div className="min-h-screen bg-gray-50 px-6 py-10">
       <div className="max-w-5xl mx-auto">
-        
+
         {/* HEADER */}
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-white shadow-lg mb-8 relative overflow-hidden">
+        <div className="bg-gradient-to-r from-gray-900 to-slate-800 rounded-2xl p-8 text-white shadow-lg mb-8">
           <div className="relative z-10">
             <button
-              onClick={() => navigate(-1)} 
+              onClick={() => navigate(-1)}
               className="flex items-center text-white/80 hover:text-white transition mb-4"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
@@ -161,15 +159,13 @@ export default function Sprints() {
             <h1 className="text-4xl font-bold mb-2">Sprints do Projeto</h1>
             <p className="text-indigo-100 text-lg opacity-90">{projeto.nome}</p>
           </div>
-          
-          {/* Ícone Decorativo */}
-          <Timer className="absolute right-8 top-1/2 -translate-y-1/2 w-32 h-32 text-white opacity-10" />
+
         </div>
 
         {/* ACTION BAR (Só Professor) */}
         {isProfessor && (
           <div className="flex justify-end mb-6">
-            <Button 
+            <Button
               onClick={() => setShowModal(true)}
               className="bg-violet-600 hover:bg-violet-700 text-white shadow-md transition-all hover:shadow-lg"
             >
@@ -194,26 +190,26 @@ export default function Sprints() {
           ) : (
             sprints.map((sprint) => {
               const status = getStatus(sprint.dataInicio, sprint.dataFim)
-              
+
               return (
                 <Card key={sprint.id} className={`border-l-4 shadow-sm hover:shadow-md transition-shadow
-                  ${status === 'EM_CURSO' ? 'border-l-green-500' : 
+                  ${status === 'EM_CURSO' ? 'border-l-green-500' :
                     status === 'PLANEAMENTO' ? 'border-l-yellow-500' : 'border-l-gray-300'}
                 `}>
                   <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row justify-between items-start gap-4">
-                      
+
                       {/* Info Principal */}
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
                           <h3 className="text-xl font-bold text-gray-800">{sprint.nome}</h3>
                           {renderStatusBadge(status)}
                         </div>
-                        
+
                         <div className="flex items-center text-gray-600 text-sm mb-4 bg-gray-50 w-fit px-3 py-1 rounded-md">
                           <CalendarDays className="w-4 h-4 mr-2 text-violet-600" />
                           <span>
-                            {new Date(sprint.dataInicio).toLocaleDateString('pt-PT')} 
+                            {new Date(sprint.dataInicio).toLocaleDateString('pt-PT')}
                             {' '}<span className="text-gray-400 mx-1">➔</span>{' '}
                             {new Date(sprint.dataFim).toLocaleDateString('pt-PT')}
                           </span>
@@ -232,8 +228,8 @@ export default function Sprints() {
                       {/* Ações */}
                       <div className="flex flex-col gap-2 min-w-[140px]">
                         {isProfessor && (
-                          <Button 
-                            variant="ghost" 
+                          <Button
+                            variant="ghost"
                             size="sm"
                             onClick={() => handleDeleteSprint(sprint.id)}
                             className="text-red-600 hover:text-red-700 hover:bg-red-50 justify-start"
@@ -242,11 +238,6 @@ export default function Sprints() {
                             Apagar
                           </Button>
                         )}
-                        {/* Futuro: Botão para ver tarefas/detalhes do sprint */}
-                        <Button variant="outline" size="sm" className="justify-start">
-                          <MoreHorizontal className="w-4 h-4 mr-2" />
-                          Detalhes
-                        </Button>
                       </div>
 
                     </div>
@@ -263,7 +254,7 @@ export default function Sprints() {
       {showModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            
+
             <div className="px-6 py-4 border-b bg-gray-50 flex justify-between items-center">
               <h2 className="text-lg font-bold text-gray-800">Novo Sprint</h2>
               <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600">
@@ -274,11 +265,11 @@ export default function Sprints() {
             <form onSubmit={handleCriarSprint} className="p-6 space-y-4">
               <div>
                 <Label htmlFor="nome">Nome do Sprint</Label>
-                <Input 
-                  id="nome" 
-                  placeholder="Ex: Sprint 1 - Planeamento" 
+                <Input
+                  id="nome"
+                  placeholder="Ex: Sprint 1 - Planeamento"
                   value={novoSprint.nome}
-                  onChange={e => setNovoSprint({...novoSprint, nome: e.target.value})}
+                  onChange={e => setNovoSprint({ ...novoSprint, nome: e.target.value })}
                   required
                 />
               </div>
@@ -286,21 +277,21 @@ export default function Sprints() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="inicio">Data Início</Label>
-                  <Input 
-                    id="inicio" 
-                    type="date" 
+                  <Input
+                    id="inicio"
+                    type="date"
                     value={novoSprint.dataInicio}
-                    onChange={e => setNovoSprint({...novoSprint, dataInicio: e.target.value})}
+                    onChange={e => setNovoSprint({ ...novoSprint, dataInicio: e.target.value })}
                     required
                   />
                 </div>
                 <div>
                   <Label htmlFor="fim">Data Fim</Label>
-                  <Input 
-                    id="fim" 
-                    type="date" 
+                  <Input
+                    id="fim"
+                    type="date"
                     value={novoSprint.dataFim}
-                    onChange={e => setNovoSprint({...novoSprint, dataFim: e.target.value})}
+                    onChange={e => setNovoSprint({ ...novoSprint, dataFim: e.target.value })}
                     required
                   />
                 </div>
@@ -308,12 +299,12 @@ export default function Sprints() {
 
               <div>
                 <Label htmlFor="objetivos">Objetivos</Label>
-                <textarea 
+                <textarea
                   id="objetivos"
                   className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 min-h-[100px]"
                   placeholder="Descreve os principais objetivos deste sprint..."
                   value={novoSprint.objetivos}
-                  onChange={e => setNovoSprint({...novoSprint, objetivos: e.target.value})}
+                  onChange={e => setNovoSprint({ ...novoSprint, objetivos: e.target.value })}
                 />
               </div>
 

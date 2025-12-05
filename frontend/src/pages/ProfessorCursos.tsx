@@ -4,7 +4,7 @@ import api from "@/lib/api"
 import { useNavigate } from "react-router-dom"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { BookOpen, Users, ArrowRight, GraduationCap,FolderKanban,Sparkles,Settings} from "lucide-react"
+import { BookOpen, Users, ArrowRight, GraduationCap, FolderKanban, Sparkles, Settings } from "lucide-react"
 
 type Curso = {
   id: number
@@ -17,16 +17,46 @@ type Curso = {
 export default function ProfessorCursos() {
   const { user } = useAuth()
   const [cursos, setCursos] = useState<Curso[]>([])
+  const [totalProjetos, setTotalProjetos] = useState(0) // Estado para o contador
   const [loading, setLoading] = useState(true)
-  const navigate = useNavigate()  
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (!user) return setLoading(false)
 
     async function carregarCursos() {
       try {
+        setLoading(true)
+
+        //Buscar Cursos
         const res = await api.get(`/api/professores/${user?.id}/cursos`)
-        setCursos(res.data)
+
+        const listaCursos = Array.isArray(res.data) ? res.data : []
+        setCursos(listaCursos)
+
+        //Calcular Total de Projetos
+        const todasDisciplinas = listaCursos.flatMap((c: Curso) =>
+          Array.isArray(c.disciplinas) ? c.disciplinas : []
+        )
+
+        // Busca projetos de cada disciplina em paralelo
+        const contagens = await Promise.all(
+          todasDisciplinas.map(async (disc) => {
+            try {
+              const resProj = await api.get(`/api/disciplinas/${disc.id}/projetos`)
+              // Proteção: Verifica se a resposta é um array antes de ler o length
+              return Array.isArray(resProj.data) ? resProj.data.length : 0
+            } catch (e) {
+              console.warn(`Não foi possível carregar projetos da disciplina ${disc.id}`)
+              return 0
+            }
+          })
+        )
+
+        // Soma o total
+        const total = contagens.reduce((acc, val) => acc + val, 0)
+        setTotalProjetos(total)
+
       } catch (err) {
         console.error("Erro ao carregar cursos do professor:", err)
       } finally {
@@ -51,27 +81,27 @@ export default function ProfessorCursos() {
   return (
     <div className="min-h-screen bg-gray-50 px-6 py-10">
       <div className="max-w-6xl mx-auto">
-        
+
         {/* Hero Section */}
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-white shadow-lg mb-8">
+        <div className="bg-gradient-to-r from-gray-900 to-slate-800 rounded-2xl p-8 text-white shadow-lg mb-8">
           <div className="flex items-start justify-between">
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="w-5 h-5" />
-                <span className="text-sm font-medium text-indigo-100">Área do Professor</span>
+                <Sparkles className="w-5 h-5 text-yellow-500" />
+                <span className="text-sm font-medium text-gray-400">Área do Professor</span>
               </div>
               <h1 className="text-4xl font-bold mb-2">
                 Olá, Prof. {user?.nome?.split(" ")[0]}!
               </h1>
-              <p className="text-indigo-100 text-lg">
-                {cursos.length === 0 
-                  ? "Ainda não leciona nenhum curso" 
+              <p className="text-gray-400 text-lg">
+                {cursos.length === 0
+                  ? "Ainda não leciona nenhum curso"
                   : `A lecionar ${cursos.length} ${cursos.length === 1 ? 'curso' : 'cursos'}`
                 }
               </p>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-              <GraduationCap className="w-12 h-12" />
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+              <GraduationCap className="w-12 h-12 text-white-500" />
             </div>
           </div>
         </div>
@@ -86,7 +116,7 @@ export default function ProfessorCursos() {
               Ainda não leciona nenhum curso
             </h2>
             <p className="text-gray-600 max-w-md mx-auto mb-6">
-              Contacte o administrador ou aguarde a atribuição dos seus cursos. 
+              Contacte o administrador ou aguarde a atribuição dos seus cursos.
               Assim que for associado a um curso, ele aparecerá aqui.
             </p>
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-violet-50 text-violet-700 rounded-full text-sm">
@@ -100,8 +130,8 @@ export default function ProfessorCursos() {
         {cursos.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {cursos.map((curso) => (
-              <Card 
-                key={curso.id} 
+              <Card
+                key={curso.id}
                 className="group hover:shadow-xl transition-all duration-300 border-0 bg-gradient-to-br from-white to-gray-50 overflow-hidden relative"
               >
                 <CardContent className="p-6">
@@ -114,12 +144,12 @@ export default function ProfessorCursos() {
                       {curso.codigo}
                     </span>
                   </div>
-                  
+
                   {/* Nome do Curso */}
                   <h3 className="text-xl font-bold text-gray-900 mb-4 line-clamp-2 min-h-[3.5rem]">
                     {curso.nome}
                   </h3>
-                  
+
                   {/* Stats do Curso */}
                   <div className="space-y-2 mb-4 pb-4 border-b border-gray-100">
                     <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -135,18 +165,18 @@ export default function ProfessorCursos() {
                       <span>Projetos ativos</span>
                     </div>
                   </div>
-                  
+
                   {/* Botões de Ação */}
                   <div className="space-y-2">
-                    <Button 
+                    <Button
                       onClick={() => navigate(`/professor/cursos/${curso.id}`)}
                       className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white group-hover:shadow-lg transition-all"
                     >
                       Gerir Curso
                       <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                     </Button>
-                    
-                    <Button 
+
+                    <Button
                       variant="outline"
                       onClick={() => navigate(`/professor/cursos/${curso.id}`)}
                       className="w-full"
@@ -201,7 +231,7 @@ export default function ProfessorCursos() {
                   <FolderKanban className="w-6 h-6 text-green-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900">0</p>
+                  <p className="text-2xl font-bold text-gray-900">{totalProjetos}</p>
                   <p className="text-sm text-gray-600">Projetos em curso</p>
                 </div>
               </CardContent>

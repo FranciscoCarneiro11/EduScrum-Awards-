@@ -4,14 +4,7 @@ import api from "@/lib/api"
 import { useNavigate } from "react-router-dom"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { 
-  BookOpen, 
-  Users, 
-  ArrowRight, 
-  GraduationCap,
-  FolderKanban,
-  Sparkles
-} from "lucide-react"
+import { BookOpen, Users, GraduationCap, FolderKanban } from "lucide-react"
 
 type Curso = {
   id: number
@@ -23,25 +16,49 @@ type Curso = {
 
 export default function AlunoCursos() {
   const { user } = useAuth()
+  const navigate = useNavigate()
+
   const [cursos, setCursos] = useState<Curso[]>([])
+  const [totalProjetos, setTotalProjetos] = useState(0)
   const [loading, setLoading] = useState(true)
-  const navigate = useNavigate()  
 
   useEffect(() => {
     if (!user) return setLoading(false)
 
-    async function carregarCursos() {
+    async function carregarDados() {
       try {
-        const res = await api.get(`/api/alunos/${user?.id}/cursos`)
-        setCursos(res.data)
+        setLoading(true)
+
+        //Carregar Cursos
+        const resCursos = await api.get<Curso[]>(`/api/alunos/${user?.id}/cursos`)
+        setCursos(resCursos.data)
+
+        //Calcular Projetos Ativos
+        let countProjetos = 0
+
+        for (const curso of resCursos.data) {
+          if (curso.disciplinas) {
+            for (const disciplina of curso.disciplinas) {
+              try {
+                // Endpoint que lista projetos de uma disciplina
+                const resProj = await api.get(`/api/disciplinas/${disciplina.id}/projetos`)
+                countProjetos += resProj.data.length
+              } catch (e) {
+                console.error(`Erro ao buscar projetos da disciplina ${disciplina.id}`, e)
+              }
+            }
+          }
+        }
+        setTotalProjetos(countProjetos)
+
       } catch (err) {
-        console.error("Erro ao carregar cursos:", err)
+        console.error("Erro ao carregar dados:", err)
       } finally {
         setLoading(false)
       }
     }
 
-    carregarCursos()
+    carregarDados()
   }, [user])
 
   if (loading) {
@@ -58,27 +75,23 @@ export default function AlunoCursos() {
   return (
     <div className="min-h-screen bg-gray-50 px-6 py-10">
       <div className="max-w-6xl mx-auto">
-        
+
         {/* Hero Section */}
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-white shadow-lg mb-8">
+        <div className="bg-gradient-to-r from-gray-900 to-slate-800 rounded-2xl p-8 text-white shadow-lg mb-8">
           <div className="flex items-start justify-between">
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="w-5 h-5" />
                 <span className="text-sm font-medium text-indigo-100">Meus Cursos</span>
               </div>
               <h1 className="text-4xl font-bold mb-2">
                 Bem-vindo, {user?.nome?.split(" ")[0]}!
               </h1>
               <p className="text-indigo-100 text-lg">
-                {cursos.length === 0 
-                  ? "Ainda não tens cursos atribuídos" 
-                  : `Tens ${cursos.length} ${cursos.length === 1 ? 'curso' : 'cursos'} ${cursos.length === 1 ? 'atribuído' : 'atribuídos'}`
-                }
+                {cursos.length === 0 ? "Ainda não tens cursos atribuídos" : `Tens ${cursos.length} ${cursos.length === 1 ? 'curso' : 'cursos'} ${cursos.length === 1 ? 'atribuído' : 'atribuídos'}`}
               </p>
             </div>
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-              <GraduationCap className="w-12 h-12" />
+              <GraduationCap className="w-12 h-12 text-white-500" />
             </div>
           </div>
         </div>
@@ -93,7 +106,7 @@ export default function AlunoCursos() {
               Ainda não tens cursos
             </h2>
             <p className="text-gray-600 max-w-md mx-auto mb-6">
-              Contacta o administrador ou aguarda a atribuição do teu curso. 
+              Contacta o administrador ou aguarda a atribuição do teu curso.
               Assim que fores associado a um curso, ele aparecerá aqui.
             </p>
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-violet-50 text-violet-700 rounded-full text-sm">
@@ -107,8 +120,8 @@ export default function AlunoCursos() {
         {cursos.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {cursos.map((curso) => (
-              <Card 
-                key={curso.id} 
+              <Card
+                key={curso.id}
                 className="group hover:shadow-xl transition-all duration-300 border-0 bg-gradient-to-br from-white to-gray-50 overflow-hidden"
               >
                 <CardContent className="p-6">
@@ -121,12 +134,12 @@ export default function AlunoCursos() {
                       {curso.codigo}
                     </span>
                   </div>
-                  
+
                   {/* Nome do Curso */}
                   <h3 className="text-xl font-bold text-gray-900 mb-4 line-clamp-2 min-h-[3.5rem]">
                     {curso.nome}
                   </h3>
-                  
+
                   {/* Stats do Curso */}
                   <div className="space-y-2 mb-4 pb-4 border-b border-gray-100">
                     <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -135,17 +148,14 @@ export default function AlunoCursos() {
                     </div>
                     <div className="flex items-center gap-2 text-sm text-gray-600">
                       <FolderKanban className="w-4 h-4 text-blue-500" />
-                      <span>Projetos ativos</span>
+                      <span>Ver projetos ativos</span>
                     </div>
                   </div>
-                  
+
                   {/* Botão de Ação */}
-                  <Button 
-                    onClick={() => navigate(`/aluno/cursos/${curso.id}`)}
-                    className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white group-hover:shadow-lg transition-all"
-                  >
+                  <Button onClick={() => navigate(`/aluno/cursos/${curso.id}`)}
+                    className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white group-hover:shadow-lg transition-all">
                     Aceder ao Curso
-                    <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </CardContent>
 
@@ -193,7 +203,7 @@ export default function AlunoCursos() {
                   <FolderKanban className="w-6 h-6 text-green-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900">0</p>
+                  <p className="text-2xl font-bold text-gray-900">{totalProjetos}</p>
                   <p className="text-sm text-gray-600">Projetos em curso</p>
                 </div>
               </CardContent>

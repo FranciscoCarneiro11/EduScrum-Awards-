@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthContext"
 import api from "@/lib/api"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import {Users,FolderOpen,BookOpen,CalendarDays,Plus,Edit,Trash2,ArrowLeft,Sparkles,} from "lucide-react"
+import { Users, FolderOpen, BookOpen, CalendarDays, Plus, Edit, Trash2, Sparkles, } from "lucide-react"
 
 export default function DisciplinaDetalhes() {
   const { disciplinaId } = useParams()
@@ -194,7 +194,7 @@ export default function DisciplinaDetalhes() {
           <h2 className="text-2xl font-bold text-gray-800 mb-2">
             Disciplina não encontrada
           </h2>
-          
+
 
         </div>
       </div>
@@ -206,14 +206,9 @@ export default function DisciplinaDetalhes() {
   return (
     <div className="min-h-screen bg-gray-50 px-6 py-10">
       <div className="max-w-6xl mx-auto">
-        {/* HEADER COM GRADIENTE */}
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-white shadow-lg mb-8">
-          <Button
-            variant="ghost"
-            onClick={() => navigate(-1)}
-            className="mb-4 text-white hover:bg-white/20 border-white/30"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
+        {/* Header */}
+        <div className="bg-gradient-to-r from-gray-900 to-slate-800 rounded-2xl p-8 text-white shadow-lg mb-8">
+          <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4 text-white hover:bg-white/20 border-white/30">
             Voltar
           </Button>
 
@@ -229,12 +224,12 @@ export default function DisciplinaDetalhes() {
               </p>
             </div>
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-              <BookOpen className="w-12 h-12" />
+              <BookOpen className="w-12 h-12 text-white-500" />
             </div>
           </div>
         </div>
 
-        {/* STATS RÁPIDAS */}
+        {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card className="border-0 shadow-sm">
             <CardContent className="p-6 flex items-center gap-4">
@@ -393,7 +388,7 @@ export default function DisciplinaDetalhes() {
                               </div>
                               <div className="w-full bg-gray-200 rounded-full h-2">
                                 <div
-                                  className="bg-gradient-to-r from-indigo-600 to-purple-600 h-2 rounded-full transition-all"
+                                  className="bg-gray-900 h-2 rounded-full transition-all"
                                   style={{ width: `${progresso}%` }}
                                 />
                               </div>
@@ -592,8 +587,8 @@ export default function DisciplinaDetalhes() {
                     {loadingCriar
                       ? "A guardar..."
                       : projetoEmEdicao
-                      ? "Guardar"
-                      : "Criar"}
+                        ? "Guardar"
+                        : "Criar"}
                   </Button>
                 </div>
               </form>

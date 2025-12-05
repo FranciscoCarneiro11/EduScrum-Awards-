@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthContext"
 import api from "@/lib/api"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import {ArrowLeft,Users,Crown,Briefcase,Code2,Plus,Trash2,UserPlus,} from "lucide-react"
+import { ArrowLeft, Users, Crown, Briefcase, Code2, Plus, Trash2, UserPlus, } from "lucide-react"
 
 type PapelScrum = "DEV" | "PO" | "SM"
 
@@ -73,7 +73,7 @@ export default function ProjetoEquipas() {
         `/api/equipas/projeto/${projetoId}`,
       )
 
-      // Para cada equipa,ir  buscar membros
+      // Para cada equipa, ir  buscar membros
       const equipasComMembros: Equipa[] = await Promise.all(
         equipasRes.data.map(async (e) => {
           try {
@@ -122,16 +122,13 @@ export default function ProjetoEquipas() {
   // Estatísticas 
   const totalEquipas = equipas.length
   const totalSM = equipas.reduce(
-    (acc, e) => acc + e.membros.filter((m) => m.papelScrum === "SM").length,
-    0,
+    (acc, e) => acc + e.membros.filter((m) => m.papelScrum === "SM").length, 0,
   )
   const totalPO = equipas.reduce(
-    (acc, e) => acc + e.membros.filter((m) => m.papelScrum === "PO").length,
-    0,
+    (acc, e) => acc + e.membros.filter((m) => m.papelScrum === "PO").length, 0,
   )
   const totalDev = equipas.reduce(
-    (acc, e) => acc + e.membros.filter((m) => m.papelScrum === "DEV").length,
-    0,
+    (acc, e) => acc + e.membros.filter((m) => m.papelScrum === "DEV").length, 0,
   )
 
   // Criar Equipa 
@@ -206,7 +203,7 @@ export default function ProjetoEquipas() {
     <div className="min-h-screen bg-gray-50 px-6 py-10">
       <div className="max-w-6xl mx-auto">
         {/* HEADER */}
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-white shadow-lg mb-10">
+        <div className="bg-gradient-to-r from-gray-900 to-slate-800 rounded-2xl p-8 text-white shadow-lg mb-8">
           <button
             onClick={() => navigate(-1)}
             className="flex items-center text-white hover:text-white/80 transition mb-4"
@@ -216,10 +213,10 @@ export default function ProjetoEquipas() {
           </button>
 
           <h1 className="text-4xl font-bold mb-2">Equipas Scrum</h1>
-          <p className="text-indigo-100 text-sm">Projeto: {projeto.nome}</p>
+          <p className="text-gray-400 text-sm">Projeto: {projeto.nome}</p>
         </div>
 
-        {/* CARDS DE ESTATÍSTICAS */}
+        {/* Cards de Estatísticas */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
           <Card>
             <CardContent className="flex items-center gap-4 p-6">
@@ -275,7 +272,7 @@ export default function ProjetoEquipas() {
           <div className="max-w-6xl mx-auto flex justify-end mb-6">
             <Button
               onClick={() => setShowModalNovaEquipa(true)}
-              className="bg-violet-600 hover:bg-violet-700 text-white px-5 py-2"
+              className="bg-gray-900 hover:bg-gray-800 text-white px-5 py-2"
             >
               <Plus className="w-4 h-4 mr-2 text-white" />
               Nova Equipa
@@ -291,7 +288,7 @@ export default function ProjetoEquipas() {
               className="bg-white rounded-xl shadow-md border border-gray-200"
             >
               {/* Header da equipa */}
-              <div className="bg-gradient-to-r from-pink-500 to-purple-600 text-white p-6 rounded-t-xl flex items-center justify-between">
+              <div className="bg-gradient-to-r from-slate-700 to-slate-600 rounded-2xl p-8 text-white shadow-lg mb-8">
                 <div>
                   <h2 className="text-xl font-semibold">{eq.nome}</h2>
                   <p className="text-sm opacity-80">
@@ -301,24 +298,11 @@ export default function ProjetoEquipas() {
 
                 {isProfessor && (
                   <div className="flex gap-3">
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="text-white hover:bg-white/20"
-                      onClick={() =>
-                        navigate(`/projetos/${projetoId}/equipas/${eq.id}/membros`)
-                      }
-                    >
+                    <Button size="icon" variant="ghost" className="text-white hover:bg-white/20" onClick={() => navigate(`/projetos/${projetoId}/equipas/${eq.id}/membros`)}>
                       <UserPlus className="w-5 h-5" />
                     </Button>
 
-
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="text-white hover:bg-white/20"
-                      onClick={() => handleDeleteEquipe(eq.id)}
-                    >
+                    <Button size="icon" variant="ghost" className="text-white hover:bg-white/20" onClick={() => handleDeleteEquipe(eq.id)}>
                       <Trash2 className="w-5 h-5" />
                     </Button>
                   </div>
@@ -334,11 +318,8 @@ export default function ProjetoEquipas() {
                   >
                     <div className="flex items-center gap-3">
                       {/* Avatar com iniciais */}
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-400 to-purple-600 flex items-center justify-center text-white font-bold">
-                        {m.nome
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
+                      <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-800 font-bold border border-gray-300">
+                        {m.nome.split(" ").map((n) => n[0]).join("")}
                       </div>
 
                       <div>
@@ -347,10 +328,9 @@ export default function ProjetoEquipas() {
                         {/* Badge do papel */}
                         <span
                           className={`inline-block text-xs px-2 py-1 rounded-full mt-1
-                            ${
-                              m.papelScrum === "SM"
-                                ? "bg-yellow-100 text-yellow-700"
-                                : m.papelScrum === "PO"
+                            ${m.papelScrum === "SM"
+                              ? "bg-yellow-100 text-yellow-700"
+                              : m.papelScrum === "PO"
                                 ? "bg-blue-100 text-blue-700"
                                 : "bg-green-100 text-green-700"
                             }
@@ -377,10 +357,10 @@ export default function ProjetoEquipas() {
               </div>
 
               {/* Placeholder para sprints */}
-              <div className="p-4 rounded-b-xl bg-purple-50 text-center">
+              <div className="p-4 rounded-b-xl bg-gray-50 text-center">
                 <button
-                  onClick={() => alert("Página de sprints — ainda por criar")}
-                  className="text-purple-700 hover:underline text-sm"
+                  onClick={() => navigate(`/projetos/${projetoId}/sprints`)}
+                  className="text-gray-600 hover:text-gray-900 hover:underline text-sm font-medium"
                 >
                   Ver Sprints
                 </button>
@@ -400,7 +380,7 @@ export default function ProjetoEquipas() {
       {showModalNovaEquipa && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 backdrop-blur-sm p-4">
           <div className="bg-white rounded-xl shadow-lg w-full max-w-md overflow-hidden">
-            <div className="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600">
+            <div className="px-6 py-3 bg-gray-900">
               <h2 className="text-white text-lg font-semibold flex items-center gap-2">
                 <Plus className="w-5 h-5 text-white" />
                 Nova Equipa
@@ -412,34 +392,23 @@ export default function ProjetoEquipas() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Nome da Equipa
                 </label>
-                <input
-                  type="text"
-                  value={novoNomeEquipa}
-                  onChange={(e) => setNovoNomeEquipa(e.target.value)}
+                <input type="text" value={novoNomeEquipa} onChange={(e) => setNovoNomeEquipa(e.target.value)}
                   placeholder="Ex: Equipa Alpha"
-                  className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-violet-400"
+                  className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-gray-400"
                 />
               </div>
 
               <div className="flex gap-3 pt-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    setShowModalNovaEquipa(false)
-                    setNovoNomeEquipa("")
-                  }}
+                <Button type="button" variant="outline" onClick={() => {
+                  setShowModalNovaEquipa(false)
+                  setNovoNomeEquipa("")
+                }}
                   className="flex-1"
                 >
                   Cancelar
                 </Button>
 
-                <Button
-                  type="button"
-                  onClick={handleCreateEquipe}
-                  disabled={!novoNomeEquipa.trim()}
-                  className="flex-1 bg-violet-600 hover:bg-violet-700 text-white"
-                >
+                <Button type="button" onClick={handleCreateEquipe} disabled={!novoNomeEquipa.trim()} className="flex-1 bg-gray-900 hover:bg-gray-800 text-white">
                   Criar Equipa
                 </Button>
               </div>

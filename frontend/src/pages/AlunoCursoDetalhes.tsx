@@ -110,11 +110,8 @@ export default function AlunoCursoDetalhes() {
     <div className="min-h-screen bg-gray-50 px-6 py-10">
       {/* Header */}
       <div className="max-w-6xl mx-auto mb-8">
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-white shadow-lg mb-8">
-          <button
-            onClick={() => navigate("/aluno/cursos")}
-            className="flex items-center text-white hover:text-white/80 transition mb-4"
-          >
+        <div className="bg-gradient-to-r from-gray-900 to-slate-800 rounded-2xl p-8 text-white shadow-lg mb-8">
+          <button onClick={() => navigate("/aluno/cursos")} className="flex items-center text-white hover:text-white/80 transition mb-4">
             <ArrowLeft className="w-5 h-5 mr-2" />
             Voltar aos cursos
           </button>
@@ -124,12 +121,12 @@ export default function AlunoCursoDetalhes() {
                 {curso.codigo}
               </span>
               <h1 className="text-4xl font-bold mb-2">{curso.nome}</h1>
-              <p className="text-indigo-100">
+              <p className="text-gray-400">
                 Bem-vindo, {user?.nome?.split(" ")[0]}!
               </p>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-              <GraduationCap className="w-12 h-12" />
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+              <GraduationCap className="w-12 h-12 text-white-500" />
             </div>
           </div>
         </div>
@@ -275,20 +272,11 @@ export default function AlunoCursoDetalhes() {
                         <p className="font-medium text-sm">{proj.nome}</p>
                         <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
                           <CalendarDays className="w-3 h-3" />
-                          {new Date(proj.dataInicio).toLocaleDateString(
-                            "pt-PT",
-                          )}
+                          {new Date(proj.dataInicio).toLocaleDateString("pt-PT")}
                         </div>
                       </div>
 
-                      {/* --- CORREÇÃO AQUI: Link ajustado para a rota correta --- */}
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() =>
-                          navigate(`/projetos/${proj.id}/equipas`)
-                        }
-                      >
+                      <Button size="sm" variant="outline" onClick={() => navigate(`/projetos/${proj.id}/equipas`)}>
                         Ver equipa
                       </Button>
                     </li>
@@ -300,12 +288,14 @@ export default function AlunoCursoDetalhes() {
                 </p>
               )}
 
-              {/* --- CORREÇÃO AQUI: Previne erro de página em branco --- */}
-              <Button
-                variant="outline"
-                className="w-full mt-4"
-                onClick={() => alert("Página de todos os projetos em construção (use a navegação por disciplina)")}
-              >
+              <Button variant="outline" className="w-full mt-4" onClick={() => {
+                // Se houver disciplinas, vai para a primeira
+                if (curso?.disciplinas && curso.disciplinas.length > 0) {
+                  navigate(`/disciplinas/${curso.disciplinas[0].id}`)
+                } else {
+                  alert("Este curso ainda não tem disciplinas com projetos.")
+                }
+              }}>
                 Ver todos os projetos
               </Button>
             </CardContent>
