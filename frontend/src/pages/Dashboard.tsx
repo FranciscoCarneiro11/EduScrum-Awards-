@@ -2,10 +2,10 @@ import { useEffect, useState } from "react"
 import { useAuth } from "@/context/AuthContext"
 import api from "@/lib/api"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Trophy, Star, TrendingUp, FolderOpen, Sparkles, CalendarDays } from "lucide-react"
+import { Trophy, Star, TrendingUp, FolderOpen, CalendarDays } from "lucide-react"
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
 
-// Tipos para os dados da API
+//Tipos para os dados da API
 type Premio = {
   id: number
   nome: string
@@ -28,7 +28,7 @@ type Projeto = {
 
 export default function Dashboard() {
   const { user } = useAuth()
-  
+
   const [conquistas, setConquistas] = useState<Conquista[]>([])
   const [projetos, setProjetos] = useState<Projeto[]>([])
   const [totalPontos, setTotalPontos] = useState(0)
@@ -41,18 +41,17 @@ export default function Dashboard() {
       try {
         setLoading(true)
 
-        // 1. Buscar Conquistas Reais
+        //Buscar Conquistas Reais
         const resConquistas = await api.get<Conquista[]>(`/api/alunos/${user?.id}/conquistas`)
         setConquistas(resConquistas.data)
 
-        // 2. Calcular Total de Pontos (Soma dos prémios)
+        //Calcular Total de Pontos 
         const somaPontos = resConquistas.data.reduce((acc, c) => acc + c.premio.valorPontos, 0)
         setTotalPontos(somaPontos)
 
-        // 3. Buscar Projetos/Cursos do Aluno para contar ativos
-        // Nota: Estamos a usar a lista de cursos como proxy para projetos ativos por enquanto
+        //Buscar Projetos/Cursos do Aluno para contar ativos
         const resCursos = await api.get(`/api/alunos/${user?.id}/cursos`)
-        setProjetos(resCursos.data) 
+        setProjetos(resCursos.data)
 
       } catch (error) {
         console.error("Erro ao carregar dashboard", error)
@@ -64,7 +63,7 @@ export default function Dashboard() {
     fetchDados()
   }, [user])
 
-  // Dados simples para o gráfico (apenas início e fim por agora)
+  // Dados simples para o gráfico
   const graficoPontos = [
     { mes: "Início", pontos: 0 },
     { mes: "Atual", pontos: totalPontos },
@@ -80,37 +79,36 @@ export default function Dashboard() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      
-      {/* Header com gradiente */}
-      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-white shadow-lg mb-8">
+
+      {/* Header */}
+      <div className="bg-gradient-to-r from-gray-900 to-slate-800 rounded-2xl p-8 text-white shadow-lg mb-8">
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <Sparkles className="w-5 h-5" />
-              <span className="text-sm font-medium text-indigo-100">Dashboard do Aluno</span>
+              <span className="text-sm font-medium text-gray-400">Dashboard do Aluno</span>
             </div>
             <h1 className="text-4xl font-bold mb-2">
               Olá, {user?.nome?.split(" ")[0]}!
             </h1>
-            <p className="text-indigo-100">
+            <p className="text-gray-400">
               Tens <strong className="text-white">{conquistas.length} prémios</strong> conquistados até agora.
             </p>
           </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-            <Trophy className="w-12 h-12" />
+          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+            <Trophy className="w-12 h-12 text-white-500" />
           </div>
         </div>
       </div>
 
-      {/* Cards de Stats (AGORA LIGADOS AOS ESTADOS) */}
+      {/* Cards de Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        
+
         <Card className="bg-gradient-to-br from-violet-50 to-purple-100 border-violet-200">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-violet-600 font-medium mb-1">Total de Pontos</p>
-                {/* Mostra a variável de estado totalPontos */}
+                {/* Mostra o totalPontos */}
                 <p className="text-4xl font-bold text-violet-700">{totalPontos}</p>
               </div>
               <Trophy className="w-12 h-12 text-violet-500 opacity-20" />
@@ -123,7 +121,7 @@ export default function Dashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-amber-600 font-medium mb-1">Prémios Recebidos</p>
-                {/* Mostra o tamanho do array conquistas */}
+                {/* Mostra as conquistas */}
                 <p className="text-4xl font-bold text-amber-700">{conquistas.length}</p>
               </div>
               <Star className="w-12 h-12 text-amber-500 opacity-20" />
@@ -147,7 +145,7 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        {/* Lista de Conquistas (Dinâmica) */}
+        {/* Lista de Conquistas */}
         <Card className="lg:col-span-2 shadow-sm">
           <CardHeader className="border-b">
             <CardTitle className="flex items-center gap-2">
@@ -169,7 +167,7 @@ export default function Dashboard() {
                           <h4 className="font-bold text-gray-900">{c.premio.nome}</h4>
                           <p className="text-sm text-gray-600">{c.premio.descricao}</p>
                         </div>
-                        <span className="font-bold text-violet-600 bg-violet-50 px-3 py-1 rounded-full text-sm">
+                        <span className="font-bold text-dark-600 bg-violet-50 px-3 py-1 rounded-full text-sm">
                           +{c.premio.valorPontos} pts
                         </span>
                       </div>
@@ -207,11 +205,11 @@ export default function Dashboard() {
                   <XAxis dataKey="mes" hide />
                   <YAxis hide />
                   <Tooltip />
-                  <Line type="monotone" dataKey="pontos" stroke="#8b5cf6" strokeWidth={3} dot={{ r: 6 }} />
+                  <Line type="monotone" dataKey="pontos" stroke="#010101ff" strokeWidth={3} dot={{ r: 6 }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
-            <p className="text-center text-sm text-gray-500 mt-4">
+            <p className="font-bold text-center text-sm text-gray-500 mt-4">
               Começaste com 0 e já vais em {totalPontos} pontos!
             </p>
           </CardContent>

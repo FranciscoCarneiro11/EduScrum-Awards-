@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useAuth } from "@/context/AuthContext"
 import { Button } from '@/components/ui/button'
 import { BookOpen, Users, GraduationCap, TrendingUp, Plus, Edit, Trash2, Shield } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import api from "@/lib/api"
 
-// --- TIPOS ---
+//Tipos para os dados da API
 type Curso = {
   id: number
   nome: string
@@ -29,6 +30,7 @@ type Stats = {
 }
 
 export default function AdminDashboard() {
+  const { user } = useAuth()
   const [cursos, setCursos] = useState<Curso[]>([])
   const [stats, setStats] = useState<Stats>({
     totalCursos: 0,
@@ -36,7 +38,7 @@ export default function AdminDashboard() {
     totalAlunos: 0,
     totalProjetos: 0
   })
-  
+
   // Estados para Gráficos
   const [dadosPie, setDadosPie] = useState<any[]>([])
   const [dadosBarra, setDadosBarra] = useState<any[]>([])
@@ -47,34 +49,32 @@ export default function AdminDashboard() {
   const [novoCurso, setNovoCurso] = useState({ nome: '', codigo: '' })
   const [loading, setLoading] = useState(true)
 
-  // --- CARREGAR DADOS ---
+  //Carregar dados
   async function loadData() {
     try {
       setLoading(true)
 
-      // 1. Buscar Cursos
+      //Buscar Cursos
       const cursosRes = await api.get<Curso[]>('/api/cursos')
       const cursosData = cursosRes.data
 
-      // 2. Buscar Utilizadores (Para totais globais)
+      //Buscar Utilizadores 
       const usersRes = await api.get<Utilizador[]>('/api/utilizadores')
       const users = usersRes.data
 
       const countAlunos = users.filter(u => u.papelSistema === 'ALUNO').length
       const countProfs = users.filter(u => u.papelSistema === 'PROFESSOR').length
 
-      // 3. Enriquecer Cursos (Contar Projetos, Alunos, Professores por curso)
-      // Nota: Isto é pesado se houver muitos cursos. Idealmente, o backend daria estes números.
+      //Enriquecer Cursos (Contar Projetos, Alunos, Professores por curso)
       let totalProjetosSistema = 0
       const cursosEnriquecidos = await Promise.all(cursosData.map(async (curso) => {
         try {
-          // Buscar contagens específicas
           const [alunosRes, profsRes, projetosRes] = await Promise.all([
             api.get(`/api/cursos/${curso.id}/alunos`),
             api.get(`/api/cursos/${curso.id}/professores`),
             api.get(`/api/cursos/${curso.id}/projetos`)
           ])
-          
+
           const qtdProjetos = projetosRes.data.length
           totalProjetosSistema += qtdProjetos
 
@@ -99,7 +99,7 @@ export default function AdminDashboard() {
         totalProjetos: totalProjetosSistema
       })
 
-      // 4. Preparar Dados para Gráficos
+      //Preparar Dados para Gráficos
       setDadosPie([
         { name: 'Alunos', value: countAlunos },
         { name: 'Professores', value: countProfs },
@@ -110,10 +110,10 @@ export default function AdminDashboard() {
         .sort((a, b) => (b.numProjetos || 0) - (a.numProjetos || 0))
         .slice(0, 5)
         .map(c => ({
-          name: c.codigo, // Usar código para caber no gráfico
+          name: c.codigo,
           projetos: c.numProjetos || 0
         }))
-      
+
       setDadosBarra(topCursos)
 
     } catch (err) {
@@ -127,15 +127,20 @@ export default function AdminDashboard() {
     loadData()
   }, [])
 
-  // --- AÇÕES ---
+  //Ações
   const handleCreateCurso = async () => {
     try {
-      // Assumindo que o backend pega o ID do admin autenticado ou passamos hardcoded se necessário
+      if (!user?.id) {
+        alert("Erro: Utilizador não autenticado.")
+        return
+      }
+
       await api.post('/api/cursos', {
         nome: novoCurso.nome,
         codigo: novoCurso.codigo,
-        adminId: 1 // ID do admin (pode vir do contexto de auth se o backend exigir)
+        adminId: user.id
       })
+
       setShowCreateModal(false)
       setNovoCurso({ nome: '', codigo: '' })
       loadData()
@@ -172,28 +177,29 @@ export default function AdminDashboard() {
   }
 
   // Cores para o Pie Chart
-  const COLORS = ['#10b981', '#8b5cf6'] // Verde (Alunos), Roxo (Profs)
+  const COLORS = ['#105fb9ff', '#8b5cf6']
 
   if (loading) return <div className="p-10 text-center">A carregar painel de administração...</div>
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      
+
       {/* Header */}
-      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-white shadow-lg mb-8">
+      <div className="bg-gradient-to-r from-gray-900 to-slate-800 rounded-2xl p-8 text-white shadow-lg mb-8">
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <Shield className="w-5 h-5" />
-              <span className="text-sm font-medium text-indigo-100">Área do Administrador</span>
+              <span className="text-sm font-medium text-gray-400">Dashboard do Administrador</span>
             </div>
-            <h1 className="text-4xl font-bold mb-2">Bem-vindo!</h1>
-            <p className="text-indigo-100">
+            <h1 className="text-4xl font-bold mb-2">
+              Olá, {user?.nome?.split(" ")[0]}!
+            </h1>
+            <p className="text-gray-400">
               Gestão global do sistema EduScrum Awards
             </p>
           </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-            <Shield className="w-12 h-12" />
+          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+            <Shield className="w-12 h-12 text-white-500" />
           </div>
         </div>
       </div>
@@ -243,7 +249,7 @@ export default function AdminDashboard() {
 
       {/* Gráficos */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        
+
         {/* Distribuição de Utilizadores */}
         <Card className="shadow-sm">
           <CardHeader className="border-b">
@@ -253,15 +259,7 @@ export default function AdminDashboard() {
             <div className="h-[250px] w-full max-w-xs">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie
-                    data={dadosPie}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={5}
-                    dataKey="value"
-                  >
+                  <Pie data={dadosPie} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
                     {dadosPie.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
@@ -270,7 +268,7 @@ export default function AdminDashboard() {
                 </PieChart>
               </ResponsiveContainer>
               <div className="flex justify-center gap-4 mt-2 text-sm">
-                <div className="flex items-center gap-1"><div className="w-3 h-3 rounded-full bg-emerald-500"></div> Alunos</div>
+                <div className="flex items-center gap-1"><div className="w-3 h-3 rounded-full bg-blue-500"></div> Alunos</div>
                 <div className="flex items-center gap-1"><div className="w-3 h-3 rounded-full bg-violet-500"></div> Professores</div>
               </div>
             </div>
@@ -288,8 +286,8 @@ export default function AdminDashboard() {
                 <BarChart data={dadosBarra}>
                   <XAxis dataKey="name" />
                   <YAxis allowDecimals={false} />
-                  <Tooltip cursor={{fill: 'transparent'}} />
-                  <Bar dataKey="projetos" fill="#8b5cf6" radius={[4, 4, 0, 0]} barSize={50} />
+                  <Tooltip cursor={{ fill: 'transparent' }} />
+                  <Bar dataKey="projetos" fill="#000000ff" radius={[4, 4, 0, 0]} barSize={50} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -302,14 +300,7 @@ export default function AdminDashboard() {
         <CardHeader className="border-b">
           <div className="flex justify-between items-center">
             <CardTitle>Gestão de Cursos</CardTitle>
-            <Button
-              onClick={() => {
-                setCursoEditar(null)
-                setNovoCurso({ nome: "", codigo: "" })
-                setShowCreateModal(true)
-              }}
-              className="bg-violet-600 hover:bg-violet-700 text-white"
-            >
+            <Button onClick={() => { setCursoEditar(null); setNovoCurso({ nome: "", codigo: "" }); setShowCreateModal(true) }} className="bg-violet-600 hover:bg-violet-700 text-white">
               <Plus className="w-4 h-4 mr-2 text-white" />
               Novo Curso
             </Button>
@@ -334,7 +325,7 @@ export default function AdminDashboard() {
                   <tr key={curso.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 font-medium text-gray-900">{curso.nome}</td>
                     <td className="px-6 py-4 text-center">
-                      <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-md font-bold">
+                      <span className="px-2 py-1 bg-blue-100 text-black-700 text-xs rounded-md font-bold">
                         {curso.codigo}
                       </span>
                     </td>
@@ -343,22 +334,13 @@ export default function AdminDashboard() {
                     <td className="px-6 py-4 text-center">{curso.numProjetos}</td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex justify-end gap-2">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => {
-                            setCursoEditar(curso)
-                            setShowCreateModal(true)
-                          }}
-                        >
+                        <Button variant="outline" size="icon" onClick={() => {
+                          setCursoEditar(curso)
+                          setShowCreateModal(true)
+                        }}>
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="text-red-500 hover:bg-red-50 hover:text-red-600"
-                          onClick={() => handleDeleteCurso(curso.id)}
-                        >
+                        <Button variant="outline" size="icon" className="text-red-500 hover:bg-red-50 hover:text-red-600" onClick={() => handleDeleteCurso(curso.id)}>
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
@@ -371,19 +353,19 @@ export default function AdminDashboard() {
         </CardContent>
       </Card>
 
-      {/* Modal Criar/Editar (Mantive igual, só simplificado visualmente) */}
+      {/* Modal Criar/Editar */}
       {showCreateModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white w-full max-w-md rounded-xl shadow-2xl p-6">
             <h2 className="text-xl font-bold mb-4">{cursoEditar ? "Editar Curso" : "Novo Curso"}</h2>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Nome</label>
                 <input
                   className="w-full border rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-violet-500"
                   value={cursoEditar ? cursoEditar.nome : novoCurso.nome}
-                  onChange={e => cursoEditar ? setCursoEditar({...cursoEditar, nome: e.target.value}) : setNovoCurso({...novoCurso, nome: e.target.value})}
+                  onChange={e => cursoEditar ? setCursoEditar({ ...cursoEditar, nome: e.target.value }) : setNovoCurso({ ...novoCurso, nome: e.target.value })}
                 />
               </div>
               <div>
@@ -391,7 +373,7 @@ export default function AdminDashboard() {
                 <input
                   className="w-full border rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-violet-500"
                   value={cursoEditar ? cursoEditar.codigo : novoCurso.codigo}
-                  onChange={e => cursoEditar ? setCursoEditar({...cursoEditar, codigo: e.target.value}) : setNovoCurso({...novoCurso, codigo: e.target.value})}
+                  onChange={e => cursoEditar ? setCursoEditar({ ...cursoEditar, codigo: e.target.value }) : setNovoCurso({ ...novoCurso, codigo: e.target.value })}
                 />
               </div>
               <div className="flex gap-3 pt-2">
