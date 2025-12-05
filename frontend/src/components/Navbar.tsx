@@ -23,13 +23,13 @@ export default function Navbar() {
   // Caminho do Dashboard dinamicamente
   const dashboardPath =
     isAdmin ? "/admin/dashboard"
-    : isProfessor ? "/professor/dashboard" 
-    : "/dashboard"
+      : isProfessor ? "/professor/dashboard"
+        : "/dashboard"
 
   return (
     <nav className="bg-white/80 backdrop-blur-md shadow-md fixed top-0 left-0 w-full z-50">
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-        
+
         {/* Logo */}
         <Link
           to="/"
@@ -40,7 +40,7 @@ export default function Navbar() {
 
         {/* Navegação */}
         <div className="flex items-center gap-6 text-gray-700">
-          
+
           {!isAuthenticated ? (
             // NÃO autenticado
             <>
@@ -50,8 +50,8 @@ export default function Navbar() {
               <Link to="/sobre" className="hover:text-violet-600 transition font-medium">
                 Sobre
               </Link>
-              <Link 
-                to="/login" 
+              <Link
+                to="/login"
                 className="bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-lg text-sm transition"
               >
                 Entrar
@@ -67,6 +67,11 @@ export default function Navbar() {
               {/* LINK DASHBOARD para todos */}
               <Link to={dashboardPath} className="hover:text-violet-600 transition font-medium">
                 Dashboard
+              </Link>
+
+              {/* LINK RANKINGS para todos */}
+              <Link to="/rankings" className="hover:text-violet-600 transition font-medium">
+                Rankings
               </Link>
 
               {isAdmin && (

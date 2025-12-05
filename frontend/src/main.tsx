@@ -14,7 +14,7 @@ import AlunoCursos from "./pages/AlunoCursos"
 import AdminGestaoUtilizadores from "./pages/AdminGestaoUtilizadores"
 import ProfessorCursos from "./pages/ProfessorCursos"
 import ProfessorCursoDetalhes from "./pages/ProfessorCursoDetalhes"
-import ProjetoEquipas from "./pages/ProjetoEquipas" 
+import ProjetoEquipas from "./pages/ProjetoEquipas"
 import EquipaMembros from "./pages/EquipaMembros"
 import "./index.css"
 import { AuthProvider } from "@/context/AuthContext"
@@ -23,6 +23,7 @@ import AlunoCursoDetalhes from "./pages/AlunoCursoDetalhes"
 import DisciplinaDetalhes from "./pages/DisciplinaDetalhes"
 import Sprints from "./pages/Sprints"
 import Premios from "./pages/Premios"
+import Rankings from "./pages/Rankings"
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
@@ -104,7 +105,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
                 </ProtectedRoute>
               }
             />
-          
+
             {/* Aluno - Detalhes do Curso */}
             <Route
               path="aluno/cursos/:cursoId"
@@ -124,7 +125,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
                 </ProtectedRoute>
               }
             />
-            
+
             {/* Página de Detalhes da Disciplina */}
             <Route
               path="disciplinas/:disciplinaId"
@@ -170,6 +171,16 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
               element={
                 <ProtectedRoute>
                   <Premios />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Página de Rankings */}
+            <Route
+              path="rankings"
+              element={
+                <ProtectedRoute>
+                  <Rankings />
                 </ProtectedRoute>
               }
             />

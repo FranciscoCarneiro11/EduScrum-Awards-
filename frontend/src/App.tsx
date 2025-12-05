@@ -14,14 +14,14 @@ export default function App() {
       {!hideLayout && <Navbar />}
 
       {/* Conteúdo principal */}
-      <main className={`flex-grow ${hideLayout ? "" : "pt-20 pb-10"}`}>
+      <main className={`flex-grow ${hideLayout ? "" : "pt-20 "}`}>
         <Outlet />
       </main>
 
       {/* Footer */}
       {!hideLayout && <Footer />}
     </div>
-    
+
   )
-  
+
 }
