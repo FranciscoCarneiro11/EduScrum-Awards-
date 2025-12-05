@@ -19,6 +19,11 @@ public class ProjetoController {
         this.projetoService = projetoService;
     }
 
+    @GetMapping("/projetos")
+    public ResponseEntity<List<ProjetoDTO>> listar() {
+        return ResponseEntity.ok(projetoService.listar());
+    }
+
     // Criar projeto numa disciplina
     @PostMapping("/disciplinas/{disciplinaId}/projetos")
     public ResponseEntity<ProjetoDTO> criarProjeto(
