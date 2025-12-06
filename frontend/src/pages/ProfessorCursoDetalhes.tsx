@@ -4,8 +4,9 @@ import { useAuth } from "@/context/AuthContext"
 import api from "@/lib/api"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { BookOpen, Users, FolderKanban, ArrowLeft, GraduationCap, Plus, Edit, Trash2 } from "lucide-react"
+import { BookOpen, Users, ArrowLeft, GraduationCap, Plus, Trash2 } from "lucide-react"
 
+//Tipos para os dados da API
 type Disciplina = {
   id: number
   nome: string
@@ -119,7 +120,7 @@ export default function ProfessorCursoDetalhes() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Curso não encontrado</h2>
-          
+
         </div>
       </div>
     )
@@ -130,13 +131,11 @@ export default function ProfessorCursoDetalhes() {
 
       {/* Header */}
       <div className="max-w-6xl mx-auto mb-8">
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-white shadow-lg mb-8">
-          <button
-            onClick={() => navigate("/professor/cursos")}
-            className="flex items-center text-white hover:text-white/80 transition mb-4"
-          >
+        <div className="bg-gradient-to-r from-gray-900 to-slate-800 rounded-2xl p-8 text-white shadow-lg mb-8">
+          <button onClick={() => navigate("/professor/cursos")}
+            className="flex items-center text-white hover:text-white/80 transition mb-4">
             <ArrowLeft className="w-5 h-5 mr-2" />
-            Voltar aos cursos
+            Voltar
           </button>
           <div className="flex items-start justify-between">
             <div>
@@ -146,8 +145,8 @@ export default function ProfessorCursoDetalhes() {
               <h1 className="text-4xl font-bold mb-2">{curso.nome}</h1>
               <p className="text-indigo-100">Gestão de disciplinas e alunos</p>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-              <GraduationCap className="w-12 h-12" />
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+              <GraduationCap className="w-12 h-12 text-white-500" />
             </div>
           </div>
         </div>
@@ -204,9 +203,8 @@ export default function ProfessorCursoDetalhes() {
                 <BookOpen className="w-5 h-5" />
                 Disciplinas do Curso
               </CardTitle>
-              <Button 
-                onClick={() => setShowDisciplinaModal(true)}
-                className="bg-violet-600 hover:bg-violet-700 text-white"
+              <Button onClick={() => setShowDisciplinaModal(true)}
+                className="bg-gray-900 hover:bg-gray-800 text-white"
               >
                 <Plus className="w-4 h-4 mr-2 text-white" />
                 Nova Disciplina
@@ -218,10 +216,7 @@ export default function ProfessorCursoDetalhes() {
             {curso.disciplinas?.length ? (
               <div className="space-y-3">
                 {curso.disciplinas.map((disc) => (
-                  <div
-                    key={disc.id}
-                    className="p-4 border rounded-lg hover:border-violet-300 hover:bg-violet-50 transition"
-                  >
+                  <div key={disc.id} className="p-4 border rounded-lg hover:border-violet-300 hover:bg-violet-50 transition">
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="font-semibold text-gray-800">{disc.nome}</h3>
@@ -229,21 +224,12 @@ export default function ProfessorCursoDetalhes() {
                       </div>
 
                       <div className="flex gap-2">
-                        {/* Ir para os detalhes da disciplina (onde estão os projetos) */}
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => navigate(`/disciplinas/${disc.id}`)}
-                        >
+                        {/* Ir para os detalhes da disciplina  */}
+                        <Button size="sm" variant="outline" onClick={() => navigate(`/disciplinas/${disc.id}`)}>
                           Ver disciplina
                         </Button>
 
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={() => handleEliminarDisciplina(disc.id)}
-                          className="hover:bg-red-50 hover:text-red-600"
-                        >
+                        <Button size="sm" variant="outline" onClick={() => handleEliminarDisciplina(disc.id)} className="hover:bg-red-50 hover:text-red-600">
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
@@ -332,16 +318,14 @@ export default function ProfessorCursoDetalhes() {
       {/* Modal Criar Disciplina */}
       {showDisciplinaModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm">
-          <Card className="w-full max-w-md shadow-2xl">
-
-            <CardHeader className="border-b bg-gradient-to-r from-indigo-600 to-purple-600">
-              <CardTitle className="flex items-center gap-2 text-white">
-                <Plus className="w-5 h-5" />
+          <div className="bg-white w-full max-w-md rounded-xl shadow-2xl overflow-hidden">
+            <div className="px-6 py-4 bg-gradient-to-r from-gray-900 to-slate-800 border-b border-gray-700">
+              <h2 className="text-lg font-bold text-white flex items-center gap-2">
                 Nova Disciplina
-              </CardTitle>
-            </CardHeader>
+              </h2>
+            </div>
 
-            <CardContent className="p-6 bg-white">
+            <div className="p-6 bg-white">
 
               {/* Nome */}
               <div>
@@ -356,7 +340,7 @@ export default function ProfessorCursoDetalhes() {
                   }
                   placeholder="Ex: Programação Web"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg 
-                    focus:ring-2 focus:ring-violet-400 focus:outline-none bg-white text-gray-900"
+                    focus:ring-2 focus:ring-gray-500 focus:outline-none bg-white text-gray-900"
                 />
               </div>
 
@@ -373,34 +357,24 @@ export default function ProfessorCursoDetalhes() {
                   }
                   placeholder="Ex: PW2024"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg 
-                    focus:ring-2 focus:ring-violet-400 focus:outline-none bg-white text-gray-900"
+                    focus:ring-2 focus:ring-gray-500 focus:outline-none bg-white text-gray-900"
                 />
               </div>
 
               {/* Botões */}
               <div className="flex gap-3 pt-6">
-                <Button
-                  onClick={() => {
-                    setShowDisciplinaModal(false)
-                    setNovaDisciplina({ nome: "", codigo: "" })
-                  }}
-                  variant="outline"
-                  className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-100"
-                >
+                <Button onClick={() => { setShowDisciplinaModal(false); setNovaDisciplina({ nome: "", codigo: "" }) }} variant="outline" className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-100">
                   Cancelar
                 </Button>
 
-                <Button
-                  onClick={handleCriarDisciplina}
-                  className="flex-1 bg-violet-600 hover:bg-violet-700 text-white"
-                  disabled={!novaDisciplina.nome || !novaDisciplina.codigo}
-                >
+                {/* BOTÃO DE CONFIRMAÇÃO */}
+                <Button onClick={handleCriarDisciplina} className="flex-1 bg-gray-900 hover:bg-gray-800 text-white" disabled={!novaDisciplina.nome || !novaDisciplina.codigo}>
                   Criar
                 </Button>
               </div>
 
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       )}
 

@@ -4,7 +4,7 @@ import api from "@/lib/api"
 import { useNavigate } from "react-router-dom"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { BookOpen, Users, ArrowRight, GraduationCap, FolderKanban, Sparkles, Settings } from "lucide-react"
+import { BookOpen, Users, ArrowRight, GraduationCap, FolderKanban, Settings } from "lucide-react"
 
 type Curso = {
   id: number
@@ -87,7 +87,6 @@ export default function ProfessorCursos() {
           <div className="flex items-start justify-between">
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="w-5 h-5 text-yellow-500" />
                 <span className="text-sm font-medium text-gray-400">Área do Professor</span>
               </div>
               <h1 className="text-4xl font-bold mb-2">
@@ -176,11 +175,7 @@ export default function ProfessorCursos() {
                       <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                     </Button>
 
-                    <Button
-                      variant="outline"
-                      onClick={() => navigate(`/professor/cursos/${curso.id}`)}
-                      className="w-full"
-                    >
+                    <Button variant="outline" onClick={() => navigate(`/professor/cursos/${curso.id}`)} className="w-full">
                       <Settings className="w-4 h-4 mr-2" />
                       Configurações
                     </Button>

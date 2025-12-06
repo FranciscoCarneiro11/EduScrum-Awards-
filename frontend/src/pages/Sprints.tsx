@@ -167,7 +167,7 @@ export default function Sprints() {
           <div className="flex justify-end mb-6">
             <Button
               onClick={() => setShowModal(true)}
-              className="bg-violet-600 hover:bg-violet-700 text-white shadow-md transition-all hover:shadow-lg"
+              className="bg-gray-900 hover:bg-gray-800 text-white shadow-md transition-all hover:shadow-lg"
             >
               <Plus className="w-5 h-5 mr-2" />
               Novo Sprint
@@ -255,9 +255,13 @@ export default function Sprints() {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-200">
 
-            <div className="px-6 py-4 border-b bg-gray-50 flex justify-between items-center">
-              <h2 className="text-lg font-bold text-gray-800">Novo Sprint</h2>
-              <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600">
+            {/* HEADER */}
+            <div className="px-6 py-4 border-b bg-gradient-to-r from-gray-900 to-slate-800 flex justify-between items-center">
+              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                <Plus className="w-5 h-5 text-white" />
+                Novo Sprint
+              </h2>
+              <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-200">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -312,7 +316,9 @@ export default function Sprints() {
                 <Button type="button" variant="outline" className="flex-1" onClick={() => setShowModal(false)}>
                   Cancelar
                 </Button>
-                <Button type="submit" className="flex-1 bg-violet-600 hover:bg-violet-700" disabled={loadingCriar}>
+
+                {/* BOTÃO SUBMISSÃO */}
+                <Button type="submit" className="flex-1 bg-gray-900 hover:bg-gray-800 text-white" disabled={loadingCriar}>
                   {loadingCriar ? "A criar..." : "Criar Sprint"}
                 </Button>
               </div>
