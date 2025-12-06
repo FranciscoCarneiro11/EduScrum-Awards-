@@ -4,10 +4,7 @@ import api from "@/lib/api"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 
-import {
-  Users, GraduationCap, BookOpen, Search,
-  UserCheck, UserX, AlertCircle
-} from "lucide-react"
+import { Users, GraduationCap, BookOpen, Search, UserCheck, UserX, AlertCircle } from "lucide-react"
 
 type Papel = "ALUNO" | "PROFESSOR" | "ADMIN"
 
@@ -239,7 +236,7 @@ export default function AdminGestaoUtilizadoresRedesign() {
           </div>
         </div>
 
-        {/*FILTROS E PESQUISA?*/}
+        {/*FILTROS E PESQUISA*/}
         <Card className="mb-6 shadow-sm">
           <CardContent className="p-6">
             <div className="flex flex-col md:flex-row gap-4">
@@ -251,14 +248,14 @@ export default function AdminGestaoUtilizadoresRedesign() {
                   placeholder="Pesquisar por nome ou email..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-violet-400 outline-none"
+                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-gray-400 outline-none"
                 />
               </div>
 
               <select
                 value={tipoPapelFiltro}
                 onChange={(e) => setTipoPapelFiltro(e.target.value as any)}
-                className="px-4 py-2 border rounded-lg"
+                className="px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-gray-400"
               >
                 <option value="TODOS">Todos os papéis</option>
                 <option value="ALUNO">Apenas Alunos</option>
@@ -268,7 +265,7 @@ export default function AdminGestaoUtilizadoresRedesign() {
               <select
                 value={statusCursoFiltro}
                 onChange={(e) => setStatusCursoFiltro(e.target.value as any)}
-                className="px-4 py-2 border rounded-lg"
+                className="px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-gray-400"
               >
                 <option value="TODOS">Todos os status</option>
                 <option value="COM_CURSO">Com curso</option>
@@ -313,7 +310,8 @@ export default function AdminGestaoUtilizadoresRedesign() {
                       <tr key={aluno.id} className="border-b hover:bg-blue-50/50">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-semibold">
+                            {/* Avatar Aluno */}
+                            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-800 font-semibold">
                               {aluno.nome.slice(0, 2).toUpperCase()}
                             </div>
                             <div>
@@ -325,15 +323,15 @@ export default function AdminGestaoUtilizadoresRedesign() {
 
                         <td className="px-6 py-4">
                           {cursoAtual ? (
-                            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-violet-50 border border-violet-200">
-                              <BookOpen className="w-4 h-4 text-violet-600" />
+                            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 border border-gray-300">
+                              <BookOpen className="w-4 h-4 text-gray-600" />
                               <span>{cursoAtual.nome}</span>
-                              <span className="text-xs text-violet-600">
+                              <span className="text-xs text-gray-500">
                                 ({cursoAtual.codigo})
                               </span>
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 text-gray-500">
+                            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-50 text-red-500">
                               <AlertCircle className="w-4 h-4" />
                               Sem curso atribuído
                             </span>
@@ -343,12 +341,7 @@ export default function AdminGestaoUtilizadoresRedesign() {
                         <td className="px-6 py-4 text-right">
                           <div className="flex justify-end gap-2">
 
-                            <Button
-                              onClick={() => abrirModal(aluno)}
-                              disabled={emLoading}
-                              className="bg-violet-600 hover:bg-violet-700 text-white"
-                              size="sm"
-                            >
+                            <Button onClick={() => abrirModal(aluno)} disabled={emLoading} className="bg-gray-900 hover:bg-gray-800 text-white" size="sm">
                               {emLoading ? "A processar..." : (
                                 <>
                                   <UserCheck className="w-4 h-4 mr-1" />
@@ -357,13 +350,7 @@ export default function AdminGestaoUtilizadoresRedesign() {
                               )}
                             </Button>
 
-                            <Button
-                              onClick={() => removerCurso(aluno)}
-                              disabled={emLoading || !cursoAtual}
-                              variant="outline"
-                              size="sm"
-                              className="border-red-200 text-red-600 hover:bg-red-50"
-                            >
+                            <Button onClick={() => removerCurso(aluno)} disabled={emLoading || !cursoAtual} variant="outline" size="sm" className="border-red-200 text-red-600 hover:bg-red-50">
                               <UserX className="w-4 h-4 mr-1" />
                               Remover
                             </Button>
@@ -414,7 +401,8 @@ export default function AdminGestaoUtilizadoresRedesign() {
                       <tr key={prof.id} className="border-b hover:bg-purple-50/50">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white font-semibold">
+                            {/* Avatar Professor*/}
+                            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold">
                               {prof.nome.slice(0, 2).toUpperCase()}
                             </div>
                             <div>
@@ -426,15 +414,15 @@ export default function AdminGestaoUtilizadoresRedesign() {
 
                         <td className="px-6 py-4">
                           {cursoAtual ? (
-                            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-violet-50 border border-violet-200">
-                              <BookOpen className="w-4 h-4 text-violet-600" />
+                            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 border border-gray-300">
+                              <BookOpen className="w-4 h-4 text-gray-600" />
                               <span>{cursoAtual.nome}</span>
-                              <span className="text-xs text-violet-600">
+                              <span className="text-xs text-gray-500">
                                 ({cursoAtual.codigo})
                               </span>
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 text-gray-500">
+                            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-50 text-red-500">
                               <AlertCircle className="w-4 h-4" />
                               Sem curso atribuído
                             </span>
@@ -444,12 +432,7 @@ export default function AdminGestaoUtilizadoresRedesign() {
                         <td className="px-6 py-4 text-right">
                           <div className="flex justify-end gap-2">
 
-                            <Button
-                              onClick={() => abrirModal(prof)}
-                              disabled={emLoading}
-                              className="bg-violet-600 hover:bg-violet-700 text-white"
-                              size="sm"
-                            >
+                            <Button onClick={() => abrirModal(prof)} disabled={emLoading} className="bg-gray-900 hover:bg-gray-800 text-white" size="sm">
                               {emLoading ? "A processar..." : (
                                 <>
                                   <UserCheck className="w-4 h-4 mr-1" />
@@ -458,13 +441,7 @@ export default function AdminGestaoUtilizadoresRedesign() {
                               )}
                             </Button>
 
-                            <Button
-                              onClick={() => removerCurso(prof)}
-                              disabled={emLoading || !cursoAtual}
-                              variant="outline"
-                              size="sm"
-                              className="border-red-200 text-red-600 hover:bg-red-50"
-                            >
+                            <Button onClick={() => removerCurso(prof)} disabled={emLoading || !cursoAtual} variant="outline" size="sm" className="border-red-200 text-red-600 hover:bg-red-50">
                               <UserX className="w-4 h-4 mr-1" />
                               Remover
                             </Button>
@@ -487,20 +464,20 @@ export default function AdminGestaoUtilizadoresRedesign() {
       {modalAberto && userSelecionado && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
 
-          <Card className="max-w-md w-full shadow-2xl">
-            <CardHeader className="border-b">
-              <CardTitle className="flex items-center gap-2">
-                <UserCheck className="w-5 h-5 text-violet-600" />
+          <Card className="max-w-md w-full shadow-2xl bg-white rounded-xl overflow-hidden">
+            <CardHeader className="border-b bg-white p-6">
+              <CardTitle className="flex items-center gap-2 text-gray-900">
+                <UserCheck className="w-5 h-5" />
                 Atribuir Curso
               </CardTitle>
             </CardHeader>
 
             <CardContent className="p-6">
-              <label className="block text-sm mb-2">Selecionar curso</label>
+              <label className="block text-sm mb-2 font-medium text-gray-700">Selecionar curso</label>
               <select
                 value={cursoSelecionadoId}
                 onChange={e => setCursoSelecionadoId(e.target.value ? Number(e.target.value) : "")}
-                className="w-full border rounded-lg px-3 py-2 mb-4"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-6 focus:ring-2 focus:ring-gray-500 outline-none"
               >
                 <option value="">-- Escolha um curso --</option>
                 {cursos.map(curso => (
@@ -511,11 +488,12 @@ export default function AdminGestaoUtilizadoresRedesign() {
               </select>
 
               <div className="flex justify-end gap-3">
-                <Button variant="outline" onClick={fecharModal}>
+                <Button variant="outline" onClick={fecharModal} className="border-gray-300 text-gray-700 hover:bg-gray-100">
                   Cancelar
                 </Button>
-                <Button
-                  className="bg-violet-600 hover:bg-violet-700 text-white"
+
+                {/* Botão de Confirmação */}
+                <Button className="bg-gray-900 hover:bg-gray-800 text-white"
                   onClick={confirmarAtribuicao}
                   disabled={!cursoSelecionadoId}
                 >

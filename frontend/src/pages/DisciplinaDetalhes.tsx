@@ -28,7 +28,7 @@ export default function DisciplinaDetalhes() {
   })
   const [loadingCriar, setLoadingCriar] = useState(false)
 
-  // ---- helpers de estado / progresso de projeto ----
+  // helpers de estado / progresso de projeto 
   type StatusProjeto = "pendente" | "em_andamento" | "concluido"
 
   function calcularStatusProjeto(proj: any): StatusProjeto {
@@ -71,14 +71,14 @@ export default function DisciplinaDetalhes() {
     return Math.round(perc)
   }
 
-  // ------------------ API ------------------
+  //API 
 
   async function carregarProjetos() {
     const response = await api.get(`/api/disciplinas/${disciplinaId}/projetos`)
     setProjetos(response.data)
   }
 
-  // carregamento inicial
+  //carregamento inicial
   useEffect(() => {
     if (!disciplinaId) return
 
@@ -174,7 +174,7 @@ export default function DisciplinaDetalhes() {
     }
   }
 
-  // --------------- loading / erros ---------------
+  //loading / erros 
 
   if (loading) {
     return (
@@ -280,10 +280,8 @@ export default function DisciplinaDetalhes() {
                     Projetos da Disciplina
                   </CardTitle>
                   {isProfessor && (
-                    <Button
-                      onClick={abrirModalNovoProjeto}
-                      className="bg-violet-600 hover:bg-violet-700 text-white"
-                    >
+                    <Button onClick={abrirModalNovoProjeto}
+                      className="bg-gray-900 hover:bg-gray-800 text-white">
                       <Plus className="w-5 h-5 mr-2 text-white" />
                       Novo Projeto
                     </Button>
@@ -306,10 +304,7 @@ export default function DisciplinaDetalhes() {
                         : "O professor ainda não criou projetos para esta disciplina"}
                     </p>
                     {isProfessor && (
-                      <Button
-                        onClick={abrirModalNovoProjeto}
-                        className="mt-2 bg-violet-600 hover:bg-violet-700"
-                      >
+                      <Button onClick={abrirModalNovoProjeto} className="bg-gray-900 hover:bg-gray-800 text-white">
                         <Plus className="w-4 h-4 mr-2" />
                         Criar Primeiro Projeto
                       </Button>
@@ -322,10 +317,7 @@ export default function DisciplinaDetalhes() {
                       const progresso = calcularProgresso(proj)
 
                       return (
-                        <div
-                          key={proj.id}
-                          className="bg-white rounded-xl shadow-sm border border-gray-200 hover:border-violet-300 hover:shadow-md transition"
-                        >
+                        <div key={proj.id} className="bg-white rounded-xl shadow-sm border border-gray-200 hover:border-violet-300 hover:shadow-md transition">
                           <div className="p-6">
                             <div className="flex items-start justify-between mb-4">
                               <div className="flex-1">
@@ -352,28 +344,13 @@ export default function DisciplinaDetalhes() {
                                       ).toLocaleDateString("pt-PT")}
                                     </span>
                                   </div>
-                                  {/* futuro: nº equipas, etc */}
                                 </div>
                               </div>
 
                               {isProfessor && (
                                 <div className="flex gap-2">
-                                  <Button
-                                    size="icon"
-                                    variant="outline"
-                                    onClick={() => abrirModalEditarProjeto(proj)}
-                                    className="h-9 w-9"
-                                  >
-                                    <Edit className="w-4 h-4" />
-                                  </Button>
-                                  <Button
-                                    size="icon"
-                                    variant="outline"
-                                    onClick={() => apagarProjeto(proj.id)}
-                                    className="h-9 w-9 hover:bg-red-50 hover:text-red-600 hover:border-red-300"
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </Button>
+                                  <Button size="icon" variant="outline" onClick={() => abrirModalEditarProjeto(proj)} className="h-9 w-9"><Edit className="w-4 h-4" /></Button>
+                                  <Button size="icon" variant="outline" onClick={() => apagarProjeto(proj.id)} className="h-9 w-9 hover:bg-red-50 hover:text-red-600 hover:border-red-300"><Trash2 className="w-4 h-4" /></Button>
                                 </div>
                               )}
                             </div>
@@ -395,26 +372,14 @@ export default function DisciplinaDetalhes() {
                             </div>
 
                             <div className="flex gap-3">
-                              <Button
-                                className="flex-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700"
-                                variant="ghost"
-                                onClick={() => navigate(`/projetos/${proj.id}/equipas`)}
-                              >
+                              <Button className="flex-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700" variant="ghost" onClick={() => navigate(`/projetos/${proj.id}/equipas`)}>
                                 Ver Equipas
                               </Button>
 
-                              <Button
-                                className="flex-1 bg-purple-50 hover:bg-purple-100 text-purple-700"
-                                variant="ghost"
-                                onClick={() => navigate(`/projetos/${proj.id}/sprints`)}
-                              >
+                              <Button className="flex-1 bg-purple-50 hover:bg-purple-100 text-purple-700" variant="ghost" onClick={() => navigate(`/projetos/${proj.id}/sprints`)}>
                                 Ver Sprints
                               </Button>
-                              <Button
-                                className="flex-1 bg-green-50 hover:bg-green-100 text-green-700"
-                                variant="ghost"
-                                onClick={() => navigate(`/disciplinas/${disciplina.id}/premios`)}
-                              >
+                              <Button className="flex-1 bg-green-50 hover:bg-green-100 text-green-700" variant="ghost" onClick={() => navigate(`/disciplinas/${disciplina.id}/premios`)}>
                                 Ver Prémios
                               </Button>
                             </div>
@@ -474,12 +439,13 @@ export default function DisciplinaDetalhes() {
 
       {/* MODAL CRIAR / EDITAR PROJETO */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-xl shadow-lg w-full max-w-md overflow-hidden">
-            {/* header */}
-            <div className="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600">
-              <h2 className="text-white text-lg font-semibold flex items-center gap-2">
-                <Plus className="w-5 h-5 text-white" />
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+
+            {/* HEADER DO MODAL */}
+            <div className="px-6 py-4 border-b bg-gradient-to-r from-gray-900 to-slate-800">
+              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                {projetoEmEdicao ? <Edit className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
                 {projetoEmEdicao ? "Editar Projeto" : "Novo Projeto"}
               </h2>
             </div>
@@ -507,14 +473,12 @@ export default function DisciplinaDetalhes() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Descrição
                   </label>
-                  <textarea
-                    value={novoProjeto.descricao}
-                    onChange={(e) =>
-                      setNovoProjeto({
-                        ...novoProjeto,
-                        descricao: e.target.value,
-                      })
-                    }
+                  <textarea value={novoProjeto.descricao} onChange={(e) =>
+                    setNovoProjeto({
+                      ...novoProjeto,
+                      descricao: e.target.value,
+                    })
+                  }
                     placeholder="Breve descrição do projeto"
                     rows={3}
                     className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-violet-400 resize-none"
@@ -527,15 +491,12 @@ export default function DisciplinaDetalhes() {
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Data de Início
                     </label>
-                    <input
-                      type="date"
-                      value={novoProjeto.dataInicio}
-                      onChange={(e) =>
-                        setNovoProjeto({
-                          ...novoProjeto,
-                          dataInicio: e.target.value,
-                        })
-                      }
+                    <input type="date" value={novoProjeto.dataInicio} onChange={(e) =>
+                      setNovoProjeto({
+                        ...novoProjeto,
+                        dataInicio: e.target.value,
+                      })
+                    }
                       className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-violet-400"
                       required
                     />
@@ -545,15 +506,12 @@ export default function DisciplinaDetalhes() {
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Data de Fim
                     </label>
-                    <input
-                      type="date"
-                      value={novoProjeto.dataFim}
-                      onChange={(e) =>
-                        setNovoProjeto({
-                          ...novoProjeto,
-                          dataFim: e.target.value,
-                        })
-                      }
+                    <input type="date" value={novoProjeto.dataFim} onChange={(e) =>
+                      setNovoProjeto({
+                        ...novoProjeto,
+                        dataFim: e.target.value,
+                      })
+                    }
                       className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-violet-400"
                       required
                     />
@@ -561,29 +519,22 @@ export default function DisciplinaDetalhes() {
                 </div>
 
                 <div className="flex gap-3 pt-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      setShowModal(false)
-                      setProjetoEmEdicao(null)
-                      setNovoProjeto({
-                        nome: "",
-                        descricao: "",
-                        dataInicio: "",
-                        dataFim: "",
-                      })
-                    }}
+                  <Button type="button" variant="outline" onClick={() => {
+                    setShowModal(false)
+                    setProjetoEmEdicao(null)
+                    setNovoProjeto({
+                      nome: "",
+                      descricao: "",
+                      dataInicio: "",
+                      dataFim: "",
+                    })
+                  }}
                     className="flex-1"
                   >
                     Cancelar
                   </Button>
 
-                  <Button
-                    type="submit"
-                    disabled={loadingCriar}
-                    className="flex-1 bg-purple-400 hover:bg-purple-500 text-white"
-                  >
+                  <Button type="submit" disabled={loadingCriar} className="flex-1 bg-gray-900 hover:bg-gray-800 text-white">
                     {loadingCriar
                       ? "A guardar..."
                       : projetoEmEdicao
