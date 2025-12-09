@@ -1,4 +1,4 @@
-package com.eduscrum.equipas;
+package com.eduscrum.awards.equipas;
 
 import com.eduscrum.awards.model.*;
 import com.eduscrum.awards.repository.*;

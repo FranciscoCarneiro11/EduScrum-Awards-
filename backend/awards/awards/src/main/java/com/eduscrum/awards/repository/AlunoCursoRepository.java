@@ -17,4 +17,6 @@ public interface AlunoCursoRepository extends JpaRepository<AlunoCurso, Long> {
 
     // Saber se o aluno já está num curso específico
     Optional<AlunoCurso> findByAlunoIdAndCursoId(Long alunoId, Long cursoId);
+
+    List<AlunoCurso> findByCursoId(Long cursoId);
 }
