@@ -61,7 +61,11 @@ export default function ProfessorDashboard() {
 
   //Carregar dados gerais
   useEffect(() => {
-    if (!user) return
+    //Verifica se user existe E se user.id existe
+    if (!user || !user.id) {
+      console.warn("A aguardar ID do utilizador...");
+      return;
+    }
 
     async function fetchDados() {
       try {

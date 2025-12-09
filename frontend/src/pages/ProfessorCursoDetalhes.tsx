@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthContext"
 import api from "@/lib/api"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { BookOpen, Users, ArrowLeft, GraduationCap, Plus, Trash2 } from "lucide-react"
+import { BookOpen, Users, ArrowLeft, GraduationCap, Plus, Trash2, Download, FileSpreadsheet } from "lucide-react"
 
 //Tipos para os dados da API
 type Disciplina = {
@@ -42,6 +42,7 @@ export default function ProfessorCursoDetalhes() {
   const [professores, setProfessores] = useState<Professor[]>([])
   const [alunos, setAlunos] = useState<Aluno[]>([])
   const [loading, setLoading] = useState(true)
+  const [downloading, setDownloading] = useState(false) // Estado para o botão de exportar
 
   // Modais
   const [showDisciplinaModal, setShowDisciplinaModal] = useState(false)
@@ -104,6 +105,38 @@ export default function ProfessorCursoDetalhes() {
     }
   }
 
+  // --- NOVA FUNÇÃO: EXPORTAR CSV ---
+  const handleExportarCsv = async () => {
+    if (!cursoId) return
+    try {
+      setDownloading(true)
+
+      // Pedir o ficheiro ao backend como "blob" (dados binários)
+      const response = await api.get(`/api/professores/cursos/${cursoId}/exportar`, {
+        responseType: 'blob'
+      })
+
+      // Criar um link temporário para forçar o download no browser
+      const url = window.URL.createObjectURL(new Blob([response.data]))
+      const link = document.createElement('a')
+      link.href = url
+      // Nome do ficheiro sugerido
+      link.setAttribute('download', `Pauta_Curso_${curso?.codigo || cursoId}.csv`)
+      document.body.appendChild(link)
+      link.click()
+
+      // Limpeza
+      link.remove()
+      window.URL.revokeObjectURL(url)
+
+    } catch (err) {
+      console.error("Erro ao exportar CSV:", err)
+      alert("Erro ao descarregar a pauta.")
+    } finally {
+      setDownloading(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -132,11 +165,31 @@ export default function ProfessorCursoDetalhes() {
       {/* Header */}
       <div className="max-w-6xl mx-auto mb-8">
         <div className="bg-gradient-to-r from-gray-900 to-slate-800 rounded-2xl p-8 text-white shadow-lg mb-8">
-          <button onClick={() => navigate("/professor/cursos")}
-            className="flex items-center text-white hover:text-white/80 transition mb-4">
-            <ArrowLeft className="w-5 h-5 mr-2" />
-            Voltar
-          </button>
+
+          <div className="flex justify-between items-start mb-4">
+            <button onClick={() => navigate("/professor/cursos")}
+              className="flex items-center text-white/80 hover:text-white transition">
+              <ArrowLeft className="w-5 h-5 mr-2" />
+              Voltar
+            </button>
+
+            {/* --- NOVO BOTÃO: EXPORTAR --- */}
+            <Button
+              onClick={handleExportarCsv}
+              disabled={downloading}
+              className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-sm"
+            >
+              {downloading ? (
+                "A gerar..."
+              ) : (
+                <>
+                  <FileSpreadsheet className="w-4 h-4 mr-2 text-green-400" />
+                  Exportar Pauta
+                </>
+              )}
+            </Button>
+          </div>
+
           <div className="flex items-start justify-between">
             <div>
               <span className="inline-block px-3 py-1 bg-white/20 rounded-full text-sm font-medium mb-3">
@@ -203,7 +256,8 @@ export default function ProfessorCursoDetalhes() {
                 <BookOpen className="w-5 h-5" />
                 Disciplinas do Curso
               </CardTitle>
-              <Button onClick={() => setShowDisciplinaModal(true)}
+              <Button
+                onClick={() => setShowDisciplinaModal(true)}
                 className="bg-gray-900 hover:bg-gray-800 text-white"
               >
                 <Plus className="w-4 h-4 mr-2 text-white" />
@@ -319,8 +373,11 @@ export default function ProfessorCursoDetalhes() {
       {showDisciplinaModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm">
           <div className="bg-white w-full max-w-md rounded-xl shadow-2xl overflow-hidden">
+
+            {/* HEADER DO MODAL */}
             <div className="px-6 py-4 bg-gradient-to-r from-gray-900 to-slate-800 border-b border-gray-700">
               <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                <Plus className="w-5 h-5" />
                 Nova Disciplina
               </h2>
             </div>
@@ -363,12 +420,22 @@ export default function ProfessorCursoDetalhes() {
 
               {/* Botões */}
               <div className="flex gap-3 pt-6">
-                <Button onClick={() => { setShowDisciplinaModal(false); setNovaDisciplina({ nome: "", codigo: "" }) }} variant="outline" className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-100">
+                <Button
+                  onClick={() => {
+                    setShowDisciplinaModal(false)
+                    setNovaDisciplina({ nome: "", codigo: "" })
+                  }}
+                  variant="outline"
+                  className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-100"
+                >
                   Cancelar
                 </Button>
 
-                {/* BOTÃO DE CONFIRMAÇÃO */}
-                <Button onClick={handleCriarDisciplina} className="flex-1 bg-gray-900 hover:bg-gray-800 text-white" disabled={!novaDisciplina.nome || !novaDisciplina.codigo}>
+                <Button
+                  onClick={handleCriarDisciplina}
+                  className="flex-1 bg-gray-900 hover:bg-gray-800 text-white"
+                  disabled={!novaDisciplina.nome || !novaDisciplina.codigo}
+                >
                   Criar
                 </Button>
               </div>
