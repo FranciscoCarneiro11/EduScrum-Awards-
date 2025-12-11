@@ -2,6 +2,8 @@ package com.eduscrum.awards.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "projeto")
@@ -21,6 +23,8 @@ public class Projeto {
     @JoinColumn(name = "disciplina_id", nullable = false)
     private Disciplina disciplina;
 
+    @OneToMany(mappedBy = "projeto", cascade = CascadeType.ALL)
+    private List<Equipa> equipas = new ArrayList<>();
 
     private LocalDate dataInicio;
 
@@ -85,5 +89,13 @@ public class Projeto {
 
     public void setDataFim(LocalDate dataFim) {
         this.dataFim = dataFim;
+    }
+
+    public List<Equipa> getEquipas() {
+        return equipas;
+    }
+
+    public void setEquipas(List<Equipa> equipas) {
+        this.equipas = equipas;
     }
 }

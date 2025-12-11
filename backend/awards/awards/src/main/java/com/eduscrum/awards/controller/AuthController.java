@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import com.eduscrum.awards.model.Admin;
 import com.eduscrum.awards.model.Aluno;
 import com.eduscrum.awards.model.PapelSistema;
 import com.eduscrum.awards.model.Professor;
@@ -21,9 +22,12 @@ import com.eduscrum.awards.security.JwtUtil;
 @CrossOrigin(origins = "*")
 public class AuthController {
 
-    @Autowired private UtilizadorRepository utilizadorRepository;
-    @Autowired private PasswordEncoder passwordEncoder;
-    @Autowired private JwtUtil jwtUtil;
+    @Autowired
+    private UtilizadorRepository utilizadorRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private JwtUtil jwtUtil;
 
     // MODELOS DOS PEDIDOS
     public static class LoginRequest {
@@ -31,7 +35,7 @@ public class AuthController {
         public String password;
     }
 
-    // === LOGIN ====
+    // LOGIN
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
 
@@ -48,15 +52,14 @@ public class AuthController {
 
         String token = jwtUtil.generateToken(user.getEmail());
         return ResponseEntity.ok(Map.of(
-            "token", token,
-            "id", user.getId(),
-            "nome", user.getNome(),
-            "email", user.getEmail(),
-            "papelSistema", user.getPapelSistema().name()
-        ));
+                "token", token,
+                "id", user.getId(),
+                "nome", user.getNome(),
+                "email", user.getEmail(),
+                "papelSistema", user.getPapelSistema().name()));
     }
 
-    // === REGISTO ===
+    // REGISTO
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UtilizadorDTO novoDTO) {
 
@@ -69,8 +72,7 @@ public class AuthController {
         }
 
         String passwordHash = passwordEncoder.encode(novoDTO.getPassword());
-        PapelSistema papel = novoDTO.getPapelSistema() != null ?
-                novoDTO.getPapelSistema() : PapelSistema.ALUNO;
+        PapelSistema papel = novoDTO.getPapelSistema() != null ? novoDTO.getPapelSistema() : PapelSistema.ALUNO;
 
         Utilizador novoUser;
 
@@ -91,6 +93,14 @@ public class AuthController {
                 prof.setPapelSistema(PapelSistema.PROFESSOR);
                 novoUser = prof;
             }
+            case ADMIN -> {
+                Admin admin = new Admin();
+                admin.setNome(novoDTO.getNome());
+                admin.setEmail(novoDTO.getEmail());
+                admin.setPasswordHash(passwordHash);
+                admin.setPapelSistema(PapelSistema.ADMIN);
+                novoUser = admin;
+            }
             default -> {
                 Utilizador u = new Utilizador();
                 u.setNome(novoDTO.getNome());
@@ -105,11 +115,10 @@ public class AuthController {
         String token = jwtUtil.generateToken(saved.getEmail());
 
         return ResponseEntity.ok(Map.of(
-            "token", token,
-            "id", saved.getId(),
-            "nome", saved.getNome(),
-            "email", saved.getEmail(),
-            "papelSistema", saved.getPapelSistema().name()
-        ));
+                "token", token,
+                "id", saved.getId(),
+                "nome", saved.getNome(),
+                "email", saved.getEmail(),
+                "papelSistema", saved.getPapelSistema().name()));
     }
 }

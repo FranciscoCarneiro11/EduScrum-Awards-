@@ -21,7 +21,8 @@ public class Conquista {
     @JoinColumn(name = "premio_id")
     private Premio premio;
 
-    public Conquista() {}
+    public Conquista() {
+    }
 
     public Conquista(Aluno aluno, Premio premio) {
         this.aluno = aluno;
@@ -30,16 +31,23 @@ public class Conquista {
     }
 
     // Getters e Setters
-    public Long getId() { 
-        return id; 
+    public Long getId() {
+        return id;
     }
-    public Aluno getAluno() { 
-        return aluno; 
+
+    public Aluno getAluno() {
+        return aluno;
     }
-    public Premio getPremio() { 
-        return premio; 
+
+    public Premio getPremio() {
+        return premio;
     }
-    public LocalDateTime getDataAtribuicao() { 
-        return dataAtribuicao; 
+
+    public LocalDateTime getDataAtribuicao() {
+        return dataAtribuicao;
+    }
+
+    public void setDataAtribuicao(LocalDateTime dataAtribuicao) {
+        this.dataAtribuicao = dataAtribuicao;
     }
 }

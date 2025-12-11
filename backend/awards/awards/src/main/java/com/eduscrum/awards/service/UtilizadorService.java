@@ -28,14 +28,14 @@ public class UtilizadorService {
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UtilizadorService(UtilizadorRepository utilizadorRepository,AlunoRepository alunoRepository,ProfessorRepository professorRepository,AdminRepository adminRepository,         PasswordEncoder passwordEncoder) {
+    public UtilizadorService(UtilizadorRepository utilizadorRepository, AlunoRepository alunoRepository,
+            ProfessorRepository professorRepository, AdminRepository adminRepository, PasswordEncoder passwordEncoder) {
         this.utilizadorRepository = utilizadorRepository;
         this.alunoRepository = alunoRepository;
         this.professorRepository = professorRepository;
-        this.adminRepository = adminRepository;     
+        this.adminRepository = adminRepository;
         this.passwordEncoder = passwordEncoder;
     }
-
 
     public List<Utilizador> listarTodos() {
         return utilizadorRepository.findAll();
@@ -56,6 +56,8 @@ public class UtilizadorService {
         // gerar hash seguro da password
         String hashedPassword = passwordEncoder.encode(password);
 
+        System.out.println("A criar utilizador do tipo: " + papelSistema); // Log para debug
+
         // guardar diretamente a subclasse quando aplicável
         switch (papelSistema) {
             case ALUNO -> {
@@ -74,7 +76,7 @@ public class UtilizadorService {
                 p.setPapelSistema(PapelSistema.PROFESSOR);
                 return professorRepository.save(p);
             }
-            case ADMIN -> {                            
+            case ADMIN -> {
                 Admin admin = new Admin();
                 admin.setNome(nome);
                 admin.setEmail(email);
