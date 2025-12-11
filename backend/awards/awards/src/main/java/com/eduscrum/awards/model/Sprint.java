@@ -12,7 +12,7 @@ public class Sprint {
     private Long id;
 
     @Column(nullable = false)
-    private String nome;        // Ex: "Sprint 1", "Sprint 2"
+    private String nome;
 
     @Column(columnDefinition = "TEXT")
     private String objetivos;
@@ -20,11 +20,14 @@ public class Sprint {
     private LocalDate dataInicio;
     private LocalDate dataFim;
 
+    private String estado = "EM_CURSO";
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "projeto_id", nullable = false)
     private Projeto projeto;
 
-    public Sprint() {}
+    public Sprint() {
+    }
 
     public Sprint(String nome, String objetivos, LocalDate dataInicio, LocalDate dataFim, Projeto projeto) {
         this.nome = nome;
@@ -35,45 +38,59 @@ public class Sprint {
     }
 
     // Getters e Setters
-    public Long getId() { 
-        return id; 
-    }
-    public void setId(Long id) { 
-        this.id = id; 
+    public Long getId() {
+        return id;
     }
 
-    public String getNome() { 
-        return nome; 
-    }
-    public void setNome(String nome) { 
-        this.nome = nome; 
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public String getObjetivos() { 
-        return objetivos; 
-    }
-    public void setObjetivos(String objetivos) { 
-        this.objetivos = objetivos; 
+    public String getNome() {
+        return nome;
     }
 
-    public LocalDate getDataInicio() { 
-        return dataInicio; 
-    }
-    public void setDataInicio(LocalDate dataInicio) { 
-        this.dataInicio = dataInicio; 
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
-    public LocalDate getDataFim() { 
-        return dataFim; 
-    }
-    public void setDataFim(LocalDate dataFim) { 
-        this.dataFim = dataFim; 
+    public String getObjetivos() {
+        return objetivos;
     }
 
-    public Projeto getProjeto() { 
-        return projeto; 
+    public void setObjetivos(String objetivos) {
+        this.objetivos = objetivos;
     }
-    public void setProjeto(Projeto projeto) { 
-        this.projeto = projeto; 
+
+    public LocalDate getDataInicio() {
+        return dataInicio;
+    }
+
+    public void setDataInicio(LocalDate dataInicio) {
+        this.dataInicio = dataInicio;
+    }
+
+    public LocalDate getDataFim() {
+        return dataFim;
+    }
+
+    public void setDataFim(LocalDate dataFim) {
+        this.dataFim = dataFim;
+    }
+
+    public Projeto getProjeto() {
+        return projeto;
+    }
+
+    public void setProjeto(Projeto projeto) {
+        this.projeto = projeto;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
     }
 }

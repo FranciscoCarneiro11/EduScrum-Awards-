@@ -7,6 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 import java.util.List;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Service
 @Transactional
@@ -17,24 +19,25 @@ public class GamificacaoService {
     private final AlunoRepository alunoRepository;
     private final DisciplinaRepository disciplinaRepository;
 
-    public GamificacaoService(PremioRepository premioRepository, ConquistaRepository conquistaRepository, AlunoRepository alunoRepository, DisciplinaRepository disciplinaRepository) {
+    public GamificacaoService(PremioRepository premioRepository, ConquistaRepository conquistaRepository,
+            AlunoRepository alunoRepository, DisciplinaRepository disciplinaRepository) {
         this.premioRepository = premioRepository;
         this.conquistaRepository = conquistaRepository;
         this.alunoRepository = alunoRepository;
         this.disciplinaRepository = disciplinaRepository;
     }
 
-    // --- Gestão de Prémios ---
+    // Gestão de Prémios
 
     public Premio criarPremio(Long disciplinaId, PremioDTO dto) {
         Disciplina d = disciplinaRepository.findById(disciplinaId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Disciplina não encontrada"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Disciplina não encontrada"));
 
         Premio p = new Premio();
         p.setNome(dto.nome);
         p.setDescricao(dto.descricao);
         p.setValorPontos(dto.valorPontos);
-        p.setTipo(Premio.TipoPremio.valueOf(dto.tipo)); 
+        p.setTipo(Premio.TipoPremio.valueOf(dto.tipo));
         p.setDisciplina(d);
 
         return premioRepository.save(p);
@@ -44,26 +47,91 @@ public class GamificacaoService {
         return premioRepository.findByDisciplinaId(disciplinaId);
     }
 
-    // --- Atribuição e Pontuação ---
+    // Atribuição e Pontuação
 
     public void atribuirPremio(Long premioId, Long alunoId) {
         Premio premio = premioRepository.findById(premioId)
-            .orElseThrow(() -> new RuntimeException("Prémio não encontrado"));
+                .orElseThrow(() -> new RuntimeException("Prémio não encontrado"));
 
         Aluno aluno = alunoRepository.findById(alunoId)
-            .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
+                .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
 
-        // 1. Registar a conquista
+        registarConquistaEAtualizarPontos(aluno, premio);
+    }
+
+    public List<Conquista> listarConquistasDoAluno(Long alunoId) {
+        return conquistaRepository.findByAlunoId(alunoId);
+    }
+
+    // Lógica de Prémios Automáticos
+
+    public void processarPremiosFimSprint(Sprint sprint) {
+        LocalDate hoje = LocalDate.now();
+
+        // Se a data de hoje for anterior ou igual à data fim, cumpriram o prazo
+        if (!hoje.isAfter(sprint.getDataFim())) {
+
+            List<Equipa> equipas = sprint.getProjeto().getEquipas();
+            String nomePremio = "Velocidade Luz";
+
+            for (Equipa equipa : equipas) {
+                for (MembroEquipa membro : equipa.getMembros()) {
+                    // Verificar se o membro é um Aluno
+                    Utilizador utilizador = membro.getUtilizador();
+
+                    if (utilizador instanceof Aluno) {
+                        Aluno aluno = (Aluno) utilizador;
+
+                        // Se já recebeu hoje, não dá outra vez
+                        if (jaRecebeuPremioHoje(aluno, nomePremio)) {
+                            continue;
+                        }
+
+                        // Atribuir prémio a cada aluno
+                        atribuirPremioAutomatico(aluno, nomePremio, 10, sprint.getProjeto().getDisciplina());
+                    }
+                }
+            }
+        }
+    }
+
+    // Método auxiliar para evitar pontos infinitos
+    private boolean jaRecebeuPremioHoje(Aluno aluno, String nomePremio) {
+        List<Conquista> conquistas = conquistaRepository.findByAlunoId(aluno.getId());
+
+        return conquistas.stream().anyMatch(c -> c.getPremio().getNome().equals(nomePremio) &&
+                c.getDataAtribuicao().toLocalDate().isEqual(LocalDate.now()));
+    }
+
+    private void atribuirPremioAutomatico(Aluno aluno, String nome, int pontos, Disciplina disciplina) {
+        // Criar o prémio na BD
+        Premio premio = new Premio();
+        premio.setNome(nome);
+        premio.setDescricao("Prémio automático: Sprint completada dentro do prazo!");
+        premio.setValorPontos(pontos);
+        premio.setDisciplina(disciplina);
+
+        try {
+            premio.setTipo(Premio.TipoPremio.valueOf("AUTOMATICO"));
+        } catch (Exception e) {
+            premio.setTipo(Premio.TipoPremio.MANUAL);
+        }
+
+        premio = premioRepository.save(premio);
+
+        // Registar e atualizar pontos
+        registarConquistaEAtualizarPontos(aluno, premio);
+    }
+
+    private void registarConquistaEAtualizarPontos(Aluno aluno, Premio premio) {
+        // Registar conquista
         Conquista conquista = new Conquista(aluno, premio);
+        conquista.setDataAtribuicao(LocalDateTime.now());
         conquistaRepository.save(conquista);
 
-        // 2. Atualizar pontuação global do aluno
+        // Atualizar pontuação global
         int novaPontuacao = aluno.getTotalPontos() + premio.getValorPontos();
         aluno.setTotalPontos(novaPontuacao);
         alunoRepository.save(aluno);
-    }
-    
-    public List<Conquista> listarConquistasDoAluno(Long alunoId) {
-        return conquistaRepository.findByAlunoId(alunoId);
     }
 }
