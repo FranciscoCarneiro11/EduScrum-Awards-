@@ -5,6 +5,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import com.eduscrum.awards.model.Premio;
@@ -21,7 +22,7 @@ import com.eduscrum.awards.repository.ConquistaRepository;
 import com.eduscrum.awards.model.PapelSistema;
 
 @SpringBootTest
-public class GamificacaoControlerIT {
+public class  GamificacaoControlerIT {
 
     private Disciplina disciplina;
 
@@ -152,7 +153,7 @@ public class GamificacaoControlerIT {
     @Test
     @DisplayName("Teste para listar as conquistas de um aluno")
     void testeListarConquistasDoAluno() {
-        // Criar Aluno
+
         aluno = new Aluno();
         aluno.setNome("Aluno Teste");
         aluno.setEmail("aluno@teste.com");
@@ -160,7 +161,7 @@ public class GamificacaoControlerIT {
         aluno.setPapelSistema(PapelSistema.ALUNO);
         alunoRepository.save(aluno);
 
-        // Criar Prémio e salvar
+
         Premio p = new Premio();
         p.setNome("Premio Directo");
         p.setDescricao("Desc");
@@ -178,4 +179,37 @@ public class GamificacaoControlerIT {
         assert (conquistas.get(0).getPremio().getId().equals(p.getId()));
     }
 
+
+    @Test 
+    @DisplayName("Teste para atualizar a pontuação total do aluno ao receber um prémio")
+    void testeAtualizarPontuacaoDoAluno() {
+        aluno = new Aluno();
+        aluno.setNome("Aluno Teste");
+        aluno.setEmail("aluno@teste.com");
+        aluno.setPasswordHash("senha123");
+        aluno.setPapelSistema(PapelSistema.ALUNO);
+        aluno.setTotalPontos(50);
+        alunoRepository.save(aluno);
+
+   
+
+
+        Premio p = new Premio();
+        p.setNome("Premio Directo");
+        p.setDescricao("Desc");
+        p.setValorPontos(20);
+        p.setTipo(Premio.TipoPremio.MANUAL);
+        p.setDisciplina(disciplina);
+        premioRepository.save(p);
+
+
+        var pontosAntes = aluno.getTotalPontos();
+        gamificacaoService.atribuirPremio(p.getId(), aluno.getId());
+
+        var alunoAtualizado = alunoRepository.findById(aluno.getId()).orElseThrow();
+        assertEquals(pontosAntes + p.getValorPontos(), alunoAtualizado.getTotalPontos());
+        
+
+       
+    }    
 }

@@ -67,4 +67,4 @@ public class RankingService {
                 .sorted(Comparator.comparingDouble(EquipaRankingDTO::getMediaPontos).reversed())
                 .collect(Collectors.toList());
     }
-}
+}   
