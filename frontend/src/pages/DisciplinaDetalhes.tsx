@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthContext"
 import api from "@/lib/api"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Users, FolderOpen, BookOpen, CalendarDays, Plus, Edit, Trash2, Sparkles, } from "lucide-react"
+import { Users, FolderOpen, BookOpen, CalendarDays, Plus, Edit, Trash2, ArrowLeft, Sparkles, } from "lucide-react"
 
 export default function DisciplinaDetalhes() {
   const { disciplinaId } = useParams()
@@ -72,7 +72,6 @@ export default function DisciplinaDetalhes() {
   }
 
   //API 
-
   async function carregarProjetos() {
     const response = await api.get(`/api/disciplinas/${disciplinaId}/projetos`)
     setProjetos(response.data)
@@ -208,9 +207,10 @@ export default function DisciplinaDetalhes() {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="bg-gradient-to-r from-gray-900 to-slate-800 rounded-2xl p-8 text-white shadow-lg mb-8">
-          <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4 text-white hover:bg-white/20 border-white/30">
+          <button onClick={() => navigate(-1)} className="flex items-center text-white/80 hover:text-white transition mb-4">
+            <ArrowLeft className="w-5 h-5 mr-2" />
             Voltar
-          </Button>
+          </button>
 
           <div className="flex items-start justify-between">
             <div>
