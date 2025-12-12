@@ -104,34 +104,22 @@ public class GamificacaoService {
     }
 
     private void atribuirPremioAutomatico(Aluno aluno, String nome, int pontos, Disciplina disciplina) {
+        // Criar o prémio na BD
+        Premio premio = new Premio();
+        premio.setNome(nome);
+        premio.setDescricao("Prémio automático: Sprint completada dentro do prazo!");
+        premio.setValorPontos(pontos);
+        premio.setDisciplina(disciplina);
 
-        // Tentar encontrar um prémio existente com o mesmo nome e disciplina
-        // Isto evita criar duplicados na tabela Premio
-        List<Premio> premiosExistentes = premioRepository.findByDisciplinaId(disciplina.getId());
-
-        Premio premio = premiosExistentes.stream()
-                .filter(p -> p.getNome().equals(nome) && p.getValorPontos() == pontos)
-                .findFirst()
-                .orElse(null);
-
-        // Se não existir, cria um novo
-        if (premio == null) {
-            premio = new Premio();
-            premio.setNome(nome);
-            premio.setDescricao("Prémio automático: Sprint completada dentro do prazo!");
-            premio.setValorPontos(pontos);
-            premio.setDisciplina(disciplina);
-
-            try {
-                premio.setTipo(Premio.TipoPremio.valueOf("AUTOMATICO"));
-            } catch (Exception e) {
-                premio.setTipo(Premio.TipoPremio.MANUAL);
-            }
-
-            premio = premioRepository.save(premio);
+        try {
+            premio.setTipo(Premio.TipoPremio.valueOf("AUTOMATICO"));
+        } catch (Exception e) {
+            premio.setTipo(Premio.TipoPremio.MANUAL);
         }
 
-        // Registar a conquista
+        premio = premioRepository.save(premio);
+
+        // Registar e atualizar pontos
         registarConquistaEAtualizarPontos(aluno, premio);
     }
 

@@ -181,9 +181,12 @@ export default function Sprints() {
         {/* HEADER */}
         <div className="bg-gradient-to-r from-gray-900 to-slate-800 rounded-2xl p-8 text-white shadow-lg mb-8">
           <div className="relative z-10">
-            <button onClick={() => navigate(-1)} className="flex items-center text-white/80 hover:text-white transition mb-4">
+            <button
+              onClick={() => navigate(-1)}
+              className="flex items-center text-white/80 hover:text-white transition mb-4"
+            >
               <ArrowLeft className="w-5 h-5 mr-2" />
-              Voltar
+              Voltar ao Projeto
             </button>
             <h1 className="text-4xl font-bold mb-2">Sprints do Projeto</h1>
             <p className="text-indigo-100 text-lg opacity-90">{projeto.nome}</p>
