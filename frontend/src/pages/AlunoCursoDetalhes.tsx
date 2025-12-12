@@ -111,9 +111,9 @@ export default function AlunoCursoDetalhes() {
       {/* Header */}
       <div className="max-w-6xl mx-auto mb-8">
         <div className="bg-gradient-to-r from-gray-900 to-slate-800 rounded-2xl p-8 text-white shadow-lg mb-8">
-          <button onClick={() => navigate("/aluno/cursos")} className="flex items-center text-white hover:text-white/80 transition mb-4">
+          <button onClick={() => navigate(-1)} className="flex items-center text-white/80 hover:text-white transition mb-4">
             <ArrowLeft className="w-5 h-5 mr-2" />
-            Voltar aos cursos
+            Voltar
           </button>
           <div className="flex items-start justify-between">
             <div>
