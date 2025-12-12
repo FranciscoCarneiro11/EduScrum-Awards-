@@ -8,18 +8,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-import { 
-  ArrowLeft, 
-  Plus, 
-  Trophy, 
-  Star, 
-  Award, 
-  Trash2, 
-  X, 
-  UserCheck 
-} from "lucide-react"
+import { ArrowLeft, Plus, Trophy, Star, Award, Trash2, X, UserCheck } from "lucide-react"
 
-// --- TIPOS ---
+//Tipos de dados 
 type Premio = {
   id: number
   nome: string
@@ -32,7 +23,7 @@ type Premio = {
 type Disciplina = {
   id: number
   nome: string
-  cursoId: number // Precisamos disto para buscar os alunos
+  cursoId: number
 }
 
 type Aluno = {
@@ -47,10 +38,10 @@ export default function Premios() {
   const { user } = useAuth()
   const isProfessor = user?.papelSistema === "PROFESSOR"
 
-  // --- ESTADOS ---
+  // ESTADOS 
   const [disciplina, setDisciplina] = useState<Disciplina | null>(null)
   const [premios, setPremios] = useState<Premio[]>([])
-  const [alunos, setAlunos] = useState<Aluno[]>([]) // Lista de alunos para o dropdown
+  const [alunos, setAlunos] = useState<Aluno[]>([])
   const [loading, setLoading] = useState(true)
 
   // Modal Criar Prémio
@@ -69,21 +60,21 @@ export default function Premios() {
   const [selectedAlunoId, setSelectedAlunoId] = useState<number | "">("")
   const [loadingAtribuir, setLoadingAtribuir] = useState(false)
 
-  // --- API ---
+  //API
   async function fetchData() {
     if (!disciplinaId) return
     try {
       setLoading(true)
-      
-      // 1. Buscar Disciplina
+
+      //Buscar Disciplina
       const discRes = await api.get<Disciplina>(`/api/disciplinas/${disciplinaId}`)
       setDisciplina(discRes.data)
 
-      // 2. Buscar Prémios da Disciplina
+      //Buscar Prémios da Disciplina
       const premiosRes = await api.get<Premio[]>(`/api/disciplinas/${disciplinaId}/premios`)
       setPremios(premiosRes.data)
 
-      // 3. Se for professor, buscar alunos do curso (para poder atribuir)
+      //Se for professor, buscar alunos do curso 
       if (isProfessor && discRes.data.cursoId) {
         const alunosRes = await api.get<Aluno[]>(`/api/cursos/${discRes.data.cursoId}/alunos`)
         setAlunos(alunosRes.data)
@@ -100,7 +91,7 @@ export default function Premios() {
     fetchData()
   }, [disciplinaId])
 
-  // --- ACTIONS: CRIAR ---
+  //CRIAR 
   async function handleCriarPremio(e: React.FormEvent) {
     e.preventDefault()
     if (!disciplinaId) return
@@ -111,7 +102,7 @@ export default function Premios() {
         ...novoPremio,
         disciplinaId: Number(disciplinaId)
       })
-      
+
       setShowCreateModal(false)
       setNovoPremio({ nome: "", descricao: "", valorPontos: 10, tipo: "MANUAL" })
       await fetchData()
@@ -123,7 +114,7 @@ export default function Premios() {
     }
   }
 
-  // --- ACTIONS: ATRIBUIR ---
+  //ATRIBUIR 
   function abrirModalAtribuir(premio: Premio) {
     setSelectedPremio(premio)
     setSelectedAlunoId("")
@@ -136,7 +127,7 @@ export default function Premios() {
     try {
       setLoadingAtribuir(true)
       await api.post(`/api/premios/${selectedPremio.id}/atribuir/${selectedAlunoId}`)
-      
+
       alert(`Prémio "${selectedPremio.nome}" atribuído com sucesso!`)
       setShowAssignModal(false)
     } catch (err) {
@@ -147,23 +138,20 @@ export default function Premios() {
     }
   }
 
-  // --- RENDER ---
+  //RENDER 
   if (loading) return <div className="flex h-screen items-center justify-center">A carregar prémios...</div>
   if (!disciplina) return <div className="flex h-screen items-center justify-center">Disciplina não encontrada.</div>
 
   return (
     <div className="min-h-screen bg-gray-50 px-6 py-10">
       <div className="max-w-6xl mx-auto">
-        
+
         {/* HEADER */}
         <div className="bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl p-8 text-white shadow-lg mb-8 relative overflow-hidden">
           <div className="relative z-10">
-            <button
-              onClick={() => navigate(-1)}
-              className="flex items-center text-white/80 hover:text-white transition mb-4"
-            >
+            <button onClick={() => navigate(-1)} className="flex items-center text-white/80 hover:text-white transition mb-4">
               <ArrowLeft className="w-5 h-5 mr-2" />
-              Voltar à Disciplina
+              Voltar
             </button>
             <h1 className="text-4xl font-bold mb-2">Prémios & Gamificação</h1>
             <p className="text-orange-100 text-lg opacity-90">{disciplina.nome}</p>
@@ -174,7 +162,7 @@ export default function Premios() {
         {/* ACTION BAR */}
         {isProfessor && (
           <div className="flex justify-end mb-6">
-            <Button 
+            <Button
               onClick={() => setShowCreateModal(true)}
               className="bg-orange-600 hover:bg-orange-700 text-white shadow-md transition-all hover:shadow-lg"
             >
@@ -200,7 +188,7 @@ export default function Premios() {
             premios.map((premio) => (
               <Card key={premio.id} className="group hover:shadow-lg transition-all border-orange-100 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-20 h-20 bg-orange-50 rounded-full -mr-10 -mt-10 transition-transform group-hover:scale-150"></div>
-                
+
                 <CardContent className="p-6 relative z-10">
                   <div className="flex justify-between items-start mb-4">
                     <div className="p-3 bg-orange-100 text-orange-600 rounded-xl">
@@ -218,7 +206,7 @@ export default function Premios() {
 
                   {isProfessor && (
                     <div className="flex gap-2">
-                      <Button 
+                      <Button
                         onClick={() => abrirModalAtribuir(premio)}
                         className="flex-1 bg-gray-900 text-white hover:bg-gray-800"
                       >
@@ -250,31 +238,31 @@ export default function Premios() {
             <form onSubmit={handleCriarPremio} className="p-6 space-y-4">
               <div>
                 <Label>Nome do Prémio</Label>
-                <Input 
-                  placeholder="Ex: Rei do Código" 
+                <Input
+                  placeholder="Ex: Rei do Código"
                   value={novoPremio.nome}
-                  onChange={e => setNovoPremio({...novoPremio, nome: e.target.value})}
+                  onChange={e => setNovoPremio({ ...novoPremio, nome: e.target.value })}
                   required
                 />
               </div>
 
               <div>
                 <Label>Descrição</Label>
-                <Input 
-                  placeholder="Ex: Código limpo e sem bugs" 
+                <Input
+                  placeholder="Ex: Código limpo e sem bugs"
                   value={novoPremio.descricao}
-                  onChange={e => setNovoPremio({...novoPremio, descricao: e.target.value})}
+                  onChange={e => setNovoPremio({ ...novoPremio, descricao: e.target.value })}
                   required
                 />
               </div>
 
               <div>
                 <Label>Valor em Pontos</Label>
-                <Input 
+                <Input
                   type="number"
                   min="1"
                   value={novoPremio.valorPontos}
-                  onChange={e => setNovoPremio({...novoPremio, valorPontos: Number(e.target.value)})}
+                  onChange={e => setNovoPremio({ ...novoPremio, valorPontos: Number(e.target.value) })}
                   required
                 />
               </div>
@@ -331,8 +319,8 @@ export default function Premios() {
                 )}
               </div>
 
-              <Button 
-                onClick={handleAtribuirPremio} 
+              <Button
+                onClick={handleAtribuirPremio}
                 className="w-full bg-gray-900 hover:bg-gray-800 text-white"
                 disabled={!selectedAlunoId || loadingAtribuir}
               >
