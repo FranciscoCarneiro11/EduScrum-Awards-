@@ -34,6 +34,11 @@ public class SprintService {
         Projeto projeto = projetoRepository.findById(projetoId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Projeto não encontrado"));
 
+        // Validar se dataFim é anterior a dataInicio
+        if (dto.getDataFim().isBefore(dto.getDataInicio())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Data Fim não pode ser anterior a Data Início");
+        }
+
         Sprint sprint = new Sprint(dto.getNome(), dto.getObjetivos(), dto.getDataInicio(), dto.getDataFim(), projeto);
         // Assumimos estado inicial padrão se não vier no DTO
         if (dto.getEstado() != null) {
@@ -53,6 +58,11 @@ public class SprintService {
     public SprintDTO atualizar(Long id, SprintDTO dto) {
         Sprint sprint = sprintRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sprint não encontrada"));
+
+        // Validar se dataFim é anterior a dataInicio
+        if (dto.getDataFim().isBefore(dto.getDataInicio())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Data Fim não pode ser anterior a Data Início");
+        }
 
         String estadoAntigo = sprint.getEstado();
 

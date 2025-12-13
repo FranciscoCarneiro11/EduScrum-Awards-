@@ -311,4 +311,25 @@ class SprintControllerIT {
         assertEquals("Sprint Projeto 1", sprintsProjeto1.get(0).getNome());
         assertEquals("Sprint Projeto 2", sprintsProjeto2.get(0).getNome());
     }
+
+
+    @Test
+    @DisplayName("Deve Lançar exceçao ao criar sprint quando a data dim for anterior a date inicio")
+    void develancarExcecaoaoQuandoDataFimAnteriorDataInicio(){
+        SprintDTO dto = new SprintDTO();
+        dto.setNome("Sprint Inválido");
+        dto.setObjetivos("Não deve funcionar");
+        dto.setDataInicio(LocalDate.of(2025, 1, 15));
+        dto.setDataFim(LocalDate.of(2025, 1, 14));
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> sprintService.criar(projetoTeste.getId(), dto),"Data Fim não pode ser anterior a Data Início");
+
+
+        assertEquals(400, exception.getStatusCode().value());
+        assertTrue(exception.getReason().contains("Data Fim não pode ser anterior a Data Início"));
+
+
+    }
 }
