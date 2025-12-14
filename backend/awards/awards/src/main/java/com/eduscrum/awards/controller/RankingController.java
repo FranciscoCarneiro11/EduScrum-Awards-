@@ -9,6 +9,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Controlador responsável pela gestão de Rankings no sistema EduScrum.
+ * Este controlador permite obter o ranking global de alunos,
+ * o ranking de alunos por curso e o ranking de equipas por projeto.
+ */
 @RestController
 @RequestMapping("/api/rankings")
 @CrossOrigin(origins = "*")

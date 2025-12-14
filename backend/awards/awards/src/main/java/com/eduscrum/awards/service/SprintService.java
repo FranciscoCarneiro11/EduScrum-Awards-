@@ -14,6 +14,11 @@ import org.springframework.context.annotation.Lazy;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Serviço responsável pela gestão de Sprints no sistema EduScrum.
+ * Este serviço permite criar, listar, atualizar e eliminar sprints,
+ * bem como processar premiações ao final de cada sprint.
+ */
 @Service
 @Transactional
 public class SprintService {

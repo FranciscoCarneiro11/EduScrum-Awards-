@@ -7,6 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
+/**
+ * Controlador responsável pela gestão de Sprints no sistema EduScrum.
+ * Este controlador permite criar, listar e eliminar sprints.
+ */
 @RestController
 @RequestMapping("/api")
 @CrossOrigin(origins = "*")

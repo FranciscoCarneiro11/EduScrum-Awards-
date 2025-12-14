@@ -11,6 +11,11 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Serviço responsável pela gestão de Projetos no sistema EduScrum.
+ * Este serviço permite criar, listar, atualizar e eliminar projetos,
+ * bem como consultar projetos associados a disciplinas ou cursos específicos.
+ */
 @Service
 public class ProjetoService {
 
@@ -27,6 +32,16 @@ public class ProjetoService {
 
         // POST /api/disciplinas/{id}/projetos
         public ProjetoDTO criarProjeto(Long disciplinaId, ProjetoRequestDTO dto) {
+
+                // --- VALIDAÇÃO DE DATAS ---
+                if (dto.getDataInicio() != null && dto.getDataFim() != null) {
+                        if (dto.getDataInicio().isAfter(dto.getDataFim())) {
+                                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                                "A data de início não pode ser posterior à data de fim.");
+                        }
+                }
+                // --------------------------
+
                 Disciplina disciplina = disciplinaRepository.findById(disciplinaId)
                                 .orElseThrow(() -> new ResponseStatusException(
                                                 HttpStatus.NOT_FOUND, "Disciplina não encontrada"));
@@ -66,6 +81,15 @@ public class ProjetoService {
                 Projeto projeto = projetoRepository.findById(projetoId)
                                 .orElseThrow(() -> new ResponseStatusException(
                                                 HttpStatus.NOT_FOUND, "Projeto não encontrado"));
+
+                // --- VALIDAÇÃO DE DATAS ---
+                if (dto.getDataInicio() != null && dto.getDataFim() != null) {
+                        if (dto.getDataInicio().isAfter(dto.getDataFim())) {
+                                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                                "A data de início não pode ser posterior à data de fim.");
+                        }
+                }
+                // --------------------------
 
                 projeto.setNome(dto.getNome());
                 projeto.setDescricao(dto.getDescricao());

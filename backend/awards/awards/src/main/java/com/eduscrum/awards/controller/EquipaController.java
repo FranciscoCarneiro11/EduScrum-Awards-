@@ -13,6 +13,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Controlador responsável pela gestão de Equipas no sistema EduScrum.
+ * Este controlador permite listar todas as equipas de um projeto,
+ * obter uma equipa por ID, criar, atualizar e eliminar equipas.
+ */
 @RestController
 @RequestMapping("/api/equipas")
 @CrossOrigin(origins = "*")
@@ -30,7 +35,7 @@ public class EquipaController {
         return service.listar();
     }
 
-    // LISTAR POR PROJETO  
+    // LISTAR POR PROJETO
     @GetMapping("/projeto/{idProjeto}")
     public List<EquipaDTO> listarPorProjeto(@PathVariable Long idProjeto) {
         return service.listarPorProjeto(idProjeto);

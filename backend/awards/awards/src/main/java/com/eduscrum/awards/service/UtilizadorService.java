@@ -18,6 +18,11 @@ import com.eduscrum.awards.repository.ProfessorRepository;
 import com.eduscrum.awards.repository.UtilizadorRepository;
 import com.eduscrum.awards.repository.AdminRepository;
 
+/**
+ * Serviço responsável pela gestão de Utilizadores no sistema EduScrum.
+ * Este serviço permite criar, listar, atualizar e eliminar utilizadores,
+ * bem como consultar utilizadores por email.
+ */
 @Service
 public class UtilizadorService {
 

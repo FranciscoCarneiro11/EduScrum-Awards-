@@ -12,6 +12,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Serviço responsável pela gestão das Equipas Scrum.
+ * Fornece funcionalidades para criar, atualizar, listar e eliminar equipas,
+ * bem como gerir os membros (alunos/utilizadores) e os seus papéis Scrum dentro
+ * de cada equipa.
+ */
 @Service
 @Transactional
 public class EquipaService {
@@ -33,7 +39,7 @@ public class EquipaService {
         this.utilizadorRepository = utilizadorRepository;
     }
 
-    //LISTAR TODAS AS EQUIPAS
+    // LISTAR TODAS AS EQUIPAS
     public List<EquipaDTO> listar() {
         return equipaRepository.findAll()
                 .stream()
@@ -41,7 +47,7 @@ public class EquipaService {
                 .collect(Collectors.toList());
     }
 
-    //LISTAR EQUIPAS POR PROJETO 
+    // LISTAR EQUIPAS POR PROJETO
     public List<EquipaDTO> listarPorProjeto(Long projetoId) {
 
         // Garante que o projeto existe
@@ -64,7 +70,7 @@ public class EquipaService {
     public EquipaDTO criar(EquipaCreateDTO dto) {
 
         if (equipaRepository.existsByNome(dto.getNome())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,"Nome já existe");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Nome já existe");
         }
 
         Equipa e = new Equipa();
@@ -147,15 +153,15 @@ public class EquipaService {
 
         MembroEquipa me = membroEquipaRepository
                 .findByEquipaIdAndUtilizadorId(idEquipa, idUtilizador)
-                .orElseThrow(() ->
-                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Membro não encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Membro não encontrado"));
 
         membroEquipaRepository.delete(me);
     }
 
     // CONVERSÃO PARA DTO
     private EquipaDTO toDTO(Equipa e) {
-        if (e == null) return null;
+        if (e == null)
+            return null;
 
         Long idProjeto = (e.getProjeto() != null) ? e.getProjeto().getId() : null;
 
@@ -168,7 +174,8 @@ public class EquipaService {
     }
 
     private MembroEquipaDTO toMembroDTO(MembroEquipa me) {
-        if (me == null) return null;
+        if (me == null)
+            return null;
 
         Utilizador u = me.getUtilizador();
 

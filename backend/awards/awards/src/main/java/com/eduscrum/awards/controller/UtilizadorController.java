@@ -18,6 +18,12 @@ import com.eduscrum.awards.model.Utilizador;
 import com.eduscrum.awards.model.UtilizadorDTO;
 import com.eduscrum.awards.service.UtilizadorService;
 
+/**
+ * Controlador responsável pela gestão de Utilizadores no sistema EduScrum.
+ * Este controlador permite obter o utilizador logado,
+ * listar todos os utilizadores,
+ * criar um novo utilizador e eliminar um utilizador.
+ */
 @RestController
 @RequestMapping("/api/utilizadores")
 @CrossOrigin(origins = "*")
@@ -26,7 +32,7 @@ public class UtilizadorController {
     @Autowired
     private UtilizadorService utilizadorService;
 
-    //Obter utilizador logado
+    // Obter utilizador logado
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(Authentication authentication) {
         // Verifica se o utilizador está autenticado
@@ -37,14 +43,13 @@ public class UtilizadorController {
         String email = authentication.getName();
 
         Utilizador user = utilizadorService.procurarPorEmail(email)
-            .orElseThrow(() -> new RuntimeException("Utilizador não encontrado"));
+                .orElseThrow(() -> new RuntimeException("Utilizador não encontrado"));
 
         UtilizadorDTO userDTO = new UtilizadorDTO(
-            user.getNome(),
-            user.getEmail(),
-            null, 
-            user.getPapelSistema()
-        );
+                user.getNome(),
+                user.getEmail(),
+                null,
+                user.getPapelSistema());
 
         return ResponseEntity.ok(userDTO);
     }
@@ -59,11 +64,10 @@ public class UtilizadorController {
     @PostMapping
     public Utilizador criarUtilizador(@RequestBody UtilizadorDTO utilizadorDTO) {
         return utilizadorService.criarUtilizador(
-            utilizadorDTO.getNome(), 
-            utilizadorDTO.getEmail(), 
-            utilizadorDTO.getPassword(), 
-            utilizadorDTO.getPapelSistema()
-        );
+                utilizadorDTO.getNome(),
+                utilizadorDTO.getEmail(),
+                utilizadorDTO.getPassword(),
+                utilizadorDTO.getPapelSistema());
     }
 
     // Endpoint para eliminar um utilizador

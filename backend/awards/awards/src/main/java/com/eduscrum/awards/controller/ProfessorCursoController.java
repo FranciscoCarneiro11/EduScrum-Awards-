@@ -10,6 +10,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Controlador responsável pela gestão de Professor-Curso no sistema EduScrum.
+ * Este controlador permite listar todos os cursos de um professor,
+ * associar um professor a um curso e desassociar um professor de um curso.
+ */
 @RestController
 @RequestMapping("/api/professores")
 @CrossOrigin(origins = "*")

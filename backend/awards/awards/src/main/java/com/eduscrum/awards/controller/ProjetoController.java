@@ -9,6 +9,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Controlador responsável pela gestão de Projetos no sistema EduScrum.
+ * Este controlador permite listar todos os projetos,
+ * obter um projeto por ID, criar, atualizar e eliminar projetos.
+ */
 @RestController
 @RequestMapping("/api")
 public class ProjetoController {

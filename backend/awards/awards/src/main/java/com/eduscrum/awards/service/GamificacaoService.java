@@ -10,6 +10,14 @@ import java.util.List;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * Serviço responsável pelo módulo de Gamificação do sistema EduScrum.
+ * Este serviço gere a criação de prémios, a atribuição de conquistas (manuais e
+ * automáticas)
+ * e o cálculo da pontuação dos alunos. Inclui lógica para processar recompensas
+ * baseadas
+ * no desempenho das equipas em Sprints.
+ */
 @Service
 @Transactional
 public class GamificacaoService {

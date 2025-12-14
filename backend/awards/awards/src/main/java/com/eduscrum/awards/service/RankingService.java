@@ -10,6 +10,13 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Serviço responsável pelo cálculo e disponibilização dos rankings do sistema.
+ * Fornece métricas de desempenho para a gamificação, incluindo classificações
+ * globais de alunos,
+ * classificações por curso e classificações de equipas dentro de projetos
+ * (baseadas na média de pontos dos membros).
+ */
 @Service
 @Transactional(readOnly = true)
 public class RankingService {
@@ -25,7 +32,7 @@ public class RankingService {
         this.membroEquipaRepository = membroEquipaRepository;
     }
 
-    // --- Ranking Individual ---
+    // Ranking Individual
 
     public List<Aluno> getRankingGlobal() {
         return alunoRepository.findAllByOrderByTotalPontosDesc();
@@ -35,7 +42,7 @@ public class RankingService {
         return alunoRepository.findTopAlunosByCurso(cursoId);
     }
 
-    // --- Ranking de Equipas ---
+    // Ranking de Equipas
 
     public List<EquipaRankingDTO> getRankingEquipasPorProjeto(Long projetoId) {
         List<Equipa> equipas = equipaRepository.findByProjetoId(projetoId);
@@ -67,4 +74,4 @@ public class RankingService {
                 .sorted(Comparator.comparingDouble(EquipaRankingDTO::getMediaPontos).reversed())
                 .collect(Collectors.toList());
     }
-}   
+}

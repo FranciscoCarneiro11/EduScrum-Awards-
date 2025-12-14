@@ -292,14 +292,6 @@ export default function EquipaMembros() {
                   <button type="button" onClick={() => setSelectedPapel("DEV")} className={`py-2 text-xs font-medium rounded-md border transition ${selectedPapel === "DEV" ? "bg-green-50 border-green-500 text-green-700" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}>Developer</button>
                   <button type="button" onClick={() => setSelectedPapel("SM")} className={`py-2 text-xs font-medium rounded-md border transition ${selectedPapel === "SM" ? "bg-yellow-50 border-yellow-500 text-yellow-700" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}>Scrum Master</button>
                   <button type="button" onClick={() => setSelectedPapel("PO")} className={`py-2 text-xs font-medium rounded-md border transition ${selectedPapel === "PO" ? "bg-blue-50 border-blue-500 text-blue-700" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}>Product Owner</button>
-                  <button type="button" onClick={() => setSelectedPapel("PO")} className={`py-2 text-xs font-medium rounded-md border transition
-                      ${selectedPapel === "PO"
-                      ? "bg-blue-50 border-blue-500 text-blue-700"
-                      : "border-gray-200 text-gray-600 hover:bg-gray-50"
-                    }`}
-                  >
-                    Product Owner
-                  </button>
                 </div>
               </div>
 

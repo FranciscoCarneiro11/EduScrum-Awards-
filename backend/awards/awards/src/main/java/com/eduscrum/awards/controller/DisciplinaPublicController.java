@@ -9,6 +9,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Controlador responsável pela gestão de Disciplinas no sistema EduScrum.
+ * Este controlador permite listar todas as disciplinas de um curso,
+ * obter uma disciplina por ID, criar, atualizar e eliminar disciplinas.
+ */
 @RestController
 @RequestMapping("/api/disciplinas")
 @CrossOrigin(origins = "*")
@@ -18,7 +23,7 @@ public class DisciplinaPublicController {
     private final ProjetoService projetoService;
 
     public DisciplinaPublicController(DisciplinaService disciplinaService,
-                                      ProjetoService projetoService) {
+            ProjetoService projetoService) {
         this.disciplinaService = disciplinaService;
         this.projetoService = projetoService;
     }
@@ -41,4 +46,3 @@ public class DisciplinaPublicController {
         return ResponseEntity.ok(projetos);
     }
 }
-

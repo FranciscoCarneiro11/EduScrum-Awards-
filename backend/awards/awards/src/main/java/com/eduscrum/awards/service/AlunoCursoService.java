@@ -14,6 +14,12 @@ import com.eduscrum.awards.repository.AlunoCursoRepository;
 import com.eduscrum.awards.repository.CursoRepository;
 import com.eduscrum.awards.repository.UtilizadorRepository;
 
+/**
+ * Serviço responsável pela gestão da associação entre Alunos e Cursos.
+ * Esta classe implementa a lógica de negócio necessária para matricular alunos,
+ * verificar restrições de inscrição (ex: um aluno num único curso) e gerir a
+ * remoção de alunos dos cursos.
+ */
 @Service
 public class AlunoCursoService {
 
@@ -21,7 +27,8 @@ public class AlunoCursoService {
     private final UtilizadorRepository utilizadorRepository;
     private final CursoRepository cursoRepository;
 
-    public AlunoCursoService(AlunoCursoRepository alunoCursoRepository,UtilizadorRepository utilizadorRepository,CursoRepository cursoRepository) {
+    public AlunoCursoService(AlunoCursoRepository alunoCursoRepository, UtilizadorRepository utilizadorRepository,
+            CursoRepository cursoRepository) {
         this.alunoCursoRepository = alunoCursoRepository;
         this.utilizadorRepository = utilizadorRepository;
         this.cursoRepository = cursoRepository;
@@ -35,7 +42,6 @@ public class AlunoCursoService {
         if (aluno.getPapelSistema() != PapelSistema.ALUNO) {
             throw new RuntimeException("Utilizador não é um aluno.");
         }
-
 
         Curso curso = cursoRepository.findById(cursoId)
                 .orElseThrow(() -> new RuntimeException("Curso não encontrado"));

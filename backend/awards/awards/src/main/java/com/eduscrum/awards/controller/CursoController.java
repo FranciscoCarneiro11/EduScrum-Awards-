@@ -13,6 +13,11 @@ import com.eduscrum.awards.model.CursoResponseDTO;
 import com.eduscrum.awards.model.Utilizador;
 import com.eduscrum.awards.service.CursoService;
 
+/**
+ * Controlador responsável pela gestão de Cursos no sistema EduScrum.
+ * Este controlador permite listar todos os cursos, obter um curso por ID,
+ * listar professores e alunos de um curso, criar, atualizar e eliminar cursos.
+ */
 @RestController
 @RequestMapping("/api/cursos")
 @CrossOrigin(origins = "*")
@@ -44,11 +49,11 @@ public class CursoController {
     @GetMapping("/{id}/professores")
     public ResponseEntity<List<UtilizadorSimplificadoDTO>> listarProfessoresDoCurso(@PathVariable Long id) {
         List<Utilizador> professores = cursoService.listarProfessoresDoCurso(id);
-        
+
         List<UtilizadorSimplificadoDTO> professoresDTO = professores.stream()
                 .map(p -> new UtilizadorSimplificadoDTO(p.getId(), p.getNome(), p.getEmail()))
                 .collect(Collectors.toList());
-        
+
         return ResponseEntity.ok(professoresDTO);
     }
 
@@ -56,11 +61,11 @@ public class CursoController {
     @GetMapping("/{id}/alunos")
     public ResponseEntity<List<UtilizadorSimplificadoDTO>> listarAlunosDoCurso(@PathVariable Long id) {
         List<Utilizador> alunos = cursoService.listarAlunosDoCurso(id);
-        
+
         List<UtilizadorSimplificadoDTO> alunosDTO = alunos.stream()
                 .map(a -> new UtilizadorSimplificadoDTO(a.getId(), a.getNome(), a.getEmail()))
                 .collect(Collectors.toList());
-        
+
         return ResponseEntity.ok(alunosDTO);
     }
 
@@ -97,13 +102,29 @@ public class CursoController {
             this.email = email;
         }
 
-        public Long getId() { return id; }
-        public String getNome() { return nome; }
-        public String getEmail() { return email; }
-        
-        public void setId(Long id) { this.id = id; }
-        public void setNome(String nome) { this.nome = nome; }
-        public void setEmail(String email) { this.email = email; }
+        public Long getId() {
+            return id;
+        }
+
+        public String getNome() {
+            return nome;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setId(Long id) {
+            this.id = id;
+        }
+
+        public void setNome(String nome) {
+            this.nome = nome;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
     }
 
 }

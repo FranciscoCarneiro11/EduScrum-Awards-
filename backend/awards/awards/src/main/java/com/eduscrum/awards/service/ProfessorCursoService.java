@@ -20,6 +20,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Serviço responsável pela gestão da associação entre Professores e Cursos.
+ * Inclui funcionalidades para atribuir professores a cursos, remover essas
+ * atribuições
+ * e funcionalidades de relatório, como a exportação de notas/pontos dos alunos
+ * para CSV.
+ */
 @Service
 @Transactional
 public class ProfessorCursoService {
@@ -87,7 +94,6 @@ public class ProfessorCursoService {
 
         for (AlunoCurso ac : inscricoes) {
             // Desembrulhar o Proxy do Hibernate
-            // transforma o "Utilizador$HibernateProxy" no objeto real "Aluno"
             Object entity = Hibernate.unproxy(ac.getAluno());
 
             if (entity instanceof Aluno) {

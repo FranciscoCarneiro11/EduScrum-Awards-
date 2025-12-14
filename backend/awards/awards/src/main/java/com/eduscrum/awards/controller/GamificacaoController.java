@@ -9,6 +9,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Controlador responsável pela gestão de Gamificação no sistema EduScrum.
+ * Este controlador permite criar prémios em disciplinas,
+ * listar prémios de uma disciplina,
+ * atribuir prémios a alunos e listar conquistas de um aluno.
+ */
 @RestController
 @RequestMapping("/api")
 @CrossOrigin(origins = "*")
@@ -38,7 +44,7 @@ public class GamificacaoController {
         service.atribuirPremio(premioId, alunoId);
         return ResponseEntity.ok().build();
     }
-    
+
     // Listar conquistas de um aluno (para o perfil/dashboard)
     @GetMapping("/alunos/{alunoId}/conquistas")
     public ResponseEntity<List<Conquista>> listarConquistas(@PathVariable Long alunoId) {

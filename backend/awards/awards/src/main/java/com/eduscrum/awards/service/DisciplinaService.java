@@ -10,13 +10,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
+/**
+ * Serviço responsável pela gestão de Disciplinas.
+ * Implementa a lógica de negócio para criar, listar, atualizar e remover
+ * disciplinas,
+ * garantindo a integridade dos dados e a associação correta com os Cursos.
+ */
 @Service
 public class DisciplinaService {
 
     private final DisciplinaRepository disciplinaRepository;
     private final CursoRepository cursoRepository;
 
-    public DisciplinaService(DisciplinaRepository disciplinaRepository,CursoRepository cursoRepository ) {
+    public DisciplinaService(DisciplinaRepository disciplinaRepository, CursoRepository cursoRepository) {
         this.disciplinaRepository = disciplinaRepository;
         this.cursoRepository = cursoRepository;
     }
@@ -24,7 +30,7 @@ public class DisciplinaService {
     @Transactional
     public Disciplina criarDisciplina(Long cursoId, DisciplinaDTO dto) {
         Curso curso = cursoRepository.findById(cursoId)
-            .orElseThrow(() -> new RuntimeException("Curso não encontrado com ID: " + cursoId));
+                .orElseThrow(() -> new RuntimeException("Curso não encontrado com ID: " + cursoId));
 
         Disciplina disciplina = new Disciplina();
         disciplina.setNome(dto.getNome());
@@ -41,7 +47,7 @@ public class DisciplinaService {
     @Transactional
     public Disciplina atualizarDisciplina(Long disciplinaId, DisciplinaDTO dto) {
         Disciplina disciplina = disciplinaRepository.findById(disciplinaId)
-            .orElseThrow(() -> new RuntimeException("Disciplina não encontrada com ID: " + disciplinaId));
+                .orElseThrow(() -> new RuntimeException("Disciplina não encontrada com ID: " + disciplinaId));
 
         disciplina.setNome(dto.getNome());
         disciplina.setCodigo(dto.getCodigo());
@@ -59,8 +65,8 @@ public class DisciplinaService {
 
     public DisciplinaDetalhesDTO obterDisciplina(Long disciplinaId) {
         Disciplina disciplina = disciplinaRepository.findById(disciplinaId)
-            .orElseThrow(() -> new RuntimeException(
-                "Disciplina não encontrada com ID: " + disciplinaId));
+                .orElseThrow(() -> new RuntimeException(
+                        "Disciplina não encontrada com ID: " + disciplinaId));
 
         Curso curso = disciplina.getCurso();
 
@@ -77,8 +83,7 @@ public class DisciplinaService {
                 disciplina.getNome(),
                 disciplina.getCodigo(),
                 cursoId,
-                cursoNome
-        );
+                cursoNome);
     }
-    
+
 }

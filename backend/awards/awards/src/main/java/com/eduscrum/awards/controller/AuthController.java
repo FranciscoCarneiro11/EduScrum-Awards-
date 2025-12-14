@@ -17,6 +17,11 @@ import com.eduscrum.awards.model.UtilizadorDTO;
 import com.eduscrum.awards.repository.UtilizadorRepository;
 import com.eduscrum.awards.security.JwtUtil;
 
+/**
+ * Controlador responsável pela gestão de autenticação no sistema EduScrum.
+ * Este controlador permite efetuar login e registro de utilizadores,
+ * bem como gerir tokens de autenticação.
+ */
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "*")

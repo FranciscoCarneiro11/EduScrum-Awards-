@@ -15,6 +15,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Serviço responsável pela gestão de Cursos no sistema EduScrum.
+ * Fornece funcionalidades para criar, listar, atualizar e eliminar cursos,
+ * bem como consultar os professores e alunos associados a cada curso.
+ */
 @Service
 public class CursoService {
 
@@ -24,7 +29,8 @@ public class CursoService {
     private final AlunoCursoRepository alunoCursoRepository;
 
     @Autowired
-    public CursoService(CursoRepository cursoRepository, AdminRepository adminRepository,ProfessorCursoRepository professorCursoRepository,AlunoCursoRepository alunoCursoRepository) {
+    public CursoService(CursoRepository cursoRepository, AdminRepository adminRepository,
+            ProfessorCursoRepository professorCursoRepository, AlunoCursoRepository alunoCursoRepository) {
         this.cursoRepository = cursoRepository;
         this.adminRepository = adminRepository;
         this.professorCursoRepository = professorCursoRepository;
@@ -49,10 +55,11 @@ public class CursoService {
 
         // Log para debug
         System.out.println("Buscar professores do curso com ID: " + cursoId);
-        
+
         // Busca todas as associações professor-curso
         List<Utilizador> professores = professorCursoRepository.findAll().stream()
-                .peek(pc -> System.out.println("  - ProfessorCurso: professorId=" + pc.getProfessor().getId() + ", cursoId=" + pc.getCurso().getId()))
+                .peek(pc -> System.out.println("  - ProfessorCurso: professorId=" + pc.getProfessor().getId()
+                        + ", cursoId=" + pc.getCurso().getId()))
                 .filter(pc -> pc.getCurso().getId().equals(cursoId))
                 .map(pc -> {
                     Utilizador prof = pc.getProfessor();
@@ -60,7 +67,7 @@ public class CursoService {
                     return prof;
                 })
                 .collect(Collectors.toList());
-        
+
         System.out.println("Total de professores encontrados: " + professores.size());
         return professores;
     }
@@ -73,10 +80,11 @@ public class CursoService {
 
         // Log para debug
         System.out.println("Buscar alunos do curso com ID: " + cursoId);
-        
+
         // Busca todas as associações aluno-curso
         List<Utilizador> alunos = alunoCursoRepository.findAll().stream()
-                .peek(ac -> System.out.println("  - AlunoCurso: alunoId=" + ac.getAluno().getId() + ", cursoId=" + ac.getCurso().getId()))
+                .peek(ac -> System.out.println(
+                        "  - AlunoCurso: alunoId=" + ac.getAluno().getId() + ", cursoId=" + ac.getCurso().getId()))
                 .filter(ac -> ac.getCurso().getId().equals(cursoId))
                 .map(ac -> {
                     Utilizador aluno = ac.getAluno();
@@ -84,7 +92,7 @@ public class CursoService {
                     return aluno;
                 })
                 .collect(Collectors.toList());
-        
+
         System.out.println("Total de alunos encontrados: " + alunos.size());
         return alunos;
     }
@@ -98,7 +106,7 @@ public class CursoService {
         if (dto.adminId == null) {
             throw new RuntimeException("É necessário especificar um admin");
         }
-        
+
         Admin admin = adminRepository.findById(dto.adminId)
                 .orElseThrow(() -> new RuntimeException("Admin não encontrado com ID: " + dto.adminId));
 
